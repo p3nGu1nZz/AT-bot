@@ -1,16 +1,23 @@
 # Agents and Automation for AT-bot
 
-This document outlines how AI agents and automated systems can enhance the AT-bot project, enabling more sophisticated workflows and collaborative development patterns.
+This document outlines how AI agents and automated systems can enhance the AT-bot project through MCP (Model Context Protocol) integration, enabling sophisticated agentic workflows and collaborative development patterns.
+
+**Core Concept**: AT-bot exposes AT Protocol/Bluesky capabilities through both a CLI interface and an MCP server, allowing agents to seamlessly interact with Bluesky without parsing shell output or managing sessions manually.
 
 **📌 Quick Links:**
-- [PLAN.md](PLAN.md) - Strategic roadmap and architecture
+- [PLAN.md](PLAN.md) - Strategic roadmap with MCP integration timeline
 - [STYLE.md](STYLE.md) - Coding standards and best practices
-- [TODO.md](TODO.md) - Project tasks and feature checklist
+- [TODO.md](TODO.md) - Project tasks and MCP-specific features
 - [.github/copilot-instructions.md](.github/copilot-instructions.md) - AI agent coding guidelines
 
 ## Overview
 
-AT-bot serves as a foundational tool for AT Protocol interactions, making it an ideal platform for agent-based automation. This document explores opportunities for integrating intelligent agents, automated workflows, and collaborative systems.
+AT-bot serves as a foundational infrastructure layer for AT Protocol interactions. The project provides two primary interfaces:
+
+1. **CLI Interface** (`bin/at-bot`): Direct command-line access for users and scripts
+2. **MCP Server Interface** (`at-bot-mcp-server`): Standardized JSON-RPC interface for AI agents
+
+This document explores opportunities for integrating intelligent agents through MCP, enabling next-generation automation workflows where agents collaborate with Bluesky as a native communication and coordination platform.
 
 ## AI Agent Integration Opportunities
 
@@ -131,73 +138,96 @@ at-bot post "$STATUS"
 - Track user sentiment
 - Generate monthly community reports
 
-## Implementation Architecture
+## MCP Server Integration
 
-### Core Components
+### What is MCP (Model Context Protocol)?
 
-```
-AT-bot Agents Architecture
+MCP is an open protocol for connecting AI models and agents to data and tools. It uses JSON-RPC 2.0 over stdio, making it language-agnostic and lightweight. AT-bot's MCP server exposes Bluesky/AT Protocol capabilities as standardized tools.
 
-┌─────────────────────┐
-│   External Events   │
-│  (GitHub, CI/CD,   │
-│   User Actions)     │
-└─────────┬───────────┘
-          │
-          ▼
-┌─────────────────────┐
-│   Event Processor   │
-│  (Webhook Handler)  │
-└─────────┬───────────┘
-          │
-          ▼
-┌─────────────────────┐
-│   Agent Controller  │
-│ (Decision Engine)   │
-└─────────┬───────────┘
-          │
-          ▼
-┌─────────────────────┐
-│     AT-bot Core     │
-│  (Authentication &  │
-│   API Interface)    │
-└─────────┬───────────┘
-          │
-          ▼
-┌─────────────────────┐
-│   Bluesky/AT Proto  │
-│     Network         │
-└─────────────────────┘
-```
+**Key Benefits:**
+- **Standardized Interface**: Agents use the same protocol regardless of underlying implementation
+- **Discoverable Tools**: Agents can discover available capabilities automatically
+- **Composable**: Tools can be combined and chained by agents
+- **Secure**: Authentication and permission management built-in
+- **Extensible**: New tools can be added without modifying the protocol
 
-### Agent Configuration
+### MCP Tools for AT-bot
+
+The AT-bot MCP server exposes tools organized by category:
+
+**Authentication Tools**
+- `auth_login` - Authenticate user
+- `auth_logout` - Clear session
+- `auth_whoami` - Get current user info
+- `auth_is_authenticated` - Check authentication status
+
+**Content Tools**
+- `post_create` - Create a new post/bleet
+- `post_reply` - Reply to existing post
+- `post_like` - Like a post
+- `post_repost` - Repost content
+- `post_delete` - Delete a post
+
+**Feed Tools**
+- `feed_read` - Read user feed
+- `feed_search` - Search posts
+- `feed_timeline` - Get timeline
+- `feed_notifications` - Get notifications
+
+**Profile Tools**
+- `profile_get` - Get user profile
+- `profile_follow` - Follow user
+- `profile_unfollow` - Unfollow user
+- `profile_block` - Block user
+- `profile_unblock` - Unblock user
+
+**Batch Operations** (Future)
+- `batch_post` - Post multiple items
+- `batch_follow` - Follow multiple users
+- `batch_schedule` - Schedule operations
+
+### MCP Configuration
 
 ```json
 {
-  "agents": {
-    "content_creator": {
-      "enabled": true,
-      "schedule": "0 9 * * *",
-      "templates": ["release", "update", "community"],
-      "ai_model": "gpt-3.5-turbo"
-    },
-    "support_bot": {
-      "enabled": true,
-      "triggers": ["mention", "dm"],
-      "knowledge_base": "/data/kb",
-      "response_delay": 300
-    },
-    "analytics": {
-      "enabled": true,
-      "collection_interval": "1h",
-      "metrics": ["engagement", "reach", "mentions"],
-      "reporting_schedule": "weekly"
+  "mcpServers": {
+    "at-bot": {
+      "command": "at-bot-mcp-server",
+      "args": ["--config", "~/.config/at-bot/mcp.json"],
+      "env": {
+        "ATP_PDS": "https://bsky.social"
+      }
     }
   }
 }
 ```
 
-### CLI Design Patterns for Agents
+### MCP Tool Schema Example
+
+```json
+{
+  "name": "post_create",
+  "description": "Create a new post on Bluesky",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "text": {
+        "type": "string",
+        "description": "The post content"
+      },
+      "reply_to": {
+        "type": "string",
+        "description": "Optional post URI to reply to"
+      },
+      "attachments": {
+        "type": "array",
+        "description": "Optional media attachments"
+      }
+    },
+    "required": ["text"]
+  }
+}
+```
 
 For seamless agent integration, commands should support:
 

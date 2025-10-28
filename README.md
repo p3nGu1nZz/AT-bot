@@ -1,10 +1,15 @@
 # AT-bot
 
-A simple but versatile AT Protocol CLI tool for Bluesky automation and workflows.
+A simple but powerful CLI tool and MCP server for Bluesky/AT Protocol automation, designed for both traditional users and AI agents.
 
 ## Overview
 
-AT-bot is a POSIX-compliant command-line tool that allows you to interact with Bluesky using the AT Protocol. It provides simple authentication and session management, making it easy to automate Bluesky workflows from the command line.
+AT-bot provides two interfaces for interacting with Bluesky:
+
+1. **CLI Interface** - Traditional command-line tool for users and scripts
+2. **MCP Server Interface** - Model Context Protocol server for AI agents and automation
+
+It provides simple authentication and session management, making it easy to automate Bluesky workflows from the command line or integrate with AI agents.
 
 ## Features
 
@@ -12,7 +17,9 @@ AT-bot is a POSIX-compliant command-line tool that allows you to interact with B
 - 💾 Session management with persistent authentication
 - 🛡️ Secure storage of session tokens (not passwords)
 - 📝 Simple, intuitive command-line interface
+- 🤖 MCP server for AI agent integration
 - 🐧 POSIX-compliant for Linux/WSL/Ubuntu environments
+- 🔗 Fully compatible with Claude Copilot and other MCP-based tools
 
 ## Installation
 

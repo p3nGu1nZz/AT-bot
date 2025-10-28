@@ -2,6 +2,42 @@
 
 This document tracks pending tasks, improvements, and features for the AT-bot project. Items are organized by priority and category.
 
+## MCP (Model Context Protocol) Server Implementation
+
+### MCP Server Architecture & Design
+- [ ] Design MCP server architecture and communication protocol
+- [ ] Define MCP tool schemas for all core operations
+- [ ] Plan MCP server implementation (Python/Node.js/Go wrapper)
+- [ ] Design authentication and session management for MCP
+- [ ] Plan error handling and logging for MCP operations
+- [ ] Document MCP integration points in core library
+
+### MCP Server Development
+- [ ] Implement MCP server with stdio communication
+- [ ] Implement authentication tools (login, logout, whoami, is_authenticated)
+- [ ] Implement content tools (post_create, post_reply, post_like, post_repost, post_delete)
+- [ ] Implement feed tools (feed_read, feed_search, feed_timeline, feed_notifications)
+- [ ] Implement profile tools (profile_get, profile_follow, profile_unfollow, profile_block)
+- [ ] Add batch operation support (batch_post, batch_follow, batch_schedule)
+- [ ] Add MCP server configuration and startup system
+- [ ] Add MCP server logging and debugging capabilities
+
+### MCP Server Testing & Documentation
+- [ ] Write integration tests for MCP server
+- [ ] Create MCP server configuration guide
+- [ ] Write MCP client examples and tutorials
+- [ ] Document MCP tool schemas and capabilities
+- [ ] Create troubleshooting guide for MCP issues
+- [ ] Add performance benchmarks for MCP operations
+
+### MCP Ecosystem Integration
+- [ ] Publish MCP server to package registries
+- [ ] Create VS Code Copilot integration guide
+- [ ] Submit to Claude Projects for discovery
+- [ ] Create GitHub-hosted MCP registry entry
+- [ ] Build MCP server examples for common use cases
+- [ ] Establish MCP server security best practices guide
+
 ## Core Functionality
 
 ### Authentication & Session Management

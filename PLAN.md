@@ -4,9 +4,9 @@ This document outlines the strategic direction, architecture decisions, and deve
 
 ## Project Vision
 
-**Mission**: Create a simple, secure, and powerful command-line tool that enables users and developers to seamlessly interact with the AT Protocol and Bluesky ecosystem.
+**Mission**: Create a simple, secure, and powerful infrastructure layer that enables users, developers, and AI agents to seamlessly interact with the AT Protocol and Bluesky ecosystem through both traditional CLI interfaces and modern MCP (Model Context Protocol) agent tooling.
 
-**Vision**: Become the go-to CLI tool for AT Protocol interactions, enabling everything from personal automation to large-scale social media management and research.
+**Vision**: Become the definitive infrastructure for AT Protocol automation - serving both traditional users through an intuitive CLI and next-generation AI agents through standardized MCP server interfaces, enabling everything from personal automation to large-scale social media management, research, and collaborative agentic workflows.
 
 ## Core Principles
 
@@ -46,40 +46,57 @@ AT-bot Current Architecture
 └─────────────────┘
 ```
 
-### Target Architecture (v1.0+)
+### Target Architecture (v1.0+) - Dual Interface Model
 
 ```
-AT-bot Target Architecture
+AT-bot Target Architecture (Dual Interface: CLI + MCP)
 
-┌─────────────────┐
-│   User (CLI)    │
-└─────────┬───────┘
-          │
-          ▼
-┌─────────────────┐
-│    bin/at-bot   │  # Enhanced CLI with subcommands
-│  (Entry Point)  │  # Plugin support
-└─────────┬───────┘
-          │
-          ▼
-┌─────────┬───────────────┬─────────┐
-│         │               │         │
-│   Auth  │  Content  │   Config    │
-│ Module  │  Module   │   Module    │
-│         │           │             │
-└─────────┼───────────────┼─────────┘
-          │               │
-          ▼               ▼
-┌─────────────────┬─────────────────┐
-│   Utilities     │     Agents      │
-│   Module        │     Module      │
-└─────────────────┴─────────────────┘
-          │
-          ▼
-┌─────────────────┐
-│  AT Protocol    │
-│   Network       │
-└─────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│           Multiple Interface Layer                         │
+├────────────────────┬──────────────────────────────────────┤
+│  CLI Interface     │    MCP Server Interface              │
+│  (bin/at-bot)      │    (at-bot-mcp-server)              │
+└────────┬───────────┴──────────────┬──────────────────────┘
+         │                          │
+         └──────────┬───────────────┘
+                    │
+                    ▼
+┌──────────────────────────────────────────┐
+│      Core Library Layer                  │
+├──────────────────────────────────────────┤
+│   lib/atproto.sh        (reusable       │
+│   lib/utils.sh          library          │
+│   lib/config.sh         functions)       │
+└──────────────┬───────────────────────────┘
+               │
+               ▼
+┌──────────────────────────────────────────┐
+│    AT Protocol / Bluesky Network        │
+└──────────────────────────────────────────┘
+```
+
+### MCP Server Architecture (New Component)
+
+```
+AI Agents (Claude, ChatGPT, etc.) via MCP Protocol
+             ↓ JSON-RPC 2.0 / stdio
+   ┌─────────────────────────────┐
+   │   AT-bot MCP Server         │
+   │ (Tool Discovery/Execution)  │
+   ├─────────────────────────────┤
+   │ Tools:                      │
+   │  • auth_login               │
+   │  • auth_whoami              │
+   │  • post_create              │
+   │  • feed_read                │
+   │  • profile_get              │
+   │  • follow_user              │
+   │  • search_posts             │
+   │  • (more...)                │
+   └──────────────┬──────────────┘
+                  │ Uses
+                  ▼
+         lib/atproto.sh
 ```
 
 ## Development Phases
@@ -92,6 +109,7 @@ AT-bot Target Architecture
 - Implement core AT Protocol interactions
 - Create solid testing foundation
 - Build community and contribution framework
+- **[NEW] Design MCP server architecture**
 
 **Key Features:**
 - [x] Secure login/logout functionality
@@ -101,14 +119,17 @@ AT-bot Target Architecture
 - [ ] Timeline reading capabilities
 - [ ] Comprehensive test suite
 - [ ] Installation and packaging improvements
+- [ ] **[NEW] MCP server design documentation**
+- [ ] **[NEW] MCP tool schema definitions**
 
 **Success Metrics:**
 - Stable authentication for 100+ users
 - Zero critical security issues
 - 80%+ test coverage
 - Active contributor community (5+ contributors)
+- **[NEW] Clear MCP architecture defined**
 
-### Phase 2: Core Features (v0.4.0 - v0.7.0)
+### Phase 2: Core Features + MCP Integration (v0.4.0 - v0.7.0)
 *Timeline: January 2026 - April 2026*
 
 **Objectives:**
@@ -116,6 +137,8 @@ AT-bot Target Architecture
 - Enhance user experience and reliability
 - Build automation foundation
 - Establish packaging ecosystem
+- **[NEW] Implement MCP server**
+- **[NEW] Create MCP tool definitions**
 
 **Key Features:**
 - [ ] Full social media operations (post, reply, follow, etc.)
@@ -125,21 +148,28 @@ AT-bot Target Architecture
 - [ ] Configuration management system
 - [ ] Multi-platform packaging (deb, homebrew, snap)
 - [ ] Basic automation scripting support
+- [ ] **[NEW] MCP server implementation (Python/Node.js wrapper)**
+- [ ] **[NEW] MCP tools for all core operations**
+- [ ] **[NEW] MCP server documentation and examples**
+- [ ] **[NEW] Integration with Copilot MCP toolset**
 
 **Success Metrics:**
-- 1000+ active users
+- 1000+ active users (CLI + MCP)
 - Complete Bluesky feature parity
 - Package availability on major platforms
 - Community-contributed automation scripts
+- **[NEW] MCP server published and discoverable**
+- **[NEW] 500+ MCP integrations**
 
-### Phase 3: Advanced Platform (v0.8.0 - v1.0.0)
+### Phase 3: Advanced Platform + Enterprise MCP (v0.8.0 - v1.0.0)
 *Timeline: May 2026 - August 2026*
 
 **Objectives:**
 - Enable advanced automation and agent workflows
 - Create extensible plugin architecture  
 - Achieve enterprise-grade reliability
-- Establish AT-bot as the definitive AT Protocol CLI
+- Establish AT-bot as definitive AT Protocol infrastructure
+- **[NEW] Build enterprise-grade MCP features**
 
 **Key Features:**
 - [ ] Agent framework and automation engine
@@ -148,12 +178,18 @@ AT-bot Target Architecture
 - [ ] Enterprise features (audit logging, compliance)
 - [ ] Performance optimization and scalability
 - [ ] Comprehensive documentation and tutorials
+- [ ] **[NEW] Advanced MCP tool sets (batch operations)**
+- [ ] **[NEW] MCP server authentication and authorization**
+- [ ] **[NEW] MCP webhook handling for real-time events**
+- [ ] **[NEW] MCP monitoring and observability**
 
 **Success Metrics:**
 - v1.0 stable release
 - 10,000+ users across various use cases
 - Active plugin ecosystem
 - Enterprise adoption cases
+- **[NEW] Enterprise MCP deployments**
+- **[NEW] 10,000+ MCP server instances deployed**
 
 ### Phase 4: Ecosystem & Innovation (v1.1.0+)
 *Timeline: September 2026 onwards*
@@ -163,6 +199,7 @@ AT-bot Target Architecture
 - Enable next-generation social media tooling
 - Expand beyond Bluesky to broader AT Protocol network
 - Maintain market leadership in AT Protocol tooling
+- **[NEW] Lead MCP standardization for social protocols**
 
 **Key Features:**
 - [ ] Multi-PDS support and federation tools
@@ -171,20 +208,32 @@ AT-bot Target Architecture
 - [ ] AI-powered content and community management
 - [ ] Cross-platform synchronization tools
 - [ ] Research and academic tooling support
+- [ ] **[NEW] MCP server marketplace**
+- [ ] **[NEW] Cross-protocol MCP tools (Twitter, Mastodon bridges)**
+- [ ] **[NEW] MCP agent orchestration framework**
+- [ ] **[NEW] MCP protocol extensions for real-time collaboration**
 
 ## Technical Strategy
 
 ### Language and Platform Decisions
 
-**Current Choice: Bash/Shell**
+**Current Choice: Bash/Shell Core**
 - ✅ Pros: Universal availability, simple deployment, easy contribution
 - ⚠️ Cons: Limited for complex features, parsing challenges
-- **Decision**: Continue with Bash for core CLI, evaluate complementary tools
+- **Decision**: Continue with Bash for core library (lib/atproto.sh), add language-agnostic layer
+
+**MCP Server Implementation**
+- **Recommended**: Python, Go, or Node.js wrapper
+- **Rationale**: 
+  - MCP protocol uses JSON-RPC 2.0 over stdio
+  - Wrapper can be language-agnostic
+  - Easy to maintain separately from bash core
+  - Better for async operations and real-time events
 
 **Future Considerations:**
-- **Go**: For performance-critical components or standalone binaries
-- **Python**: For complex automation and AI integration
-- **Rust**: For security-critical or performance-sensitive modules
+- **Go**: High-performance MCP server for production deployments
+- **Python**: Rapid prototyping and AI integration
+- **Rust**: Security-critical components or extreme performance requirements
 
 ### Architecture Evolution
 
