@@ -44,14 +44,18 @@ Commands:
     logout              Logout and clear session
     refresh             Refresh session token
     whoami              Display current authenticated user
-    post <text>         Create a new post
+    post <text>         Create a new post (supports --image <file>)
     reply <uri> <text>  Reply to a post
     like <uri>          Like a post
     repost <uri>        Repost a post
     feed [limit]        Read your timeline (default: 10 posts)
     follow <handle>     Follow a user
     unfollow <handle>   Unfollow a user
+    followers [handle]  View followers (defaults to current user)
+    following [handle]  View following (defaults to current user)
     search <query>      Search for posts
+    profile [handle]    View profile (defaults to current user)
+    profile-edit        Edit your profile
     config              Manage configuration
     clear-credentials   Clear saved credentials
     help                Show this help message
@@ -79,6 +83,7 @@ Examples:
     at-bot login                    # Interactive login
     at-bot whoami                   # Check current user
     at-bot post "Hello Bluesky!"    # Create a post
+    at-bot post --image photo.jpg "Check this out!"  # Post with image
     at-bot reply at://... "Great!"  # Reply to a post
     at-bot like at://...            # Like a post
     at-bot repost at://...          # Repost a post
@@ -86,7 +91,15 @@ Examples:
     at-bot feed 20                  # Read timeline (20 posts)
     at-bot follow user.bsky.social  # Follow a user
     at-bot unfollow user.bsky.social # Unfollow a user
+    at-bot followers                # View your followers
+    at-bot followers user.bsky.social # View another user's followers
+    at-bot following                # View who you follow
+    at-bot following user.bsky.social 100 # View who another user follows (limit 100)
     at-bot search "bluesky" 20      # Search for posts
+    at-bot profile                  # View your profile
+    at-bot profile user.bsky.social # View another user's profile
+    at-bot profile-edit --name "My Name" --bio "My bio"  # Update profile
+    at-bot profile-edit --avatar avatar.png --banner banner.jpg  # Update images
     at-bot refresh                  # Refresh session
     at-bot config list              # Show configuration
     at-bot config set feed_limit 50 # Change default feed limit
@@ -139,12 +152,37 @@ main() {
             ;;
         post)
             shift
-            if [ -z "$1" ]; then
+            
+            # Parse options
+            local image_file=""
+            local text=""
+            
+            while [ $# -gt 0 ]; do
+                case "$1" in
+                    --image)
+                        shift
+                        image_file="$1"
+                        shift
+                        ;;
+                    *)
+                        # Collect remaining args as text
+                        if [ -z "$text" ]; then
+                            text="$1"
+                        else
+                            text="$text $1"
+                        fi
+                        shift
+                        ;;
+                esac
+            done
+            
+            if [ -z "$text" ]; then
                 error "Post text is required"
-                echo "Usage: at-bot post <text>" >&2
+                echo "Usage: at-bot post [--image <file>] <text>" >&2
                 exit 1
             fi
-            atproto_post "$@"
+            
+            atproto_post "$text" "" "$image_file"
             ;;
         reply)
             shift
@@ -242,6 +280,60 @@ main() {
                     exit 1
                     ;;
             esac
+            ;;
+        profile)
+            shift
+            # Optional: handle argument (defaults to current user)
+            atproto_show_profile "$@"
+            ;;
+        profile-edit)
+            shift
+            # Parse optional flags: --name, --bio, --avatar, --banner
+            local display_name="" description="" avatar="" banner=""
+            while [ $# -gt 0 ]; do
+                case "$1" in
+                    --name)
+                        display_name="$2"
+                        shift 2
+                        ;;
+                    --bio)
+                        description="$2"
+                        shift 2
+                        ;;
+                    --avatar)
+                        avatar="$2"
+                        shift 2
+                        ;;
+                    --banner)
+                        banner="$2"
+                        shift 2
+                        ;;
+                    *)
+                        error "Unknown option: $1"
+                        echo "Usage: at-bot profile-edit [--name <name>] [--bio <bio>] [--avatar <file>] [--banner <file>]" >&2
+                        exit 1
+                        ;;
+                esac
+            done
+            
+            # At least one option must be provided
+            if [ -z "$display_name" ] && [ -z "$description" ] && [ -z "$avatar" ] && [ -z "$banner" ]; then
+                error "At least one option must be provided"
+                echo "Usage: at-bot profile-edit [--name <name>] [--bio <bio>] [--avatar <file>] [--banner <file>]" >&2
+                exit 1
+            fi
+            
+            atproto_update_profile "$display_name" "$description" "$avatar" "$banner"
+            ;;
+        followers)
+            shift
+            # Optional: handle and limit arguments
+            atproto_get_followers "$@"
+            ;;
+        following)
+            shift
+            # Optional: handle and limit arguments
+            atproto_get_following "$@"
             ;;
         clear-credentials)
             clear_credentials

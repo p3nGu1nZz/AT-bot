@@ -336,13 +336,139 @@ EOF
     fi
 }
 
+# Upload a blob (image/video) to AT Protocol
+# Arguments:
+#   $1 - file path
+# Returns: JSON with blob reference (for embedding in posts)
+atproto_upload_blob() {
+    local file_path="$1"
+    
+    if [ -z "$file_path" ]; then
+        error "File path is required"
+        return 1
+    fi
+    
+    if [ ! -f "$file_path" ]; then
+        error "File not found: $file_path"
+        return 1
+    fi
+    
+    if [ ! -f "$SESSION_FILE" ]; then
+        error "Not logged in. Run 'at-bot login' first."
+        return 1
+    fi
+    
+    # Get access token
+    local access_token session_data
+    session_data=$(cat "$SESSION_FILE")
+    access_token=$(json_get_field "$session_data" "accessJwt")
+    
+    if [ -z "$access_token" ]; then
+        error "Invalid session data"
+        return 1
+    fi
+    
+    # Detect MIME type
+    local mime_type
+    case "${file_path##*.}" in
+        jpg|jpeg)
+            mime_type="image/jpeg"
+            ;;
+        png)
+            mime_type="image/png"
+            ;;
+        gif)
+            mime_type="image/gif"
+            ;;
+        webp)
+            mime_type="image/webp"
+            ;;
+        mp4)
+            mime_type="video/mp4"
+            ;;
+        *)
+            error "Unsupported file type. Supported: jpg, png, gif, webp, mp4"
+            return 1
+            ;;
+    esac
+    
+    # Check file size
+    local file_size
+    file_size=$(wc -c < "$file_path")
+    
+    # Size limits: 1MB for images, 50MB for videos
+    local max_size
+    if [[ "$mime_type" == image/* ]]; then
+        max_size=1048576  # 1MB
+        if [ "$file_size" -gt "$max_size" ]; then
+            error "Image file too large. Maximum size is 1MB ($(( max_size / 1024 ))KB)"
+            return 1
+        fi
+    elif [[ "$mime_type" == video/* ]]; then
+        max_size=52428800  # 50MB
+        if [ "$file_size" -gt "$max_size" ]; then
+            error "Video file too large. Maximum size is 50MB"
+            return 1
+        fi
+    fi
+    
+    debug "Uploading blob: $file_path ($mime_type, $(( file_size / 1024 ))KB)"
+    
+    # Upload blob using curl (binary data)
+    local response
+    response=$(curl -s -X POST \
+        -H "Authorization: Bearer $access_token" \
+        -H "Content-Type: $mime_type" \
+        --data-binary "@$file_path" \
+        "$ATP_PDS/xrpc/com.atproto.repo.uploadBlob")
+    
+    # Check for errors
+    if echo "$response" | grep -q '"error"'; then
+        local error_msg
+        error_msg=$(json_get_field "$response" "message")
+        if [ -z "$error_msg" ]; then
+            error_msg="Unknown error"
+        fi
+        error "Blob upload failed: $error_msg"
+        return 1
+    fi
+    
+    # Extract blob reference
+    local blob_ref blob_type blob_size blob_mime_type
+    blob_ref=$(echo "$response" | grep -o '"blob"[^}]*"ref"[^}]*"\$link":"[^"]*"' | grep -o '"\$link":"[^"]*"' | cut -d'"' -f4)
+    blob_type=$(echo "$response" | grep -o '"\$type":"[^"]*"' | head -1 | cut -d'"' -f4)
+    blob_size=$(json_get_field "$response" "size")
+    blob_mime_type=$(json_get_field "$response" "mimeType")
+    
+    if [ -z "$blob_ref" ]; then
+        error "Failed to extract blob reference from response"
+        return 1
+    fi
+    
+    debug "Blob uploaded successfully: $blob_ref"
+    
+    # Return blob reference in format needed for embedding
+    cat << EOF
+{
+  "\$type": "$blob_type",
+  "ref": {
+    "\$link": "$blob_ref"
+  },
+  "mimeType": "$blob_mime_type",
+  "size": $blob_size
+}
+EOF
+}
+
 # Create a post on Bluesky
 # Arguments:
 #   $1 - post text content
 #   $2 - optional reply-to URI
+#   $3 - optional image file path
 atproto_post() {
     local text="$1"
     local reply_to="${2:-}"
+    local image_file="${3:-}"
     
     if [ -z "$text" ]; then
         error "Post text is required"
@@ -368,6 +494,34 @@ atproto_post() {
     # Get current timestamp in ISO 8601 format
     local timestamp
     timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
+    
+    # Upload image if provided
+    local embed_json=""
+    if [ -n "$image_file" ]; then
+        debug "Uploading image: $image_file"
+        local blob_ref
+        blob_ref=$(atproto_upload_blob "$image_file")
+        
+        if [ -z "$blob_ref" ]; then
+            error "Failed to upload image"
+            return 1
+        fi
+        
+        # Create embed JSON for image
+        embed_json=$(cat <<EOF
+,
+        "embed": {
+            "\$type": "app.bsky.embed.images",
+            "images": [
+                {
+                    "alt": "",
+                    "image": $blob_ref
+                }
+            ]
+        }
+EOF
+)
+    fi
     
     # Build post record
     local record
@@ -414,7 +568,7 @@ atproto_post() {
                 "uri": "$parent_uri",
                 "cid": "$parent_cid"
             }
-        }
+        }$embed_json
     }
 }
 EOF
@@ -427,7 +581,7 @@ EOF
     "record": {
         "\$type": "app.bsky.feed.post",
         "text": "$text",
-        "createdAt": "$timestamp"
+        "createdAt": "$timestamp"$embed_json
     }
 }
 EOF
@@ -1293,4 +1447,406 @@ clear_credentials() {
         warning "Encryption key still exists at $ENCRYPTION_KEY_FILE"
         echo "Remove it manually if you want to generate a new key: rm $ENCRYPTION_KEY_FILE"
     fi
+}
+
+# Get user profile information
+#
+# Retrieves profile information for a specified user handle or DID.
+#
+# Arguments:
+#   $1 - handle or DID (optional, defaults to current user)
+#
+# Returns:
+#   0 - Success, profile information retrieved
+#   1 - Failed to retrieve profile
+#
+# Environment:
+#   ATP_PDS - AT Protocol server (default: https://bsky.social)
+#
+# Outputs:
+#   Profile information in JSON format
+atproto_get_profile() {
+    local actor="${1:-}"
+    
+    # Get access token
+    local access_token
+    access_token=$(get_access_token) || {
+        error "Not logged in. Use 'at-bot login' first."
+        return 1
+    }
+    
+    # If no actor specified, get current user's DID
+    if [ -z "$actor" ]; then
+        actor=$(get_session_did)
+        if [ -z "$actor" ]; then
+            error "Could not determine current user"
+            return 1
+        fi
+    fi
+    
+    debug "Fetching profile for: $actor"
+    
+    # Make API request
+    local response
+    response=$(api_request GET "/xrpc/app.bsky.actor.getProfile?actor=$actor" "" "$access_token")
+    
+    if [ $? -ne 0 ]; then
+        error "Failed to fetch profile"
+        return 1
+    fi
+    
+    echo "$response"
+    return 0
+}
+
+# Display formatted profile information
+#
+# Displays profile information in a human-readable format.
+#
+# Arguments:
+#   $1 - handle or DID (optional, defaults to current user)
+#
+# Returns:
+#   0 - Success
+#   1 - Failed to retrieve profile
+atproto_show_profile() {
+    local actor="${1:-}"
+    
+    local profile_json
+    profile_json=$(atproto_get_profile "$actor")
+    
+    if [ $? -ne 0 ]; then
+        return 1
+    fi
+    
+    # Extract profile fields
+    local handle display_name description followers following posts
+    handle=$(json_get_field "$profile_json" "handle")
+    display_name=$(json_get_field "$profile_json" "displayName")
+    description=$(json_get_field "$profile_json" "description")
+    followers=$(json_get_field "$profile_json" "followersCount")
+    following=$(json_get_field "$profile_json" "followsCount")
+    posts=$(json_get_field "$profile_json" "postsCount")
+    
+    # Display profile
+    echo ""
+    echo -e "${BLUE}Profile Information${NC}"
+    echo -e "${BLUE}===================${NC}"
+    echo ""
+    
+    if [ -n "$display_name" ]; then
+        echo -e "${GREEN}Name:${NC}        $display_name"
+    fi
+    echo -e "${GREEN}Handle:${NC}      @$handle"
+    
+    if [ -n "$description" ]; then
+        echo -e "${GREEN}Bio:${NC}         $description"
+    fi
+    
+    echo ""
+    echo -e "${GREEN}Stats:${NC}"
+    echo -e "  Posts:     ${BLUE}$posts${NC}"
+    echo -e "  Followers: ${BLUE}$followers${NC}"
+    echo -e "  Following: ${BLUE}$following${NC}"
+    echo ""
+    
+    return 0
+}
+
+# Update user profile
+#
+# Updates the authenticated user's profile information.
+# Can update display name, bio, avatar, and banner.
+#
+# Arguments:
+#   $1 - display_name (optional, pass empty string to skip)
+#   $2 - description/bio (optional, pass empty string to skip)
+#   $3 - avatar_file (optional, image file path)
+#   $4 - banner_file (optional, image file path)
+#
+# Returns:
+#   0 - Success, profile updated
+#   1 - Failed to update profile
+#
+# Environment:
+#   ATP_PDS - AT Protocol server (default: https://bsky.social)
+#
+# Files:
+#   Reads: Avatar and banner image files if provided
+atproto_update_profile() {
+    local display_name="$1"
+    local description="$2"
+    local avatar_file="$3"
+    local banner_file="$4"
+    
+    # Get access token
+    local access_token
+    access_token=$(get_access_token) || {
+        error "Not logged in. Use 'at-bot login' first."
+        return 1
+    }
+    
+    # Get current DID
+    local did
+    did=$(get_session_did)
+    if [ -z "$did" ]; then
+        error "Could not determine current user"
+        return 1
+    fi
+    
+    debug "Updating profile for: $did"
+    
+    # Get current profile
+    local current_profile
+    current_profile=$(atproto_get_profile)
+    if [ $? -ne 0 ]; then
+        error "Failed to retrieve current profile"
+        return 1
+    fi
+    
+    # Build updated profile JSON
+    local avatar_json="" banner_json=""
+    
+    # Upload avatar if provided
+    if [ -n "$avatar_file" ]; then
+        debug "Uploading avatar: $avatar_file"
+        local avatar_blob
+        avatar_blob=$(atproto_upload_blob "$avatar_file")
+        if [ $? -eq 0 ]; then
+            avatar_json="\"avatar\": $(echo "$avatar_blob" | grep -o '"blob":{[^}]*}'),"
+        else
+            error "Failed to upload avatar"
+            return 1
+        fi
+    fi
+    
+    # Upload banner if provided
+    if [ -n "$banner_file" ]; then
+        debug "Uploading banner: $banner_file"
+        local banner_blob
+        banner_blob=$(atproto_upload_blob "$banner_file")
+        if [ $? -eq 0 ]; then
+            banner_json="\"banner\": $(echo "$banner_blob" | grep -o '"blob":{[^}]*}'),"
+        else
+            error "Failed to upload banner"
+            return 1
+        fi
+    fi
+    
+    # Use current values if not updating
+    if [ -z "$display_name" ]; then
+        display_name=$(json_get_field "$current_profile" "displayName")
+    fi
+    if [ -z "$description" ]; then
+        description=$(json_get_field "$current_profile" "description")
+    fi
+    
+    # Build profile record
+    local profile_record
+    profile_record="{
+        \"\$type\": \"app.bsky.actor.profile\",
+        \"displayName\": \"$display_name\",
+        \"description\": \"$description\",
+        $avatar_json
+        $banner_json
+        \"createdAt\": \"$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")\"
+    }"
+    
+    # Remove trailing commas in JSON (happens when avatar/banner not provided)
+    profile_record=$(echo "$profile_record" | sed 's/,\([[:space:]]*\)}/\1}/g')
+    
+    debug "Profile record: $profile_record"
+    
+    # Update profile via putRecord
+    local response
+    response=$(api_request POST "/xrpc/com.atproto.repo.putRecord" \
+        "{\"repo\":\"$did\",\"collection\":\"app.bsky.actor.profile\",\"rkey\":\"self\",\"record\":$profile_record}" \
+        "$access_token")
+    
+    if [ $? -ne 0 ]; then
+        error "Failed to update profile"
+        return 1
+    fi
+    
+    success "Profile updated successfully"
+    return 0
+}
+
+# Get list of followers
+#
+# Retrieves the list of followers for a specified user.
+#
+# Arguments:
+#   $1 - handle or DID (optional, defaults to current user)
+#   $2 - limit (optional, default: 50, max: 100)
+#
+# Returns:
+#   0 - Success, followers list retrieved
+#   1 - Failed to retrieve followers
+#
+# Environment:
+#   ATP_PDS - AT Protocol server (default: https://bsky.social)
+#
+# Outputs:
+#   Followers list in formatted text
+atproto_get_followers() {
+    local actor="${1:-}"
+    local limit="${2:-50}"
+    
+    # Get access token
+    local access_token
+    access_token=$(get_access_token) || {
+        error "Not logged in. Use 'at-bot login' first."
+        return 1
+    }
+    
+    # If no actor specified, get current user's DID
+    if [ -z "$actor" ]; then
+        actor=$(get_session_did)
+        if [ -z "$actor" ]; then
+            error "Could not determine current user"
+            return 1
+        fi
+    fi
+    
+    # Validate limit
+    if [ "$limit" -gt 100 ]; then
+        warning "Limit capped at 100 (requested: $limit)"
+        limit=100
+    fi
+    
+    debug "Fetching followers for: $actor (limit: $limit)"
+    
+    # Make API request
+    local response
+    response=$(api_request GET "/xrpc/app.bsky.graph.getFollowers?actor=$actor&limit=$limit" "" "$access_token")
+    
+    if [ $? -ne 0 ]; then
+        error "Failed to fetch followers"
+        return 1
+    fi
+    
+    # Parse and display followers
+    echo ""
+    echo -e "${BLUE}Followers${NC}"
+    echo -e "${BLUE}=========${NC}"
+    echo ""
+    
+    # Extract followers array and parse each follower
+    # Note: This is a simplified parser - in production would use jq or similar
+    local count=0
+    while IFS= read -r line; do
+        if [[ "$line" =~ \"handle\":\"([^\"]+)\" ]]; then
+            local handle="${BASH_REMATCH[1]}"
+            local display_name=""
+            
+            # Try to get displayName from the same object
+            if [[ "$response" =~ \"displayName\":\"([^\"]+)\".*\"handle\":\"$handle\" ]] || \
+               [[ "$response" =~ \"handle\":\"$handle\".*\"displayName\":\"([^\"]+)\" ]]; then
+                display_name="${BASH_REMATCH[1]}"
+            fi
+            
+            count=$((count + 1))
+            if [ -n "$display_name" ]; then
+                echo -e "${GREEN}$count.${NC} $display_name ${BLUE}(@$handle)${NC}"
+            else
+                echo -e "${GREEN}$count.${NC} ${BLUE}@$handle${NC}"
+            fi
+        fi
+    done <<< "$response"
+    
+    echo ""
+    echo -e "${BLUE}Total:${NC} $count followers"
+    echo ""
+    
+    return 0
+}
+
+# Get list of users being followed
+#
+# Retrieves the list of users that a specified user is following.
+#
+# Arguments:
+#   $1 - handle or DID (optional, defaults to current user)
+#   $2 - limit (optional, default: 50, max: 100)
+#
+# Returns:
+#   0 - Success, following list retrieved
+#   1 - Failed to retrieve following
+#
+# Environment:
+#   ATP_PDS - AT Protocol server (default: https://bsky.social)
+#
+# Outputs:
+#   Following list in formatted text
+atproto_get_following() {
+    local actor="${1:-}"
+    local limit="${2:-50}"
+    
+    # Get access token
+    local access_token
+    access_token=$(get_access_token) || {
+        error "Not logged in. Use 'at-bot login' first."
+        return 1
+    }
+    
+    # If no actor specified, get current user's DID
+    if [ -z "$actor" ]; then
+        actor=$(get_session_did)
+        if [ -z "$actor" ]; then
+            error "Could not determine current user"
+            return 1
+        fi
+    fi
+    
+    # Validate limit
+    if [ "$limit" -gt 100 ]; then
+        warning "Limit capped at 100 (requested: $limit)"
+        limit=100
+    fi
+    
+    debug "Fetching following for: $actor (limit: $limit)"
+    
+    # Make API request
+    local response
+    response=$(api_request GET "/xrpc/app.bsky.graph.getFollows?actor=$actor&limit=$limit" "" "$access_token")
+    
+    if [ $? -ne 0 ]; then
+        error "Failed to fetch following"
+        return 1
+    fi
+    
+    # Parse and display following
+    echo ""
+    echo -e "${BLUE}Following${NC}"
+    echo -e "${BLUE}=========${NC}"
+    echo ""
+    
+    # Extract follows array and parse each follow
+    local count=0
+    while IFS= read -r line; do
+        if [[ "$line" =~ \"handle\":\"([^\"]+)\" ]]; then
+            local handle="${BASH_REMATCH[1]}"
+            local display_name=""
+            
+            # Try to get displayName from the same object
+            if [[ "$response" =~ \"displayName\":\"([^\"]+)\".*\"handle\":\"$handle\" ]] || \
+               [[ "$response" =~ \"handle\":\"$handle\".*\"displayName\":\"([^\"]+)\" ]]; then
+                display_name="${BASH_REMATCH[1]}"
+            fi
+            
+            count=$((count + 1))
+            if [ -n "$display_name" ]; then
+                echo -e "${GREEN}$count.${NC} $display_name ${BLUE}(@$handle)${NC}"
+            else
+                echo -e "${GREEN}$count.${NC} ${BLUE}@$handle${NC}"
+            fi
+        fi
+    done <<< "$response"
+    
+    echo ""
+    echo -e "${BLUE}Total:${NC} $count following"
+    echo ""
+    
+    return 0
 }
