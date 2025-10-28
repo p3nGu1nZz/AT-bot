@@ -42,6 +42,8 @@
 
 # AT-bot specific
 session.json
+credentials.json
+*.key
 *.swp
 *~
 .DS_Store
