@@ -299,13 +299,13 @@ test_whoami() {
 test_validate_session() {
     print_section "🔐 Validate Session"
     echo ""
-    print_test "Validating session..."
-    if output=$("$AT_BOT" validate-session 2>&1); then
-        print_success "Session is valid:"
+    print_test "Validating session by retrieving user info..."
+    if output=$("$AT_BOT" whoami 2>&1); then
+        print_success "Session is valid! User info:"
         echo ""
         echo "$output" | sed 's/^/  /'
     else
-        print_warning "Session validation not available"
+        print_error "Session validation failed - session may be expired"
     fi
     press_enter
 }
