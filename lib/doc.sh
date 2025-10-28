@@ -759,9 +759,9 @@ TEMPLATE_EOF
     return 0
 }
 
-# Convert markdown to PDF using wkhtmltopdf backend
+# Convert markdown to PDF using wkhtmltopdf
 convert_to_pdf() {
-    info "Converting to PDF using HTML->PDF pipeline..."
+    info "Converting to PDF using wkhtmltopdf..."
     
     local build_dir="dist/docs"
     local html_template="$build_dir/template.html"
@@ -796,8 +796,10 @@ convert_to_pdf() {
     
     # Step 2: Convert HTML to PDF using wkhtmltopdf
     info "Converting HTML to PDF (this may take a moment)..."
+    
+    # Capture wkhtmltopdf output to check for errors
     local wkhtmltopdf_output
-    wkhtmltopdf_output=$(timeout 120 wkhtmltopdf \
+    wkhtmltopdf_output=$(wkhtmltopdf \
         --page-size A4 \
         --margin-top 0.75in \
         --margin-right 0.75in \
@@ -806,13 +808,18 @@ convert_to_pdf() {
         --encoding UTF-8 \
         --enable-local-file-access \
         "file://$abs_html_intermediate" \
-        "$abs_pdf_file" 2>&1 || true)
+        "$abs_pdf_file" 2>&1) || {
+        error "wkhtmltopdf failed to generate PDF"
+        echo "$wkhtmltopdf_output" >&2
+        rm -f "$abs_html_intermediate" "$html_template"
+        return 1
+    }
     
-    # Check if PDF was created (wkhtmltopdf may return warnings that aren't errors)
-    if [ ! -f "$abs_pdf_file" ] || [ ! -s "$abs_pdf_file" ]; then
-        error "wkhtmltopdf conversion failed"
-        error "Output: $wkhtmltopdf_output"
-        error "Check that wkhtmltopdf is properly installed and has access to required libraries"
+    # Check for image load failures in output
+    if echo "$wkhtmltopdf_output" | grep -q "Failed to load"; then
+        error "PDF generation failed: Image load error"
+        echo "$wkhtmltopdf_output" | grep "Failed to load" | sed 's/^/  /' >&2
+        rm -f "$abs_html_intermediate" "$html_template" "$abs_pdf_file"
         return 1
     fi
     
@@ -848,9 +855,8 @@ main() {
     # Compile documents
     compile_markdown
     
-    # Convert to PDF (disabled for now - wkhtmltopdf takes too long)
-    # convert_to_pdf
-    info "PDF generation disabled (use 'convert_to_pdf' manually if needed)"
+    # Convert to PDF
+    convert_to_pdf
     
     # Summary
     echo ""

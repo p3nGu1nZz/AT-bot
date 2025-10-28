@@ -1,8 +1,12 @@
 # AT-bot Complete Documentation
 
+\pagebreak
+
+![AT-bot Logo](/mnt/c/Users/3nigma/source/repos/AT-bot/doc/_images/figure-0.png)
+
 ---
 
-# **AT-bot**
+# **AT Protocol Bot**
 
 ## A Simple, Secure CLI Tool for AT Protocol & Bluesky Automation
 
