@@ -91,6 +91,9 @@ declare -a DOC_ORDER=(
     "doc/QUICKREF.md"
     "doc/CONFIGURATION.md"
     "doc/DOCUMENTATION.md"
+    "doc/FAQ.md"
+    "doc/ENVIRONMENT_VARIABLES.md"
+    "doc/EXAMPLES.md"
     
     # Feature Documentation
     "doc/ENCRYPTION.md"
