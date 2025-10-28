@@ -5,7 +5,6 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
 # Test configuration
 TESTS_PASSED=0
@@ -15,7 +14,6 @@ TESTS_TOTAL=0
 # Color output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
@@ -63,7 +61,8 @@ print_summary() {
 # Run test
 run_test() {
     local test_file=$1
-    local test_name=$(basename "$test_file" .sh)
+    local test_name
+    test_name=$(basename "$test_file" .sh)
     
     if bash "$test_file" > /dev/null 2>&1; then
         print_result 0 "$test_name"

@@ -48,7 +48,8 @@ read_secure() {
         return 1
     fi
     
-    eval "$var_name='$value'"
+    # Use printf to safely assign the value
+    printf -v "$var_name" '%s' "$value"
 }
 
 # Read password securely
@@ -65,7 +66,8 @@ read_password() {
         return 1
     fi
     
-    eval "$var_name='$value'"
+    # Use printf to safely assign the value
+    printf -v "$var_name" '%s' "$value"
 }
 
 # Make API request

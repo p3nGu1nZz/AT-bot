@@ -26,6 +26,8 @@ source "$LIB_DIR/atproto.sh"
 
 # Configuration
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/at-bot"
+# SESSION_FILE is used by sourced library
+# shellcheck disable=SC2034
 SESSION_FILE="$CONFIG_DIR/session.json"
 
 # Display usage information
