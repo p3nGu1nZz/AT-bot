@@ -50,6 +50,60 @@ error() {
     echo -e "${RED}✗${NC} $*" >&2
 }
 
+# Parse YAML configuration file (simple parser for key: value pairs)
+parse_yaml_config() {
+    local key="$1"
+    local file="$2"
+    local value=""
+    
+    if [ -z "$key" ] || [ ! -f "$file" ]; then
+        echo ""
+        return
+    fi
+    
+    if [[ "$key" == *.* ]]; then
+        # Nested key like "metadata.author"
+        local section=$(echo "$key" | cut -d. -f1)
+        local subkey=$(echo "$key" | cut -d. -f2)
+        
+        # Simple grep and sed approach: find lines in section with subkey
+        value=$(grep -A 100 "^$section:" "$file" 2>/dev/null | grep "^[[:space:]]*$subkey:" | head -1 | sed "s/^[[:space:]]*$subkey:[[:space:]]*//; s/[\"']//g; s/#.*//" | xargs)
+    else
+        # Top-level key
+        value=$(grep "^[[:space:]]*$key:" "$file" 2>/dev/null | head -1 | sed "s/^[[:space:]]*$key:[[:space:]]*//; s/[\"']//g; s/#.*//" | xargs)
+    fi
+    
+    echo "$value"
+}
+
+# Load configuration from YAML
+load_config() {
+    info "Loading configuration from $CONFIG_FILE..."
+    
+    # Metadata
+    CONFIG_PROJECT_NAME=$(parse_yaml_config "metadata.project_name" "$CONFIG_FILE")
+    CONFIG_TITLE=$(parse_yaml_config "metadata.title" "$CONFIG_FILE")
+    CONFIG_DESCRIPTION=$(parse_yaml_config "metadata.description" "$CONFIG_FILE")
+    CONFIG_VERSION=$(parse_yaml_config "metadata.version" "$CONFIG_FILE")
+    CONFIG_AUTHOR=$(parse_yaml_config "metadata.author" "$CONFIG_FILE")
+    CONFIG_LICENSE=$(parse_yaml_config "metadata.license" "$CONFIG_FILE")
+    CONFIG_REPOSITORY=$(parse_yaml_config "metadata.repository" "$CONFIG_FILE")
+    
+    # Output
+    CONFIG_OUTPUT_DIR=$(parse_yaml_config "output.directory" "$CONFIG_FILE")
+    CONFIG_OUTPUT_FORMAT=$(parse_yaml_config "output.format" "$CONFIG_FILE")
+    CONFIG_TOC=$(parse_yaml_config "output.toc" "$CONFIG_FILE")
+    
+    # Build options
+    CONFIG_VERBOSE=$(parse_yaml_config "build.verbose" "$CONFIG_FILE")
+    CONFIG_CLEAN=$(parse_yaml_config "build.clean_before_build" "$CONFIG_FILE")
+    
+    # Update derived values if config file specifies them
+    if [ -n "$CONFIG_OUTPUT_DIR" ] && [ "$CONFIG_OUTPUT_DIR" != "null" ]; then
+        OUTPUT_DIR="$PROJECT_ROOT/$CONFIG_OUTPUT_DIR"
+    fi
+}
+
 # Check dependencies
 check_dependencies() {
     info "Checking dependencies..."
@@ -113,6 +167,14 @@ generate_toc() {
 prepare_output_directory() {
     info "Preparing output directory..."
     mkdir -p "$OUTPUT_DIR"
+    
+    # Copy image assets to output directory
+    if [ -d "$PROJECT_ROOT/doc/_images" ]; then
+        info "Copying image assets..."
+        cp -r "$PROJECT_ROOT/doc/_images" "$OUTPUT_DIR/_images" 2>/dev/null || true
+        success "Images copied to output directory"
+    fi
+    
     success "Output directory ready: $OUTPUT_DIR"
 }
 
@@ -481,29 +543,32 @@ EOF
 generate_cover_page() {
     info "Generating cover page..."
     
-    local version="0.3.0"
+    local title="${CONFIG_TITLE:-AT Protocol Bot}"
+    local author="${CONFIG_AUTHOR:-AT-bot Development Team}"
+    local version="${CONFIG_VERSION:-0.1.0}"
+    local repository="${CONFIG_REPOSITORY:-https://github.com/p3nGu1nZz/AT-bot}"
+    local license="${CONFIG_LICENSE:-CC0 1.0 Universal}"
     local date=$(date "+%B %d, %Y")
     
     cat > "$OUTPUT_DIR/cover.md" << EOF
 ---
-title: "AT-bot Complete Documentation"
-author: "AT-bot Development Team"
+title: "$title"
+author: "$author"
 date: "$date"
 ---
 
-# AT-bot
-
-## Complete Documentation
+# $title
 
 ### Version $version
 
-The Definitive Guide to AT Protocol Command-Line Automation
+The Definitive Guide to AT Protocol Command-Line Automation for Humans and Machines.
 
 ---
 
 **Generated:** $date  
-**Project:** https://github.com/p3nGu1nZz/AT-bot  
-**License:** MIT
+**Project:** $repository
+**Authors:** $author
+**License:** $license
 
 \\newpage
 
@@ -633,14 +698,59 @@ compile_markdown() {
 # Create HTML template with CSS styling for PDF conversion
 create_html_template() {
     local template_file="$1"
+    local title="${CONFIG_TITLE:-AT-bot Documentation}"
     
-    cat > "$template_file" << 'TEMPLATE_EOF'
+    cat > "$template_file" << EOF
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>AT-bot - Complete Documentation</title>
+    <title>$title</title>
     <style>
+        /* Page setup */
+        @page {
+            size: A4;
+            margin: 1in;
+            
+            @top-left {
+                content: "$CONFIG_PROJECT_NAME";
+                font-size: 10pt;
+                color: #666;
+            }
+            
+            @top-center {
+                content: "$CONFIG_TITLE";
+                font-size: 10pt;
+                color: #666;
+                font-weight: bold;
+            }
+            
+            @top-right {
+                content: "v$CONFIG_VERSION";
+                font-size: 10pt;
+                color: #666;
+            }
+            
+            @bottom-left {
+                content: "© $CONFIG_AUTHOR";
+                font-size: 9pt;
+                color: #999;
+            }
+            
+            @bottom-center {
+                content: string(chapter);
+                font-size: 9pt;
+                color: #999;
+                font-style: italic;
+            }
+            
+            @bottom-right {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: 9pt;
+                color: #999;
+            }
+        }
+
         /* Base styling */
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -660,6 +770,7 @@ create_html_template() {
             margin-top: 30px;
             font-size: 24pt;
             page-break-after: avoid;
+            string-set: chapter content();
         }
         h2 {
             color: #34495e;
@@ -668,6 +779,7 @@ create_html_template() {
             margin-top: 25px;
             font-size: 18pt;
             page-break-after: avoid;
+            string-set: chapter content();
         }
         h3 {
             color: #7f8c8d;
@@ -748,13 +860,22 @@ create_html_template() {
             color: #3498db;
             text-decoration: none;
         }
+
+        /* Images - centered horizontally */
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 15px auto;
+            page-break-inside: avoid;
+        }
     </style>
 </head>
 <body>
-$body$
+\$body\$
 </body>
 </html>
-TEMPLATE_EOF
+EOF
 
     return 0
 }
@@ -799,7 +920,8 @@ convert_to_pdf() {
     
     # Capture wkhtmltopdf output to check for errors
     local wkhtmltopdf_output
-    wkhtmltopdf_output=$(wkhtmltopdf \
+    # Run wkhtmltopdf from the output directory so relative image paths work
+    wkhtmltopdf_output=$(cd "$OUTPUT_DIR" && wkhtmltopdf \
         --page-size A4 \
         --margin-top 0.75in \
         --margin-right 0.75in \
@@ -837,6 +959,18 @@ main() {
     echo -e "${CYAN}════════════════════════════════════════════════════════${NC}"
     echo -e "${CYAN}  AT-bot Documentation Compiler${NC}"
     echo -e "${CYAN}════════════════════════════════════════════════════════${NC}"
+    echo ""
+    
+    # Load configuration
+    load_config
+    
+    echo -e "${BLUE}Configuration:${NC}"
+    echo "  Project: $CONFIG_PROJECT_NAME"
+    echo "  Title: $CONFIG_TITLE"
+    echo "  Version: $CONFIG_VERSION"
+    echo "  Author: $CONFIG_AUTHOR"
+    echo "  License: $CONFIG_LICENSE"
+    echo "  Output: $OUTPUT_DIR"
     echo ""
     
     # Check dependencies
