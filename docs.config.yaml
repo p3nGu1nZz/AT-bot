@@ -45,7 +45,17 @@ exclude:
 # Include patterns (explicit list of what to include)
 # If specified, ONLY files matching these patterns will be included
 # This is an allowlist approach - everything else is excluded unless listed here
+# 
+# Build order is important for PDF generation:
+# 1. TOC (near beginning)
+# 2. Main/core docs (middle)
+# 3. API reference (end/appendix)
 include:
+  # ==================== FRONT MATTER ====================
+  # Table of Contents (generated, placed near beginning)
+  - doc/TOC.md
+  
+  # ==================== CORE PROJECT DOCS ====================
   # Core project documentation
   - README.md
   - PLAN.md
@@ -55,15 +65,28 @@ include:
   - LICENSE
   - CONTRIBUTING.md
   
-  # Feature and implementation documentation
-  - doc/**/*.md
-  - doc/examples/**/*.sh
-  - doc/examples/**/*.bash
+  # ==================== USER & DEVELOPER GUIDES ====================
+  # Feature and implementation documentation (main docs)
+  - doc/QUICKSTART.md
+  - doc/QUICKREF.md
+  - doc/CONFIGURATION.md
+  - doc/DEBUG_MODE.md
+  - doc/ENCRYPTION.md
+  - doc/ARCHITECTURE.md
+  - doc/DOCUMENTATION.md
+  - doc/TESTING.md
   
   # MCP documentation
   - mcp-server/README.md
-  - mcp-server/docs/**/*.md
+  - mcp-server/docs/QUICKSTART_MCP.md
+  - mcp-server/docs/MCP_INTEGRATION.md
+  - mcp-server/docs/MCP_TOOLS.md
   
+  # ==================== EXAMPLES ====================
+  - doc/examples/**/*.sh
+  - doc/examples/**/*.bash
+  
+  # ==================== SOURCE REFERENCE ====================
   # Source code for reference (optional)
   - lib/atproto.sh
   - lib/config.sh
@@ -74,6 +97,10 @@ include:
   - scripts/install-completions.sh
   - Makefile
   - install.sh
+  
+  # ==================== APPENDIX ====================
+  # API Reference (placed at end as appendix)
+  - doc/API.md
 
 # Output configuration
 output:

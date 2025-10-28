@@ -1,9 +1,13 @@
 #!/bin/bash
 # AT-bot Documentation Compiler
 # Purpose: Compile all markdown documentation into a single, formatted PDF
-# Dependencies: pandoc (markdown->HTML), wkhtmltopdf (HTML->PDF)
+# Dependencies: pandoc (markdown->HTML), wkhtmltopdf (HTML->PDF), yq (YAML parsing)
 # 
-# Conversion pipeline: Markdown files -> Compiled markdown -> HTML template -> PDF
+# Conversion pipeline: 
+# 1. Generate TOC from docs.config.yaml
+# 2. Markdown files -> Compiled markdown (with TOC, main docs, then API.md appendix)
+# 3. Compiled markdown -> HTML template
+# 4. HTML template -> PDF
 
 set -e
 
@@ -11,11 +15,14 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
+# Configuration files
+CONFIG_FILE="$PROJECT_ROOT/docs.config.yaml"
+
 # Output configuration
 OUTPUT_DIR="$PROJECT_ROOT/dist/docs"
 COMPILED_MD="$OUTPUT_DIR/AT-bot_Complete_Documentation.md"
 COMPILED_PDF="$OUTPUT_DIR/AT-bot_Complete_Documentation.pdf"
-TOC_FILE="$OUTPUT_DIR/TOC.md"
+TOC_SOURCE="$PROJECT_ROOT/doc/TOC.md"
 CSS_FILE="$OUTPUT_DIR/documentation.css"
 
 # Color output
@@ -83,6 +90,23 @@ check_dependencies() {
     
     success "All dependencies available"
     return 0
+}
+
+# Generate Table of Contents from source docs
+generate_toc() {
+    info "Generating Table of Contents..."
+    
+    # Call the TOC generator script from lib/
+    if [ -x "$SCRIPT_DIR/gen-toc.sh" ]; then
+        bash "$SCRIPT_DIR/gen-toc.sh" || {
+            warning "TOC generation had issues, continuing with existing TOC"
+        }
+        if [ -f "$TOC_SOURCE" ]; then
+            success "TOC generated: $TOC_SOURCE"
+        fi
+    else
+        warning "TOC generator not found, skipping TOC generation"
+    fi
 }
 
 # Create output directory
@@ -818,6 +842,9 @@ main() {
     # Check dependencies
     check_dependencies || exit 1
     
+    # Generate TOC from source documentation
+    generate_toc
+    
     # Prepare output
     prepare_output_directory
     
@@ -840,6 +867,8 @@ main() {
     echo "Generated files:"
     echo "  📝 Markdown: $COMPILED_MD"
     echo "  📄 PDF: $COMPILED_PDF"
+    echo ""
+    echo "📋 TOC Source: $TOC_SOURCE"
     echo ""
     echo "Share the PDF with: ${CYAN}$COMPILED_PDF${NC}"
     echo ""
