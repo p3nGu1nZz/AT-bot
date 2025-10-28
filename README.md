@@ -329,6 +329,28 @@ AT-bot takes security seriously:
 
 ## Documentation
 
+### Quick Reference Guides
+
+- **[FAQ.md](doc/FAQ.md)** - Frequently asked questions about installation, usage, troubleshooting, and security
+- **[EXAMPLES.md](doc/EXAMPLES.md)** - Practical code examples and automation scripts
+- **[ENVIRONMENT_VARIABLES.md](doc/ENVIRONMENT_VARIABLES.md)** - Complete reference for all supported environment variables
+- **[QUICKSTART.md](doc/QUICKSTART.md)** - Quick start guide to get up and running in 5 minutes
+
+### Technical Documentation
+
+- **[SECURITY.md](SECURITY.md)** - Security policies, threat model, and best practices
+- **[ENCRYPTION.md](doc/ENCRYPTION.md)** - Detailed encryption implementation and cryptographic details
+- **[DEBUG_MODE.md](doc/DEBUG_MODE.md)** - Debugging guide with examples
+- **[TESTING.md](doc/TESTING.md)** - Testing strategy and how to run tests
+- **[ARCHITECTURE.md](doc/ARCHITECTURE.md)** - System design and architecture overview
+
+### Development Guides
+
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contributor guidelines, development setup, and code review process
+- **[STYLE.md](STYLE.md)** - Coding standards and conventions
+- **[PLAN.md](PLAN.md)** - Strategic roadmap and architecture evolution
+- **[AGENTS.md](AGENTS.md)** - AI agent integration patterns and automation opportunities
+
 ### Complete Documentation Package
 
 Generate a comprehensive, professionally formatted PDF containing all project documentation:
