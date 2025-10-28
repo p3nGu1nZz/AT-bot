@@ -41,7 +41,7 @@ clear_screen() {
 print_header() {
     clear_screen
     echo -e "${CYAN}╔═══════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║${NC}  ${WHITE}AT-bot Comprehensive Test Suite${NC}               ${CYAN}║${NC}"
+    echo -e "${CYAN}║${NC}  ${WHITE}AT-bot Comprehensive Test Suite${NC}             ${CYAN}║${NC}"
     echo -e "${CYAN}╚═══════════════════════════════════════════════════════════╝${NC}"
 }
 
