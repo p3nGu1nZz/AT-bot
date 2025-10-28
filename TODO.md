@@ -100,11 +100,17 @@ This document tracks pending tasks, improvements, and features for the AT-bot pr
 
 ### Testing
 - [x] ✅ **COMPLETED** - Expand test coverage for edge cases (encryption test suite added)
+- [x] ✅ **COMPLETED** - Create comprehensive unit test runner (`scripts/test-unit.sh`)
+- [x] ✅ **COMPLETED** - Integrate unit test runner into Makefile (`make test-unit`)
+- [x] ✅ **COMPLETED** - Document test runner with comprehensive help and examples
+- [x] ✅ **COMPLETED** - Update TESTING.md guide with test-unit documentation
+- [x] ✅ **COMPLETED** - Update README.md with testing instructions
 - [ ] Add integration tests with mock AT Protocol server
 - [ ] Implement automated testing in CI/CD pipeline
 - [ ] Add performance benchmarks and tests
 - [ ] Create test fixtures for different scenarios
 - [ ] Add security-focused tests (credential handling, permissions)
+- [ ] Add JSON export option to test-unit.sh for CI/CD parsing
 
 ### Code Organization
 - [ ] Refactor library functions into separate modules
