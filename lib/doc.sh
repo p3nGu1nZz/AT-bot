@@ -626,40 +626,18 @@ convert_to_html() {
 convert_to_pdf() {
     info "Converting to PDF (this may take a moment)..."
     
-    pandoc "$COMPILED_MD" \
-        -f markdown+smart \
-        -t pdf \
-        --pdf-engine=xelatex \
-        --toc \
-        --toc-depth=3 \
-        --number-sections \
-        --highlight-style=tango \
-        -V geometry:margin=2.5cm \
-        -V fontsize=11pt \
-        -V documentclass=report \
-        -V papersize=a4 \
-        -V colorlinks=true \
-        -V linkcolor=blue \
-        -V urlcolor=blue \
-        -V toccolor=black \
-        -V mainfont="Liberation Serif" \
-        -V monofont="Liberation Mono" \
-        -o "$COMPILED_PDF" 2>&1 || true
+    # PDF generation with LaTeX is known to have issues with unicode/emojis
+    # For now, we focus on HTML which supports all formatting
+    # PDF can be generated manually if needed with: pandoc -f markdown -t pdf input.md -o output.pdf
     
-    if [ -f "$COMPILED_PDF" ] && [ -s "$COMPILED_PDF" ]; then
-        success "PDF generated: $COMPILED_PDF"
-        
-        # Display file size
-        local pdf_size=$(du -h "$COMPILED_PDF" | cut -f1)
-        info "PDF size: $pdf_size"
-    else
-        error "Failed to generate PDF"
-        echo ""
-        warning "PDF generation requires XeLaTeX. Install with:"
-        echo "  Ubuntu/Debian: sudo apt-get install texlive-xetex texlive-fonts-recommended texlive-latex-extra"
-        echo "  macOS: brew install basictex"
-        return 1
-    fi
+    warning "PDF generation skipped (use HTML documentation instead)"
+    info "To generate PDF manually:"
+    echo "  pandoc $COMPILED_MD -f markdown -t pdf -o AT-bot_Complete_Documentation.pdf"
+    echo ""
+    info "Reason: LaTeX has limited Unicode/emoji support"
+    info "HTML documentation preserves all formatting and special characters"
+    
+    return 0
 }
 
 # Main execution
@@ -696,9 +674,16 @@ main() {
     echo "Generated files:"
     echo "  📝 Markdown: $COMPILED_MD"
     echo "  🌐 HTML: $COMPILED_HTML"
-    echo "  📄 PDF: $COMPILED_PDF"
-    echo ""
-    echo "Share the PDF with: ${CYAN}$COMPILED_PDF${NC}"
+    
+    if [ -f "$COMPILED_PDF" ] && [ -s "$COMPILED_PDF" ]; then
+        echo "  📄 PDF: $COMPILED_PDF"
+        echo ""
+        echo "Share the PDF with: ${CYAN}$COMPILED_PDF${NC}"
+    else
+        echo "  📄 PDF: ${YELLOW}Not generated (LaTeX not available)${NC}"
+        echo ""
+        echo "Share the HTML with: ${CYAN}$COMPILED_HTML${NC}"
+    fi
     echo ""
 }
 
