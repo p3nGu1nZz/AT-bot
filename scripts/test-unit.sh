@@ -136,7 +136,7 @@ Test Categories:
 
   Integration Tests:
     atp_test.sh              - Comprehensive AT Protocol integration
-    manual_test.sh           - Manual testing utilities
+    manual_test.sh           - Manual testing utilities (interactive, skipped by default)
     debug_demo.sh            - Debug mode demonstrations
 
 CI/CD Integration:
@@ -229,6 +229,13 @@ run_test() {
     local test_file="$1"
     local test_name
     test_name=$(basename "$test_file" .sh)
+    
+    # Skip interactive tests by default
+    if [[ "$test_name" == "manual_test" ]] && [ "$VERBOSE" != "true" ]; then
+        log_skip "$test_name (interactive test, skipped in non-verbose mode)"
+        TESTS_SKIPPED=$((TESTS_SKIPPED + 1))
+        return 2  # Skip code
+    fi
     
     # Skip if doesn't match pattern
     if [ -n "$TEST_PATTERN" ] && ! [[ "$test_name" =~ $TEST_PATTERN ]]; then

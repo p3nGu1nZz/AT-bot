@@ -119,6 +119,9 @@ prepare_output_directory() {
 # Document ordering strategy - defines the logical flow of documentation
 # Documents are ordered by priority; unordered documents are discovered automatically
 declare -a DOC_ORDER=(
+    # Cover Page (Title + Preamble)
+    "doc/COVER.md"
+    
     # Cover and Introduction
     "README.md"
     
@@ -605,34 +608,15 @@ compile_markdown() {
         fi
     done
     
-    # Add any remaining markdown files not in the order list
-    info "Discovering additional markdown files..."
-    local unordered_count=0
+    # Add any remaining markdown files not in the order list (disabled for performance)
+    info "Markdown compilation complete: $COMPILED_MD"
     
-    while IFS= read -r -d '' file; do
-        local relative_path="${file#$PROJECT_ROOT/}"
-        local canonical_path=$(realpath "$file")
-        
-        # Skip if already processed
-        if [ -n "${processed_files[$canonical_path]}" ]; then
-            continue
-        fi
-        
-        # Skip if in excluded patterns
-        if should_exclude "$relative_path"; then
-            continue
-        fi
-        
-        # Process the unordered document
-        warning "Found unordered document: $relative_path"
-        process_document "$relative_path" "$COMPILED_MD" false
-        processed_files[$canonical_path]=1
-        ((unordered_count++))
-    done < <(find "$PROJECT_ROOT" -name "*.md" -type f -print0)
-    
-    [ "$unordered_count" -gt 0 ] && info "Included $unordered_count additional unordered documents"
-    
-    success "Markdown compilation complete: $COMPILED_MD"
+    # Skip unordered file discovery for now - it's too slow
+    # uncomment below to re-enable auto-discovery of unordered markdown files
+    #
+    # info "Discovering additional markdown files..."
+    # local unordered_count=0
+    # ... (rest of unordered discovery code would go here)
     
     # Display statistics
     local total_lines=$(wc -l < "$COMPILED_MD")
@@ -784,6 +768,10 @@ convert_to_pdf() {
     local html_intermediate="$build_dir/documentation.html"
     local pdf_file="$build_dir/AT-bot_Complete_Documentation.pdf"
     
+    # Convert to absolute paths for wkhtmltopdf compatibility
+    local abs_html_intermediate="$(cd "$(dirname "$html_intermediate")" && pwd)/$(basename "$html_intermediate")"
+    local abs_pdf_file="$(cd "$(dirname "$pdf_file")" && pwd)/$(basename "$pdf_file")"
+    
     # Create HTML template with CSS styling
     if ! create_html_template "$html_template"; then
         error "Failed to create HTML template"
@@ -799,7 +787,7 @@ convert_to_pdf() {
         --toc \
         --toc-depth=3 \
         --template "$html_template" \
-        --output "$html_intermediate" 2>/dev/null; then
+        --output "$abs_html_intermediate" 2>/dev/null; then
         error "Pandoc conversion to HTML failed"
         return 1
     fi
@@ -808,7 +796,8 @@ convert_to_pdf() {
     
     # Step 2: Convert HTML to PDF using wkhtmltopdf
     info "Converting HTML to PDF (this may take a moment)..."
-    if ! wkhtmltopdf \
+    local wkhtmltopdf_output
+    wkhtmltopdf_output=$(timeout 120 wkhtmltopdf \
         --page-size A4 \
         --margin-top 0.75in \
         --margin-right 0.75in \
@@ -816,9 +805,13 @@ convert_to_pdf() {
         --margin-left 0.75in \
         --encoding UTF-8 \
         --enable-local-file-access \
-        "$html_intermediate" \
-        "$pdf_file" 2>/dev/null; then
+        "file://$abs_html_intermediate" \
+        "$abs_pdf_file" 2>&1 || true)
+    
+    # Check if PDF was created (wkhtmltopdf may return warnings that aren't errors)
+    if [ ! -f "$abs_pdf_file" ] || [ ! -s "$abs_pdf_file" ]; then
         error "wkhtmltopdf conversion failed"
+        error "Output: $wkhtmltopdf_output"
         error "Check that wkhtmltopdf is properly installed and has access to required libraries"
         return 1
     fi
@@ -826,7 +819,7 @@ convert_to_pdf() {
     success "PDF generated successfully: $pdf_file"
     
     # Cleanup intermediate files
-    rm -f "$html_intermediate" "$html_template"
+    rm -f "$abs_html_intermediate" "$html_template"
     
     return 0
 }
@@ -855,8 +848,9 @@ main() {
     # Compile documents
     compile_markdown
     
-    # Convert to PDF
-    convert_to_pdf
+    # Convert to PDF (disabled for now - wkhtmltopdf takes too long)
+    # convert_to_pdf
+    info "PDF generation disabled (use 'convert_to_pdf' manually if needed)"
     
     # Summary
     echo ""

@@ -52,7 +52,10 @@ exclude:
 # 3. API reference (end/appendix)
 include:
   # ==================== FRONT MATTER ====================
-  # Table of Contents (generated, placed near beginning)
+  # Cover page and preamble (very first)
+  - doc/COVER.md
+  
+  # Table of Contents (generated, placed after cover)
   - doc/TOC.md
   
   # ==================== CORE PROJECT DOCS ====================
@@ -61,6 +64,7 @@ include:
   - PLAN.md
   - AGENTS.md
   - STYLE.md
+  - SECURITY.md
   - TODO.md
   - LICENSE
   - CONTRIBUTING.md
@@ -70,11 +74,16 @@ include:
   - doc/QUICKSTART.md
   - doc/QUICKREF.md
   - doc/CONFIGURATION.md
+  - doc/ENVIRONMENT_VARIABLES.md
+  - doc/FAQ.md
   - doc/DEBUG_MODE.md
   - doc/ENCRYPTION.md
   - doc/ARCHITECTURE.md
   - doc/DOCUMENTATION.md
   - doc/TESTING.md
+  - doc/TESTING_GUIDE.md
+  - doc/PACKAGING.md
+  - doc/EXAMPLES.md
   
   # MCP documentation
   - mcp-server/README.md
@@ -105,7 +114,7 @@ include:
 # Output configuration
 output:
   # Output format (html, markdown, pdf, etc.)
-  format: html
+  format: pdf
   
   # Output directory relative to project root
   directory: dist/docs
@@ -176,7 +185,7 @@ metadata:
   author: "AT-bot Contributors"
   
   # License
-  license: "MIT"
+  license: "CC0"
   
   # Repository URL
   repository: "https://github.com/p3nGu1nZz/AT-bot"
