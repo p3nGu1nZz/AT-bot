@@ -2,6 +2,12 @@
 
 This document outlines how AI agents and automated systems can enhance the AT-bot project, enabling more sophisticated workflows and collaborative development patterns.
 
+**📌 Quick Links:**
+- [PLAN.md](PLAN.md) - Strategic roadmap and architecture
+- [STYLE.md](STYLE.md) - Coding standards and best practices
+- [TODO.md](TODO.md) - Project tasks and feature checklist
+- [.github/copilot-instructions.md](.github/copilot-instructions.md) - AI agent coding guidelines
+
 ## Overview
 
 AT-bot serves as a foundational tool for AT Protocol interactions, making it an ideal platform for agent-based automation. This document explores opportunities for integrating intelligent agents, automated workflows, and collaborative systems.
@@ -191,6 +197,51 @@ AT-bot Agents Architecture
 }
 ```
 
+### CLI Design Patterns for Agents
+
+For seamless agent integration, commands should support:
+
+**Non-Interactive Operation**
+```bash
+# Environment variables for credentials (development/testing only)
+BLUESKY_HANDLE="bot.bsky.social"
+BLUESKY_PASSWORD="$APP_PASSWORD"
+at-bot login
+
+# Commands with exit codes for automation
+at-bot whoami && echo "Logged in successfully" || echo "Login failed"
+```
+
+**Structured Output**
+```bash
+# Machine-readable JSON output (future enhancement)
+at-bot whoami --format json
+# Output: {"handle":"user.bsky.social","did":"did:plc:...","status":"authenticated"}
+
+# Exit codes for scripting
+at-bot check-session
+# Returns: 0 if logged in, 1 if not, 2 if session expired
+```
+
+**Composable Operations**
+```bash
+# Chain multiple commands
+message=$(generate_daily_report)
+at-bot post "$message" && \
+  at-bot follow "@user.bsky.social" && \
+  log_success || log_failure
+```
+
+**Batch/Bulk Operations** (Future)
+```bash
+# Read from files
+at-bot batch-post @daily-posts.txt
+at-bot batch-follow @followers-list.txt
+at-bot schedule @weekly-schedule.json
+```
+
+See [.github/copilot-instructions.md](.github/copilot-instructions.md) for implementation details.
+
 ## Security and Privacy Considerations
 
 ### Agent Authentication
@@ -299,6 +350,34 @@ We welcome contributions to the AT-bot agent ecosystem:
 4. **Documentation**: Improve agent documentation and tutorials
 
 See [CONTRIBUTING.md](doc/CONTRIBUTING.md) for more details on how to contribute.
+
+### Implementation Guidelines
+
+When implementing agent features, follow these guidelines:
+
+1. **Code Style**: Adhere to [STYLE.md](STYLE.md) standards
+   - Use proper naming conventions
+   - Include comprehensive function documentation
+   - Implement robust error handling
+   - Follow security best practices
+
+2. **Agent-Friendly Design**: Reference [.github/copilot-instructions.md](.github/copilot-instructions.md)
+   - Support non-interactive operation
+   - Provide structured output options
+   - Use meaningful exit codes
+   - Enable command composition
+
+3. **Documentation**: Update relevant docs
+   - Add examples to [AGENTS.md](AGENTS.md) for new automation patterns
+   - Update [TODO.md](TODO.md) with completed/new items
+   - Maintain [PLAN.md](PLAN.md) alignment with architecture
+   - Document in copilot-instructions.md for developer guidance
+
+4. **Testing**: Ensure quality
+   - Write tests for new automation features
+   - Test non-interactive workflows
+   - Verify exit codes and output formats
+   - Test security-sensitive operations
 
 ## Resources
 
