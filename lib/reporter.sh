@@ -301,7 +301,11 @@ progress_bar() {
     printf "%${empty}s" | tr ' ' '░'
     printf "] %3d%%${NC}" "$percent"
     
-    [ "$current" -eq "$total" ] && echo ""
+    if [ "$current" -eq "$total" ]; then
+        echo ""
+    fi
+    
+    return 0
 }
 
 # ============================================================================
