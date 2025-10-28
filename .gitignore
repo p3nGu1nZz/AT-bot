@@ -39,3 +39,13 @@
 
 # debug information files
 *.dwo
+
+# AT-bot specific
+session.json
+*.swp
+*~
+.DS_Store
+
+# Test artifacts
+tests/tmp/
+tests/*.log

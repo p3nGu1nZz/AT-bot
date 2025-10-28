@@ -1,0 +1,102 @@
+#!/bin/bash
+# AT-bot - A simple CLI tool for Bluesky AT Protocol automation
+# Copyright (c) 2025 AT-bot Contributors
+
+set -e
+
+# Source library functions
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+INSTALL_PREFIX="$(dirname "$SCRIPT_DIR")"
+
+# Support both installed and development configurations
+if [ -f "$SCRIPT_DIR/../lib/atproto.sh" ]; then
+    # Development/source tree
+    LIB_DIR="$SCRIPT_DIR/../lib"
+elif [ -f "$INSTALL_PREFIX/lib/at-bot/atproto.sh" ]; then
+    # Installed with PREFIX
+    LIB_DIR="$INSTALL_PREFIX/lib/at-bot"
+else
+    echo "Error: Cannot find AT-bot library files" >&2
+    echo "Looked in: $SCRIPT_DIR/../lib and $INSTALL_PREFIX/lib/at-bot" >&2
+    exit 1
+fi
+
+# shellcheck source=../lib/atproto.sh
+source "$LIB_DIR/atproto.sh"
+
+# Configuration
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/at-bot"
+SESSION_FILE="$CONFIG_DIR/session.json"
+
+# Display usage information
+show_help() {
+    cat << EOF
+AT-bot - A simple CLI tool for Bluesky AT Protocol automation
+
+Usage: at-bot [COMMAND] [OPTIONS]
+
+Commands:
+    login               Login to your Bluesky account
+    logout              Logout and clear session
+    whoami              Display current authenticated user
+    help                Show this help message
+
+Options:
+    -h, --help          Show this help message
+    -v, --version       Show version information
+
+Examples:
+    at-bot login        # Interactive login
+    at-bot whoami       # Check current user
+    at-bot logout       # Clear session
+
+Environment Variables:
+    BLUESKY_HANDLE      Your Bluesky handle (optional)
+    BLUESKY_PASSWORD    Your Bluesky app password (optional)
+
+Configuration:
+    Session data is stored in: $CONFIG_DIR/session.json
+
+For more information, visit: https://github.com/p3nGu1nZz/AT-bot
+EOF
+}
+
+# Display version information
+show_version() {
+    echo "AT-bot version 0.1.0"
+    echo "AT Protocol CLI tool for Bluesky"
+}
+
+# Main command dispatcher
+main() {
+    # Ensure config directory exists
+    mkdir -p "$CONFIG_DIR"
+    
+    # Parse command
+    case "${1:-help}" in
+        login)
+            shift
+            atproto_login "$@"
+            ;;
+        logout)
+            atproto_logout
+            ;;
+        whoami)
+            atproto_whoami
+            ;;
+        help|--help|-h)
+            show_help
+            ;;
+        --version|-v)
+            show_version
+            ;;
+        *)
+            echo "Error: Unknown command '$1'" >&2
+            echo "Run 'at-bot help' for usage information." >&2
+            exit 1
+            ;;
+    esac
+}
+
+# Run main function
+main "$@"
