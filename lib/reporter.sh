@@ -164,9 +164,10 @@ section() {
 # Usage: subsection "Subsection Title"
 subsection() {
     local title="$1"
+    local len=${#title}
     echo ""
     echo -e "${CYAN}${title}${NC}"
-    echo -e "${CYAN}$(printf '-%.0s' $(seq 1 ${#title}))${NC}"
+    echo -e "${CYAN}$(printf '%*s' "$len" | tr ' ' '-')${NC}"
     echo ""
 }
 
