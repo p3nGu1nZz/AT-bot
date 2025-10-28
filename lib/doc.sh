@@ -503,16 +503,26 @@ process_document() {
     
     # Add page break before each document (except first)
     if [ "$is_first" = "false" ]; then
-        echo -e "\n\\newpage\n" >> "$output"
+        echo "" >> "$output"
+        echo "---" >> "$output"
+        echo "" >> "$output"
     fi
     
     # Add document section marker with title
     local title=$(get_document_title "$PROJECT_ROOT/$file")
     echo "<!-- Document: $file -->" >> "$output"
     
-    # Append document content
-    cat "$PROJECT_ROOT/$file" >> "$output"
-    echo -e "\n" >> "$output"
+    # Append document content, stripping YAML front matter and converting --- to ~~~ 
+    # (to prevent pandoc from misinterpreting embedded --- as YAML blocks)
+    tail -n +1 "$PROJECT_ROOT/$file" | awk '
+    /^---$/ && NR==1 { in_frontmatter=1; next }
+    /^---$/ && in_frontmatter==1 { in_frontmatter=0; next }
+    in_frontmatter==1 { next }
+    /^---$/ { print "~~~"; next }
+    { print }
+    ' >> "$output"
+    
+    echo "" >> "$output"
 }
 
 # Compile all documents into single markdown
