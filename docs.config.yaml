@@ -175,17 +175,20 @@ metadata:
   # Project name
   project_name: AT-bot
   
+  # Project title (used in cover page and headers)
+  title: "AT Protocol Bot — Minimal MCP bridge"
+  
   # Project description
   description: "A simple CLI tool for Bluesky AT Protocol automation"
   
   # Version (can be read from package.json or set manually)
-  version: "0.1.0"
+  version: "1.0"
   
   # Author
-  author: "AT-bot Contributors"
+  author: "Kara Rawson {rawsonkara@gmail.com}, et al."
   
   # License
-  license: "CC0"
+  license: "CC0 1.0 Universal (Public Domain)"
   
   # Repository URL
   repository: "https://github.com/p3nGu1nZz/AT-bot"

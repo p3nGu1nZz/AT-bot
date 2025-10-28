@@ -2,7 +2,7 @@
 
 \pagebreak
 
-![AT-bot Logo](/mnt/c/Users/3nigma/source/repos/AT-bot/doc/_images/figure-0.png)
+![AT-bot Logo](_images/figure-0.png)
 
 ---
 
@@ -550,5 +550,3 @@ at-bot help            # Show command help
 **Last Updated**: October 28, 2025  
 **Next Update**: Phase 2 Release (January 2026)  
 **Status**: Phase 1 - Foundation Complete
-
----
