@@ -30,17 +30,15 @@ SKIPPED_TESTS=0
 # Utility functions
 print_header() {
     echo ""
-    echo -e "${CYAN}╔═══════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║${NC}  ${WHITE}AT-bot Automated Integration Tests${NC}               ${CYAN}║${NC}"
-    echo -e "${CYAN}╚═══════════════════════════════════════════════════════════╝${NC}"
+    echo -e "${WHITE}AT-bot Automated Integration Tests${NC}"
+    echo -e "${BLUE}$(printf '═%.0s' {1..60})${NC}"
     echo ""
 }
 
 print_section() {
     echo ""
-    echo -e "${CYAN}────────────────────────────────────────────────────────────${NC}"
-    printf "${CYAN}│${NC} %-58s${CYAN}│${NC}\n" "$1"
-    echo -e "${CYAN}────────────────────────────────────────────────────────────${NC}"
+    printf "%s\n" "$1"
+    echo -e "${BLUE}$(printf '─%.0s' {1..60})${NC}"
 }
 
 print_test() {
@@ -54,6 +52,15 @@ print_success() {
 
 print_failure() {
     ((FAILED_TESTS++))
+    echo -e "${RED}  ✗${NC} $1"
+}
+
+# Print info without incrementing test counter
+print_check_success() {
+    echo -e "${GREEN}  ✓${NC} $1"
+}
+
+print_check_failure() {
     echo -e "${RED}  ✗${NC} $1"
 }
 
@@ -216,18 +223,18 @@ test_diagnostics() {
     
     print_test "Session file status"
     if [ -f "$SESSION_FILE" ]; then
-        print_success "Session file exists at $SESSION_FILE"
+        print_check_success "Session file exists at $SESSION_FILE"
         local size=$(du -h "$SESSION_FILE" | cut -f1)
         print_info "Session file size: $size"
     else
-        print_failure "Session file not found"
+        print_check_failure "Session file not found"
     fi
     
     print_test "Binary verification"
     if [ -f "$AT_BOT" ] && [ -x "$AT_BOT" ]; then
-        print_success "AT-bot binary is executable at $AT_BOT"
+        print_check_success "AT-bot binary is executable at $AT_BOT"
     else
-        print_failure "AT-bot binary not found or not executable"
+        print_check_failure "AT-bot binary not found or not executable"
     fi
     
     print_test "Dependencies check"
@@ -235,7 +242,7 @@ test_diagnostics() {
         if command -v "$cmd" >/dev/null 2>&1; then
             print_info "✓ $cmd available"
         else
-            print_failure "✗ $cmd not found"
+            print_check_failure "✗ $cmd not found"
         fi
     done
 }
@@ -243,9 +250,8 @@ test_diagnostics() {
 # Print test summary
 print_summary() {
     echo ""
-    echo -e "${CYAN}╔═══════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║${NC}  ${WHITE}Test Summary${NC}                                             ${CYAN}║${NC}"
-    echo -e "${CYAN}╚═══════════════════════════════════════════════════════════╝${NC}"
+    echo -e "${WHITE}Test Summary${NC}"
+    echo -e "${BLUE}$(printf '─%.0s' {1..60})${NC}"
     echo ""
     echo -e "  Total Tests:    ${WHITE}$TOTAL_TESTS${NC}"
     echo -e "  ${GREEN}✓ Passed:${NC}       $PASSED_TESTS"

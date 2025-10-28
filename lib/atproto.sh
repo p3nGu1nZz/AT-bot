@@ -677,7 +677,21 @@ atproto_feed() {
         # Text output - human-readable format
         success "Feed retrieved successfully!"
         echo ""
-        echo "$response" | grep -o '"text":"[^"]*"' | sed 's/"text":"//g' | sed 's/"$//g' | nl
+        
+        # Parse posts and display with proper formatting
+        local count=0
+        echo "$response" | grep -o '"text":"[^"]*"' | while IFS= read -r line; do
+            count=$((count + 1))
+            # Extract text, unescape newlines and limit to 80 chars
+            local post_text=$(echo "$line" | sed 's/"text":"//g; s/"$//g; s/\\n/ /g; s/\\"/"/g')
+            
+            # Truncate at 80 characters and add ellipsis if needed
+            if [ ${#post_text} -gt 80 ]; then
+                post_text="${post_text:0:77}..."
+            fi
+            
+            printf "%12d    %s\n" "$count" "$post_text"
+        done
     fi
     
     return 0
@@ -1190,7 +1204,21 @@ atproto_search() {
         
         echo "Found $post_count posts:"
         echo ""
-        echo "$response" | grep -o '"text":"[^"]*"' | sed 's/"text":"//g' | sed 's/"$//g' | nl
+        
+        # Parse posts and display with proper formatting
+        local count=0
+        echo "$response" | grep -o '"text":"[^"]*"' | while IFS= read -r line; do
+            count=$((count + 1))
+            # Extract text, unescape newlines and limit to 80 chars
+            local post_text=$(echo "$line" | sed 's/"text":"//g; s/"$//g; s/\\n/ /g; s/\\"/"/g')
+            
+            # Truncate at 80 characters and add ellipsis if needed
+            if [ ${#post_text} -gt 80 ]; then
+                post_text="${post_text:0:77}..."
+            fi
+            
+            printf "%12d    %s\n" "$count" "$post_text"
+        done
     fi
     
     return 0
@@ -1545,9 +1573,9 @@ atproto_show_profile() {
     
     echo ""
     echo -e "${GREEN}Stats:${NC}"
-    echo -e "  Posts:     ${BLUE}$posts${NC}"
-    echo -e "  Followers: ${BLUE}$followers${NC}"
-    echo -e "  Following: ${BLUE}$following${NC}"
+    echo -e "  Posts:     ${BLUE}${posts:-N/A}${NC}"
+    echo -e "  Followers: ${BLUE}${followers:-N/A}${NC}"
+    echo -e "  Following: ${BLUE}${following:-N/A}${NC}"
     echo ""
     
     return 0
