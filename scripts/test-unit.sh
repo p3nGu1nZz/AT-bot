@@ -30,6 +30,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 TESTS_DIR="$PROJECT_ROOT/tests"
 
+# Source reporter library for console display functions
+if [ -f "$PROJECT_ROOT/lib/reporter.sh" ]; then
+    source "$PROJECT_ROOT/lib/reporter.sh"
+else
+    echo "Error: reporter.sh not found" >&2
+    exit 1
+fi
+
 # Test statistics
 TESTS_PASSED=0
 TESTS_FAILED=0
@@ -44,48 +52,13 @@ LIST_ONLY=false
 FAILED_ONLY=false
 TEST_PATTERN=""
 
-# Color output (auto-detect if terminal)
-if [ -t 1 ]; then
-    RED='\033[0;31m'
-    GREEN='\033[0;32m'
-    YELLOW='\033[1;33m'
-    BLUE='\033[0;34m'
-    CYAN='\033[0;36m'
-    NC='\033[0m'
-else
-    RED=''
-    GREEN=''
-    YELLOW=''
-    BLUE=''
-    CYAN=''
-    NC=''
-fi
-
 # Temporary file for test output
 TEST_OUTPUT=$(mktemp)
 FAILED_TESTS_FILE=$(mktemp)
 trap "rm -f $TEST_OUTPUT $FAILED_TESTS_FILE" EXIT
 
-# Logging functions
-log_info() {
-    [ "$QUIET" = false ] && echo -e "${BLUE}ℹ${NC} $*"
-}
-
-log_success() {
-    [ "$QUIET" = false ] && echo -e "${GREEN}✓${NC} $*"
-}
-
-log_error() {
-    echo -e "${RED}✗${NC} $*" >&2
-}
-
-log_warning() {
-    [ "$QUIET" = false ] && echo -e "${YELLOW}⚠${NC} $*"
-}
-
-log_skip() {
-    [ "$QUIET" = false ] && echo -e "${YELLOW}⊘${NC} $*"
-}
+# Note: Logging functions (log_info, log_success, log_error, log_warning, log_skip)
+# are now provided by lib/reporter.sh which is sourced above
 
 # Print help
 show_help() {
@@ -289,23 +262,10 @@ run_test() {
 
 # Print test summary
 print_summary() {
-    echo ""
-    echo -e "${BLUE}════════════════════════════════════════════════════════${NC}"
-    echo -e "${BLUE}Test Summary${NC}"
-    echo -e "${BLUE}════════════════════════════════════════════════════════${NC}"
-    
     TESTS_TOTAL=$((TESTS_PASSED + TESTS_FAILED))
     
-    local pass_percent=0
-    if [ "$TESTS_TOTAL" -gt 0 ]; then
-        pass_percent=$((TESTS_PASSED * 100 / TESTS_TOTAL))
-    fi
-    
-    echo "  Passed:   ${GREEN}$TESTS_PASSED${NC}/$TESTS_TOTAL"
-    echo "  Failed:   ${RED}$TESTS_FAILED${NC}/$TESTS_TOTAL"
-    [ "$TESTS_SKIPPED" -gt 0 ] && echo "  Skipped:  ${YELLOW}$TESTS_SKIPPED${NC}"
-    echo "  Success Rate: ${pass_percent}%"
-    echo ""
+    # Use reporter.sh test_summary function
+    test_summary "$TESTS_PASSED" "$TESTS_FAILED" "$TESTS_SKIPPED"
     
     # Show failed tests if any
     if [ -s "$FAILED_TESTS_FILE" ]; then
@@ -354,11 +314,7 @@ main() {
     
     # Header
     if [ "$QUIET" = false ]; then
-        echo ""
-        echo -e "${BLUE}════════════════════════════════════════════════════════${NC}"
-        echo -e "${BLUE}AT-bot Unit Test Runner${NC}"
-        echo -e "${BLUE}════════════════════════════════════════════════════════${NC}"
-        echo ""
+        section "AT-bot Unit Test Runner"
         
         if [ -n "$TEST_PATTERN" ]; then
             log_info "Running tests matching pattern: $TEST_PATTERN"
