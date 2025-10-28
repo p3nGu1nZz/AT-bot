@@ -103,26 +103,26 @@ check_core_dependencies() {
     return $missing
 }
 
-# Optional dependencies
-check_optional_dependencies() {
-    info "Checking optional dependencies..."
-    local missing=0
+# Main setup function
+setup_dependencies() {
+    info "AT-bot Dependency Check"
+    info "======================="
+    info ""
     
-    if ! has_command "jq"; then
-        warning "jq is not installed (optional, useful for JSON processing)"
-        missing=$((missing + 1))
-    else
-        success "jq is installed"
+    local os
+    os=$(detect_os)
+    info "Detected OS: $os"
+    info ""
+    
+    # Check core dependencies
+    if ! check_core_dependencies; then
+        warning "Some core dependencies are missing"
+        return 1
     fi
     
-    if ! has_command "make"; then
-        warning "make is not installed (optional, used in Makefile)"
-        missing=$((missing + 1))
-    else
-        success "make is installed"
-    fi
-    
-    return 0  # Optional deps don't cause failure
+    info ""
+    success "Dependency check complete!"
+    return 0
 }
 
 # Get package manager
@@ -231,23 +231,6 @@ get_package_name() {
         wkhtmltopdf:*)
             echo "wkhtmltopdf"
             ;;
-        # jq
-        jq:*)
-            echo "jq"
-            ;;
-        # make
-        make:ubuntu|make:debian)
-            echo "make"
-            ;;
-        make:fedora|make:rhel|make:centos)
-            echo "make"
-            ;;
-        make:macos)
-            echo "make"
-            ;;
-        make:*)
-            echo "make"
-            ;;
         *)
             echo "$pkg"
             ;;
@@ -322,11 +305,6 @@ setup_dependencies() {
     fi
     
     info ""
-    
-    # Check optional dependencies
-    check_optional_dependencies
-    
-    info ""
     success "Dependency check complete!"
     return 0
 }
@@ -362,29 +340,13 @@ install_missing_deps() {
         packages+=("$(get_package_name openssl "$os")")
     fi
     
-    # Check for optional packages to install
-    local optional_packages=()
-    if ! has_command "pandoc"; then
-        optional_packages+=("$(get_package_name pandoc "$os")")
-    fi
-    
-    if ! has_command "make"; then
-        optional_packages+=("$(get_package_name make "$os")")
-    fi
-    
-    if [ ${#packages[@]} -eq 0 ] && [ ${#optional_packages[@]} -eq 0 ]; then
+    if [ ${#packages[@]} -eq 0 ]; then
         success "All dependencies already installed!"
         return 0
     fi
     
     # Display what will be installed
-    if [ ${#packages[@]} -gt 0 ]; then
-        info "Core dependencies to install: ${packages[*]}"
-    fi
-    
-    if [ ${#optional_packages[@]} -gt 0 ]; then
-        info "Optional dependencies to install: ${optional_packages[*]}"
-    fi
+    info "Core dependencies to install: ${packages[*]}"
     
     info ""
     
@@ -410,29 +372,6 @@ install_missing_deps() {
                 return 1
                 ;;
         esac
-    fi
-    
-    # Optionally install optional packages
-    if [ ${#optional_packages[@]} -gt 0 ]; then
-        info ""
-        read -p "Install optional dependencies? (y/n) " -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            case "$os" in
-                ubuntu|debian)
-                    install_with_apt "${optional_packages[@]}" || warning "Failed to install some optional packages"
-                    ;;
-                fedora|rhel|centos)
-                    install_with_dnf "${optional_packages[@]}" || warning "Failed to install some optional packages"
-                    ;;
-                macos)
-                    install_with_brew "${optional_packages[@]}" || warning "Failed to install some optional packages"
-                    ;;
-                alpine)
-                    install_with_apk "${optional_packages[@]}" || warning "Failed to install some optional packages"
-                    ;;
-            esac
-        fi
     fi
     
     info ""
