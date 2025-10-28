@@ -1,6 +1,6 @@
 # AT-bot Documentation Table of Contents
 
-**Last Generated:** 2025-10-28 09:59:14  
+**Last Generated:** 2025-10-28 10:02:55  
 **Version:** 0.1.0
 
 ---
