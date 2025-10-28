@@ -240,6 +240,131 @@ Response: {success: true, uri: "at://...", cid: "bafy..."}
 
 ---
 
+### `search_posts`
+
+Search for posts on Bluesky matching a query.
+
+**Status:** ✅ Implemented
+
+**Schema:**
+```json
+{
+  "name": "search_posts",
+  "description": "Search for posts matching a query",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "Search query string"
+      },
+      "limit": {
+        "type": "number",
+        "description": "Maximum results to return (default: 10)",
+        "default": 10
+      }
+    },
+    "required": ["query"]
+  }
+}
+```
+
+**Returns:**
+```json
+{
+  "success": true,
+  "message": "Search results for: bluesky\n\nFound 10 posts:\n\n1. First post...\n2. Second post..."
+}
+```
+
+**Example Usage:**
+```
+Agent: Call search_posts with query="bluesky", limit=20
+Response: {success: true, message: "Search results..."}
+```
+
+---
+
+### `user_follow`
+
+Follow a user on Bluesky.
+
+**Status:** ✅ Implemented
+
+**Schema:**
+```json
+{
+  "name": "user_follow",
+  "description": "Follow a user",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "handle": {
+        "type": "string",
+        "description": "User handle or DID (e.g., user.bsky.social)"
+      }
+    },
+    "required": ["handle"]
+  }
+}
+```
+
+**Returns:**
+```json
+{
+  "success": true,
+  "message": "Successfully followed: user.bsky.social"
+}
+```
+
+**Example Usage:**
+```
+Agent: Call user_follow with handle="user.bsky.social"
+Response: {success: true, message: "Successfully followed: user.bsky.social"}
+```
+
+---
+
+### `user_unfollow`
+
+Unfollow a user on Bluesky.
+
+**Status:** ✅ Implemented
+
+**Schema:**
+```json
+{
+  "name": "user_unfollow",
+  "description": "Unfollow a user",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "handle": {
+        "type": "string",
+        "description": "User handle or DID (e.g., user.bsky.social)"
+      }
+    },
+    "required": ["handle"]
+  }
+}
+```
+
+**Returns:**
+```json
+{
+  "success": true,
+  "message": "Successfully unfollowed: user.bsky.social"
+}
+```
+
+**Example Usage:**
+```
+Agent: Call user_unfollow with handle="user.bsky.social"
+Response: {success: true, message: "Successfully unfollowed: user.bsky.social"}
+```
+
+---
+
 ### `post_reply`
 
 Reply to an existing post.

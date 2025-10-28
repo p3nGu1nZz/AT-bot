@@ -166,6 +166,45 @@ atproto_new_feature() {
 - Use JSON for structured config, shell variables for simple settings
 - Maintain backward compatibility with existing session format
 
+## Documentation Organization
+
+### File Placement Guidelines
+
+When creating or updating documentation, ensure files are placed in the correct location:
+
+**Strategic/Root-Level Documents** (Keep at project root)
+- `README.md` - Project overview and getting started
+- `PLAN.md` - Strategic roadmap and vision
+- `AGENTS.md` - AI agent integration and automation patterns
+- `STYLE.md` - Code style and standards (this file)
+- `TODO.md` - Project tasks and feature backlog
+
+**Session Summaries** (Place in `doc/sessions/`)
+- Development session logs and notes
+- Code review summaries
+- Decision documentation from work sessions
+- Pattern: `SESSION_SUMMARY_YYYY-MM-DD[_TOPIC].md`
+
+**Progress Reports** (Place in `doc/progress/`)
+- Project progress updates
+- Milestone reports
+- Project dashboard and metrics
+- Pattern: `PROGRESS_YYYY-MM-DD.md` or `MILESTONE_*.md`
+
+**Feature & Implementation Documentation** (Place in `doc/`)
+- Feature guides (CONFIGURATION.md, ENCRYPTION.md, DEBUG_MODE.md, etc.)
+- How-to guides and tutorials
+- Security and testing documentation
+- Architecture and design documents
+
+**MCP-Specific Documentation** (Place in `mcp-server/docs/`)
+- MCP server implementation guides
+- MCP tool definitions and schemas
+- MCP integration examples
+- Pattern: `MCP_*.md` or `QUICKSTART_MCP.md`
+
+For detailed organization guidelines, see the Documentation Organization Guidelines section in [STYLE.md](../STYLE.md).
+
 ## Code Style & Quality Standards
 
 For detailed coding standards, refer to [STYLE.md](../STYLE.md). Key requirements:

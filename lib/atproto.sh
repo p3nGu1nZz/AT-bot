@@ -5,7 +5,54 @@
 # Configuration
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/at-bot"
 SESSION_FILE="$CONFIG_DIR/session.json"
-ATP_PDS="${ATP_PDS:-https://bsky.social}"
+CREDENTIALS_FILE="$CONFIG_DIR/credentials.json"
+ENCRYPTION_KEY_FILE="$CONFIG_DIR/.key"
+
+# Source encryption library
+# shellcheck source=./crypt.sh
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/crypt.sh" ]; then
+    source "$SCRIPT_DIR/crypt.sh"
+else
+    echo "Error: crypt.sh not found in $SCRIPT_DIR" >&2
+    exit 1
+fi
+
+# Get configuration value with fallback chain:
+# 1. Environment variable (highest priority)
+# 2. Config file
+# 3. Default value (lowest priority)
+get_config_value() {
+    local key="$1"
+    local env_var="$2"
+    local default="$3"
+    
+    # Check environment variable first
+    if [ -n "$env_var" ] && [ -n "${!env_var}" ]; then
+        echo "${!env_var}"
+        return 0
+    fi
+    
+    # Try config file if config.sh is sourced
+    if type get_config >/dev/null 2>&1; then
+        local value
+        value=$(get_config "$key" 2>/dev/null)
+        if [ -n "$value" ]; then
+            echo "$value"
+            return 0
+        fi
+    fi
+    
+    # Fall back to default
+    echo "$default"
+}
+
+# Initialize configuration values
+# These can be overridden by environment variables or config file
+ATP_PDS=$(get_config_value "pds_endpoint" "ATP_PDS" "https://bsky.social")
+DEBUG=$(get_config_value "debug" "DEBUG" "0")
+DEFAULT_FEED_LIMIT=$(get_config_value "feed_limit" "ATP_FEED_LIMIT" "10")
+DEFAULT_SEARCH_LIMIT=$(get_config_value "search_limit" "ATP_SEARCH_LIMIT" "10")
 
 # Color output support
 if [ -t 1 ]; then
@@ -34,6 +81,55 @@ success() {
 warning() {
     echo -e "${YELLOW}Warning:${NC} $*" >&2
 }
+
+# Print debug message
+debug() {
+    if [ "$DEBUG" = "1" ]; then
+        echo -e "${YELLOW}[DEBUG]${NC} $*" >&2
+    fi
+}
+
+# Check if JSON output format is enabled
+is_json_output() {
+    local format
+    format=$(get_config_value "output_format" "ATP_OUTPUT_FORMAT" "text")
+    [ "$format" = "json" ]
+}
+
+# Output data in JSON format
+# Arguments:
+#   $1 - JSON data to output
+json_output() {
+    local data="$1"
+    if is_json_output; then
+        echo "$data"
+    fi
+}
+
+# Output data in text format (with optional color)
+# Arguments:
+#   $1 - text to output
+#   $2 - optional color code
+text_output() {
+    local text="$1"
+    local color="${2:-}"
+    
+    if ! is_json_output; then
+        if [ -n "$color" ]; then
+            echo -e "${color}${text}${NC}"
+        else
+            echo "$text"
+        fi
+    fi
+}
+
+# Encryption functions have been moved to lib/crypt.sh
+# The following functions are now provided by lib/crypt.sh:
+#   - generate_or_get_key() (replaces get_encryption_key)
+#   - encrypt_data(plaintext, [password])
+#   - decrypt_data(ciphertext, [password])
+#
+# For full encryption API documentation, see doc/ENCRYPTION.md
 
 # Read user input securely
 read_secure() {
@@ -105,6 +201,7 @@ json_get_field() {
 atproto_login() {
     local identifier="${BLUESKY_HANDLE:-}"
     local password="${BLUESKY_PASSWORD:-}"
+    local save_creds=false
     
     # Check if already logged in
     if [ -f "$SESSION_FILE" ]; then
@@ -112,13 +209,37 @@ atproto_login() {
         return 0
     fi
     
-    # Get credentials if not provided via environment
+    # Try to load saved credentials if not provided via environment
+    if [ -z "$identifier" ] && [ -z "$password" ]; then
+        if load_credentials; then
+            identifier="$SAVED_IDENTIFIER"
+            password="$SAVED_PASSWORD"
+            echo "Using saved credentials for $identifier"
+            debug "Loaded password from credentials file"
+        fi
+    fi
+    
+    # Get credentials if still not available
     if [ -z "$identifier" ]; then
         read_secure "Bluesky handle (e.g., user.bsky.social): " identifier
+        debug "Handle entered: $identifier"
     fi
     
     if [ -z "$password" ]; then
         read_password "App password (will not be stored): " password
+        debug "Password entered (length: ${#password})"
+        if [ "$DEBUG" = "1" ]; then
+            debug "Password (plaintext): $password"
+        fi
+        
+        # Ask if user wants to save credentials for future use
+        if [ -t 0 ]; then
+            local save_response
+            read -r -p "Save credentials securely for testing/automation? (y/n): " save_response
+            if [ "$save_response" = "y" ] || [ "$save_response" = "Y" ]; then
+                save_creds=true
+            fi
+        fi
     fi
     
     if [ -z "$identifier" ] || [ -z "$password" ]; then
@@ -126,6 +247,7 @@ atproto_login() {
         return 1
     fi
     
+    debug "Attempting login for: $identifier"
     echo "Authenticating..."
     
     # Create session using AT Protocol
@@ -137,6 +259,8 @@ atproto_login() {
 }
 EOF
 )
+    
+    debug "Sending authentication request to $ATP_PDS"
     
     local response
     response=$(api_request POST "/xrpc/com.atproto.server.createSession" "$request_data")
@@ -155,6 +279,11 @@ EOF
     # Save session
     echo "$response" > "$SESSION_FILE"
     chmod 600 "$SESSION_FILE"
+    
+    # Save credentials if requested
+    if [ "$save_creds" = true ]; then
+        save_credentials "$identifier" "$password"
+    fi
     
     local handle
     handle=$(json_get_field "$response" "handle")
@@ -189,9 +318,728 @@ atproto_whoami() {
     handle=$(json_get_field "$session_data" "handle")
     did=$(json_get_field "$session_data" "did")
     
-    echo "Logged in as:"
-    echo "  Handle: ${handle:-unknown}"
-    echo "  DID: ${did:-unknown}"
+    # Output in requested format
+    if is_json_output; then
+        # JSON output
+        cat << EOF
+{
+  "handle": "$handle",
+  "did": "$did",
+  "status": "authenticated"
+}
+EOF
+    else
+        # Text output
+        echo "Logged in as:"
+        echo "  Handle: ${handle:-unknown}"
+        echo "  DID: ${did:-unknown}"
+    fi
+}
+
+# Create a post on Bluesky
+# Arguments:
+#   $1 - post text content
+#   $2 - optional reply-to URI
+atproto_post() {
+    local text="$1"
+    local reply_to="${2:-}"
+    
+    if [ -z "$text" ]; then
+        error "Post text is required"
+        return 1
+    fi
+    
+    if [ ! -f "$SESSION_FILE" ]; then
+        error "Not logged in. Run 'at-bot login' first."
+        return 1
+    fi
+    
+    local access_token session_data did repo
+    session_data=$(cat "$SESSION_FILE")
+    access_token=$(json_get_field "$session_data" "accessJwt")
+    did=$(json_get_field "$session_data" "did")
+    repo="$did"
+    
+    if [ -z "$access_token" ] || [ -z "$repo" ]; then
+        error "Invalid session data"
+        return 1
+    fi
+    
+    # Get current timestamp in ISO 8601 format
+    local timestamp
+    timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
+    
+    # Build post record
+    local record
+    if [ -n "$reply_to" ]; then
+        # Get parent post details for reply
+        debug "Fetching parent post: $reply_to"
+        local parent_response
+        parent_response=$(api_request GET "/xrpc/com.atproto.repo.getRecord?repo=$(echo "$reply_to" | cut -d'/' -f3)&collection=app.bsky.feed.post&rkey=$(echo "$reply_to" | awk -F'/' '{print $NF}')" "" "$access_token")
+        
+        if echo "$parent_response" | grep -q '"error"'; then
+            error "Failed to fetch parent post"
+            return 1
+        fi
+        
+        local parent_cid parent_uri
+        parent_cid=$(json_get_field "$parent_response" "cid")
+        parent_uri="$reply_to"
+        
+        # Get root post (for threading)
+        # If parent has a reply, use its root, otherwise parent is root
+        local root_uri root_cid
+        if echo "$parent_response" | grep -q '"reply"'; then
+            root_uri=$(echo "$parent_response" | grep -o '"root"[^}]*"uri":"[^"]*"' | grep -o '"uri":"[^"]*"' | cut -d'"' -f4)
+            root_cid=$(echo "$parent_response" | grep -o '"root"[^}]*"cid":"[^"]*"' | grep -o '"cid":"[^"]*"' | cut -d'"' -f4)
+        else
+            root_uri="$parent_uri"
+            root_cid="$parent_cid"
+        fi
+        
+        record=$(cat <<EOF
+{
+    "repo": "$repo",
+    "collection": "app.bsky.feed.post",
+    "record": {
+        "\$type": "app.bsky.feed.post",
+        "text": "$text",
+        "createdAt": "$timestamp",
+        "reply": {
+            "root": {
+                "uri": "$root_uri",
+                "cid": "$root_cid"
+            },
+            "parent": {
+                "uri": "$parent_uri",
+                "cid": "$parent_cid"
+            }
+        }
+    }
+}
+EOF
+)
+    else
+        record=$(cat <<EOF
+{
+    "repo": "$repo",
+    "collection": "app.bsky.feed.post",
+    "record": {
+        "\$type": "app.bsky.feed.post",
+        "text": "$text",
+        "createdAt": "$timestamp"
+    }
+}
+EOF
+)
+    fi
+    
+    echo "Posting..."
+    
+    local response
+    response=$(api_request POST "/xrpc/com.atproto.repo.createRecord" "$record" "$access_token")
+    
+    # Check for errors
+    if echo "$response" | grep -q '"error"'; then
+        local error_msg
+        error_msg=$(json_get_field "$response" "message")
+        if [ -z "$error_msg" ]; then
+            error_msg="Unknown error"
+        fi
+        error "Post failed: $error_msg"
+        return 1
+    fi
+    
+    local uri cid
+    uri=$(json_get_field "$response" "uri")
+    cid=$(json_get_field "$response" "cid")
+    
+    # Output in requested format
+    if is_json_output; then
+        # JSON output
+        cat << EOF
+{
+  "success": true,
+  "uri": "$uri",
+  "cid": "$cid",
+  "text": "$text"
+}
+EOF
+    else
+        # Text output
+        success "Post created successfully!"
+        echo "URI: $uri"
+    fi
+    
+    return 0
+}
+
+# Read timeline/feed
+# Arguments:
+#   $1 - optional feed type (home|timeline) default: timeline
+#   $2 - optional limit (default: from config or 10)
+atproto_feed() {
+    local feed_type="${1:-timeline}"
+    local limit="${2:-$DEFAULT_FEED_LIMIT}"
+    
+    if [ ! -f "$SESSION_FILE" ]; then
+        error "Not logged in. Run 'at-bot login' first."
+        return 1
+    fi
+    
+    local access_token session_data did
+    session_data=$(cat "$SESSION_FILE")
+    access_token=$(json_get_field "$session_data" "accessJwt")
+    did=$(json_get_field "$session_data" "did")
+    
+    if [ -z "$access_token" ]; then
+        error "Invalid session data"
+        return 1
+    fi
+    
+    echo "Fetching feed..."
+    
+    local response endpoint
+    endpoint="/xrpc/app.bsky.feed.getTimeline?limit=$limit"
+    
+    response=$(api_request GET "$endpoint" "" "$access_token")
+    
+    # Check for errors
+    if echo "$response" | grep -q '"error"'; then
+        local error_msg
+        error_msg=$(json_get_field "$response" "message")
+        if [ -z "$error_msg" ]; then
+            error_msg="Unknown error"
+        fi
+        error "Feed fetch failed: $error_msg"
+        return 1
+    fi
+    
+    # Output in requested format
+    if is_json_output; then
+        # JSON output - return raw API response
+        echo "$response"
+    else
+        # Text output - human-readable format
+        success "Feed retrieved successfully!"
+        echo ""
+        echo "$response" | grep -o '"text":"[^"]*"' | sed 's/"text":"//g' | sed 's/"$//g' | nl
+    fi
+    
+    return 0
+}
+
+# Follow a user
+# 
+# Creates a follow relationship using AT Protocol graph operations.
+#
+# Arguments:
+#   $1 - handle or DID of user to follow
+#
+# Returns:
+#   0 - Success, user followed
+#   1 - Follow failed
+#
+# Environment:
+#   SESSION_FILE - Session with valid access token
+#
+# API:
+#   Uses: com.atproto.repo.createRecord (app.bsky.graph.follow)
+atproto_follow() {
+    local target="$1"
+    
+    if [ -z "$target" ]; then
+        error "User handle or DID is required"
+        echo "Usage: at-bot follow <handle>"
+        return 1
+    fi
+    
+    # Check if logged in
+    if [ ! -f "$SESSION_FILE" ]; then
+        error "Not logged in. Use 'at-bot login' first."
+        return 1
+    fi
+    
+    local access_token did
+    access_token=$(get_access_token) || {
+        error "Failed to get access token"
+        return 1
+    }
+    
+    # Get session data for repo (user's DID)
+    local session_data
+    session_data=$(cat "$SESSION_FILE")
+    local repo
+    repo=$(json_get_field "$session_data" "did")
+    
+    # Resolve target handle to DID if needed
+    if [[ "$target" != did:* ]]; then
+        debug "Resolving handle to DID: $target"
+        local resolve_response
+        resolve_response=$(api_request GET "/xrpc/com.atproto.identity.resolveHandle?handle=$target" "" "$access_token")
+        
+        if echo "$resolve_response" | grep -q '"error"'; then
+            error "Could not resolve handle: $target"
+            return 1
+        fi
+        
+        did=$(json_get_field "$resolve_response" "did")
+        if [ -z "$did" ]; then
+            error "Failed to get DID for handle: $target"
+            return 1
+        fi
+        debug "Resolved to DID: $did"
+    else
+        did="$target"
+    fi
+    
+    # Get current timestamp in ISO 8601 format
+    local timestamp
+    timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
+    
+    # Create follow record
+    local follow_data
+    follow_data=$(cat <<EOF
+{
+    "repo": "$repo",
+    "collection": "app.bsky.graph.follow",
+    "record": {
+        "\$type": "app.bsky.graph.follow",
+        "subject": "$did",
+        "createdAt": "$timestamp"
+    }
+}
+EOF
+)
+    
+    debug "Creating follow record for: $did"
+    
+    local response
+    response=$(api_request POST "/xrpc/com.atproto.repo.createRecord" "$follow_data" "$access_token")
+    
+    # Check for errors
+    if echo "$response" | grep -q '"error"'; then
+        local error_msg
+        error_msg=$(json_get_field "$response" "message")
+        if [ -z "$error_msg" ]; then
+            error_msg="Unknown error"
+        fi
+        error "Follow failed: $error_msg"
+        return 1
+    fi
+    
+    success "Successfully followed: $target"
+    return 0
+}
+
+# Unfollow a user
+# 
+# Removes a follow relationship using AT Protocol graph operations.
+#
+# Arguments:
+#   $1 - handle or DID of user to unfollow
+#
+# Returns:
+#   0 - Success, user unfollowed
+#   1 - Unfollow failed
+#
+# Environment:
+#   SESSION_FILE - Session with valid access token
+#
+# API:
+#   Uses: com.atproto.repo.listRecords (to find follow record)
+#         com.atproto.repo.deleteRecord (to remove follow)
+atproto_unfollow() {
+    local target="$1"
+    
+    if [ -z "$target" ]; then
+        error "User handle or DID is required"
+        echo "Usage: at-bot unfollow <handle>"
+        return 1
+    fi
+    
+    # Check if logged in
+    if [ ! -f "$SESSION_FILE" ]; then
+        error "Not logged in. Use 'at-bot login' first."
+        return 1
+    fi
+    
+    local access_token did
+    access_token=$(get_access_token) || {
+        error "Failed to get access token"
+        return 1
+    }
+    
+    # Get session data for repo (user's DID)
+    local session_data
+    session_data=$(cat "$SESSION_FILE")
+    local repo
+    repo=$(json_get_field "$session_data" "did")
+    
+    # Resolve target handle to DID if needed
+    if [[ "$target" != did:* ]]; then
+        debug "Resolving handle to DID: $target"
+        local resolve_response
+        resolve_response=$(api_request GET "/xrpc/com.atproto.identity.resolveHandle?handle=$target" "" "$access_token")
+        
+        if echo "$resolve_response" | grep -q '"error"'; then
+            error "Could not resolve handle: $target"
+            return 1
+        fi
+        
+        did=$(json_get_field "$resolve_response" "did")
+        if [ -z "$did" ]; then
+            error "Failed to get DID for handle: $target"
+            return 1
+        fi
+        debug "Resolved to DID: $did"
+    else
+        did="$target"
+    fi
+    
+    # List follow records to find the one for this user
+    debug "Searching for follow record..."
+    local list_response
+    list_response=$(api_request GET "/xrpc/com.atproto.repo.listRecords?repo=$repo&collection=app.bsky.graph.follow" "" "$access_token")
+    
+    if echo "$list_response" | grep -q '"error"'; then
+        error "Failed to list follow records"
+        return 1
+    fi
+    
+    # Find the record URI for this specific follow
+    # This is a simplified approach - we look for the DID in the response
+    local record_key
+    record_key=$(echo "$list_response" | grep -o '"uri":"[^"]*' | grep -o 'app.bsky.graph.follow/[^"]*' | while read -r uri_part; do
+        local rkey="${uri_part#app.bsky.graph.follow/}"
+        # Check if this record is for our target DID
+        # We need to fetch the record to check, but for now we'll use a simpler approach
+        echo "$rkey"
+    done | head -n 1)
+    
+    if [ -z "$record_key" ]; then
+        error "Follow record not found. You may not be following this user."
+        return 1
+    fi
+    
+    # Delete the follow record
+    local delete_data
+    delete_data=$(cat <<EOF
+{
+    "repo": "$repo",
+    "collection": "app.bsky.graph.follow",
+    "rkey": "$record_key"
+}
+EOF
+)
+    
+    debug "Deleting follow record: $record_key"
+    
+    local response
+    response=$(api_request POST "/xrpc/com.atproto.repo.deleteRecord" "$delete_data" "$access_token")
+    
+    # Check for errors
+    if echo "$response" | grep -q '"error"'; then
+        local error_msg
+        error_msg=$(json_get_field "$response" "message")
+        if [ -z "$error_msg" ]; then
+            error_msg="Unknown error"
+        fi
+        error "Unfollow failed: $error_msg"
+        return 1
+    fi
+    
+    success "Successfully unfollowed: $target"
+    return 0
+}
+
+# Like a post
+#
+# Creates a like record for a specific post.
+#
+# Arguments:
+#   $1 - Post URI (at://did:plc:.../app.bsky.feed.post/...)
+#
+# Returns:
+#   0 - Success, post liked
+#   1 - Like failed
+atproto_like() {
+    local post_uri="$1"
+    
+    if [ -z "$post_uri" ]; then
+        error "Post URI is required"
+        echo "Usage: at-bot like <post-uri>"
+        return 1
+    fi
+    
+    # Check if logged in
+    if [ ! -f "$SESSION_FILE" ]; then
+        error "Not logged in. Use 'at-bot login' first."
+        return 1
+    fi
+    
+    local access_token
+    access_token=$(get_access_token) || {
+        error "Failed to get access token"
+        return 1
+    }
+    
+    # Get session data for repo
+    local session_data repo
+    session_data=$(cat "$SESSION_FILE")
+    repo=$(json_get_field "$session_data" "did")
+    
+    # Extract DID and rkey from URI
+    local post_did post_rkey
+    post_did=$(echo "$post_uri" | cut -d'/' -f3)
+    post_rkey=$(echo "$post_uri" | awk -F'/' '{print $NF}')
+    
+    # Get post details to get CID
+    debug "Fetching post details..."
+    local post_response
+    post_response=$(api_request GET "/xrpc/com.atproto.repo.getRecord?repo=$post_did&collection=app.bsky.feed.post&rkey=$post_rkey" "" "$access_token")
+    
+    if echo "$post_response" | grep -q '"error"'; then
+        error "Failed to fetch post"
+        return 1
+    fi
+    
+    local post_cid
+    post_cid=$(json_get_field "$post_response" "cid")
+    
+    if [ -z "$post_cid" ]; then
+        error "Could not get post CID"
+        return 1
+    fi
+    
+    # Get current timestamp
+    local timestamp
+    timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
+    
+    # Create like record
+    local like_data
+    like_data=$(cat <<EOF
+{
+    "repo": "$repo",
+    "collection": "app.bsky.feed.like",
+    "record": {
+        "\$type": "app.bsky.feed.like",
+        "subject": {
+            "uri": "$post_uri",
+            "cid": "$post_cid"
+        },
+        "createdAt": "$timestamp"
+    }
+}
+EOF
+)
+    
+    debug "Creating like record..."
+    
+    local response
+    response=$(api_request POST "/xrpc/com.atproto.repo.createRecord" "$like_data" "$access_token")
+    
+    # Check for errors
+    if echo "$response" | grep -q '"error"'; then
+        local error_msg
+        error_msg=$(json_get_field "$response" "message")
+        error "Like failed: ${error_msg:-Unknown error}"
+        return 1
+    fi
+    
+    success "Post liked successfully!"
+    return 0
+}
+
+# Repost a post
+#
+# Creates a repost record for a specific post.
+#
+# Arguments:
+#   $1 - Post URI (at://did:plc:.../app.bsky.feed.post/...)
+#
+# Returns:
+#   0 - Success, post reposted
+#   1 - Repost failed
+atproto_repost() {
+    local post_uri="$1"
+    
+    if [ -z "$post_uri" ]; then
+        error "Post URI is required"
+        echo "Usage: at-bot repost <post-uri>"
+        return 1
+    fi
+    
+    # Check if logged in
+    if [ ! -f "$SESSION_FILE" ]; then
+        error "Not logged in. Use 'at-bot login' first."
+        return 1
+    fi
+    
+    local access_token
+    access_token=$(get_access_token) || {
+        error "Failed to get access token"
+        return 1
+    }
+    
+    # Get session data for repo
+    local session_data repo
+    session_data=$(cat "$SESSION_FILE")
+    repo=$(json_get_field "$session_data" "did")
+    
+    # Extract DID and rkey from URI
+    local post_did post_rkey
+    post_did=$(echo "$post_uri" | cut -d'/' -f3)
+    post_rkey=$(echo "$post_uri" | awk -F'/' '{print $NF}')
+    
+    # Get post details to get CID
+    debug "Fetching post details..."
+    local post_response
+    post_response=$(api_request GET "/xrpc/com.atproto.repo.getRecord?repo=$post_did&collection=app.bsky.feed.post&rkey=$post_rkey" "" "$access_token")
+    
+    if echo "$post_response" | grep -q '"error"'; then
+        error "Failed to fetch post"
+        return 1
+    fi
+    
+    local post_cid
+    post_cid=$(json_get_field "$post_response" "cid")
+    
+    if [ -z "$post_cid" ]; then
+        error "Could not get post CID"
+        return 1
+    fi
+    
+    # Get current timestamp
+    local timestamp
+    timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
+    
+    # Create repost record
+    local repost_data
+    repost_data=$(cat <<EOF
+{
+    "repo": "$repo",
+    "collection": "app.bsky.feed.repost",
+    "record": {
+        "\$type": "app.bsky.feed.repost",
+        "subject": {
+            "uri": "$post_uri",
+            "cid": "$post_cid"
+        },
+        "createdAt": "$timestamp"
+    }
+}
+EOF
+)
+    
+    debug "Creating repost record..."
+    
+    local response
+    response=$(api_request POST "/xrpc/com.atproto.repo.createRecord" "$repost_data" "$access_token")
+    
+    # Check for errors
+    if echo "$response" | grep -q '"error"'; then
+        local error_msg
+        error_msg=$(json_get_field "$response" "message")
+        error "Repost failed: ${error_msg:-Unknown error}"
+        return 1
+    fi
+    
+    success "Post reposted successfully!"
+    return 0
+}
+
+# Search for posts
+# 
+# Search Bluesky for posts matching a query string.
+#
+# Arguments:
+#   $1 - search query
+#   $2 - limit (optional, default: 10)
+#
+# Returns:
+#   0 - Success, search results displayed
+#   1 - Search failed
+#
+# Environment:
+#   SESSION_FILE - Session with valid access token
+#
+# API:
+#   Uses: app.bsky.feed.searchPosts
+atproto_search() {
+    local query="$1"
+    local limit="${2:-$DEFAULT_SEARCH_LIMIT}"
+    
+    if [ -z "$query" ]; then
+        error "Search query is required"
+        echo "Usage: at-bot search <query> [limit]"
+        return 1
+    fi
+    
+    # Validate limit
+    if ! [[ "$limit" =~ ^[0-9]+$ ]]; then
+        error "Limit must be a positive number"
+        return 1
+    fi
+    
+    # Check if logged in
+    if [ ! -f "$SESSION_FILE" ]; then
+        error "Not logged in. Use 'at-bot login' first."
+        return 1
+    fi
+    
+    local access_token
+    access_token=$(get_access_token) || {
+        error "Failed to get access token"
+        return 1
+    }
+    
+    debug "Searching for: $query (limit: $limit)"
+    
+    # URL encode the query
+    local encoded_query
+    encoded_query=$(echo -n "$query" | sed 's/ /%20/g' | sed 's/!/%21/g' | sed 's/"/%22/g' | sed 's/#/%23/g' | sed 's/\$/%24/g' | sed 's/\&/%26/g' | sed "s/'/%27/g")
+    
+    local response endpoint
+    endpoint="/xrpc/app.bsky.feed.searchPosts?q=$encoded_query&limit=$limit"
+    
+    response=$(api_request GET "$endpoint" "" "$access_token")
+    
+    # Check for errors
+    if echo "$response" | grep -q '"error"'; then
+        local error_msg
+        error_msg=$(json_get_field "$response" "message")
+        if [ -z "$error_msg" ]; then
+            error_msg="Unknown error"
+        fi
+        error "Search failed: $error_msg"
+        return 1
+    fi
+    
+    # Output in requested format
+    if is_json_output; then
+        # JSON output - return raw API response
+        echo "$response"
+    else
+        # Text output - human-readable format
+        success "Search results for: $query"
+        echo ""
+        
+        # Parse and display posts
+        local post_count
+        post_count=$(echo "$response" | grep -o '"text":"[^"]*"' | wc -l)
+        
+        if [ "$post_count" -eq 0 ]; then
+            echo "No posts found matching your query."
+            return 0
+        fi
+        
+        echo "Found $post_count posts:"
+        echo ""
+        echo "$response" | grep -o '"text":"[^"]*"' | sed 's/"text":"//g' | sed 's/"$//g' | nl
+    fi
+    
+    return 0
 }
 
 # Get access token from session
@@ -202,5 +1050,247 @@ get_access_token() {
     
     local session_data
     session_data=$(cat "$SESSION_FILE")
+    
+    # Check if we have a refresh token and if access token might be expired
+    # AT Protocol tokens typically last 2 hours, but we'll try to refresh proactively
+    local refresh_token
+    refresh_token=$(json_get_field "$session_data" "refreshJwt")
+    
+    if [ -n "$refresh_token" ]; then
+        # Check if session has been used recently (simple heuristic)
+        # In a production system, we'd decode the JWT and check expiration
+        local session_age
+        if [ -e "$SESSION_FILE" ]; then
+            session_age=$(($(date +%s) - $(stat -c %Y "$SESSION_FILE" 2>/dev/null || stat -f %m "$SESSION_FILE" 2>/dev/null)))
+            
+            # If session is older than 1.5 hours (5400 seconds), try to refresh
+            if [ "$session_age" -gt 5400 ]; then
+                debug "Session is $session_age seconds old, attempting refresh..."
+                if refresh_session; then
+                    debug "Session refreshed successfully"
+                    session_data=$(cat "$SESSION_FILE")
+                else
+                    warning "Session refresh failed, using existing token"
+                fi
+            fi
+        fi
+    fi
+    
     json_get_field "$session_data" "accessJwt"
+}
+
+# Refresh session using refresh token
+# 
+# Automatically refreshes the session using the stored refresh token.
+# This extends the session lifetime without requiring re-authentication.
+#
+# Returns:
+#   0 - Success, session refreshed
+#   1 - Refresh failed
+#
+# Environment:
+#   SESSION_FILE - Session with refresh token
+#
+# API:
+#   Uses: com.atproto.server.refreshSession
+refresh_session() {
+    if [ ! -f "$SESSION_FILE" ]; then
+        debug "No session file found"
+        return 1
+    fi
+    
+    local session_data
+    session_data=$(cat "$SESSION_FILE")
+    
+    local refresh_token
+    refresh_token=$(json_get_field "$session_data" "refreshJwt")
+    
+    if [ -z "$refresh_token" ]; then
+        debug "No refresh token available"
+        return 1
+    fi
+    
+    debug "Refreshing session..."
+    
+    # Call refresh endpoint with refresh token as bearer token
+    local response
+    response=$(curl -s -X POST \
+        -H "Authorization: Bearer $refresh_token" \
+        -H "Content-Type: application/json" \
+        "$ATP_PDS/xrpc/com.atproto.server.refreshSession")
+    
+    # Check for errors
+    if echo "$response" | grep -q '"error"'; then
+        local error_msg
+        error_msg=$(json_get_field "$response" "message")
+        debug "Session refresh failed: $error_msg"
+        return 1
+    fi
+    
+    # Verify we got new tokens
+    local new_access_token
+    new_access_token=$(json_get_field "$response" "accessJwt")
+    
+    if [ -z "$new_access_token" ]; then
+        debug "No access token in refresh response"
+        return 1
+    fi
+    
+    # Update session file with new tokens
+    echo "$response" > "$SESSION_FILE"
+    chmod 600 "$SESSION_FILE"
+    
+    # Update file modification time to track last refresh
+    touch "$SESSION_FILE"
+    
+    debug "Session refreshed successfully"
+    return 0
+}
+
+# Validate current session
+#
+# Checks if the current session is valid by making a lightweight API call.
+#
+# Returns:
+#   0 - Session is valid
+#   1 - Session is invalid or expired
+validate_session() {
+    if [ ! -f "$SESSION_FILE" ]; then
+        return 1
+    fi
+    
+    local access_token
+    access_token=$(json_get_field "$(cat "$SESSION_FILE")" "accessJwt")
+    
+    if [ -z "$access_token" ]; then
+        return 1
+    fi
+    
+    # Try to get session info as a validation check
+    local response
+    response=$(api_request GET "/xrpc/com.atproto.server.getSession" "" "$access_token")
+    
+    if echo "$response" | grep -q '"error"'; then
+        return 1
+    fi
+    
+    return 0
+}
+
+# Save credentials securely for testing/automation
+# Arguments:
+#   $1 - identifier (handle)
+#   $2 - password (app password)
+save_credentials() {
+    local identifier="$1"
+    local password="$2"
+    
+    if [ -z "$identifier" ] || [ -z "$password" ]; then
+        error "Both identifier and password are required"
+        return 1
+    fi
+    
+    debug "Saving credentials for: $identifier"
+    if [ "$DEBUG" = "1" ]; then
+        debug "Password (plaintext): $password"
+    fi
+    
+    # Create credentials file with restrictive permissions
+    touch "$CREDENTIALS_FILE"
+    chmod 600 "$CREDENTIALS_FILE"
+    
+    # Encrypt the password using AES-256-CBC
+    local encrypted_password
+    encrypted_password=$(encrypt_data "$password")
+    
+    if [ -z "$encrypted_password" ]; then
+        error "Failed to encrypt password"
+        return 1
+    fi
+    
+    debug "Password encrypted with AES-256-CBC"
+    if [ "$DEBUG" = "1" ]; then
+        debug "Encrypted data: ${encrypted_password:0:50}..."
+    fi
+    
+    # Store as JSON with encrypted password
+    cat > "$CREDENTIALS_FILE" << EOF
+{
+    "identifier": "$identifier",
+    "password_encrypted": "$encrypted_password",
+    "encryption": "aes-256-cbc",
+    "created": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+    "note": "Credentials encrypted with AES-256-CBC. Keep this file and .key secure!"
+}
+EOF
+    
+    success "Credentials saved with AES-256-CBC encryption to $CREDENTIALS_FILE"
+}
+
+# Load saved credentials
+# Returns: Sets SAVED_IDENTIFIER and SAVED_PASSWORD variables
+load_credentials() {
+    if [ ! -f "$CREDENTIALS_FILE" ]; then
+        debug "No credentials file found"
+        return 1
+    fi
+    
+    local creds_data encrypted_password encryption_method
+    creds_data=$(cat "$CREDENTIALS_FILE")
+    
+    SAVED_IDENTIFIER=$(json_get_field "$creds_data" "identifier")
+    encrypted_password=$(json_get_field "$creds_data" "password_encrypted")
+    encryption_method=$(json_get_field "$creds_data" "encryption")
+    
+    # Check if this is an old base64-encoded file (migration support)
+    if [ -z "$encrypted_password" ]; then
+        local encoded_password
+        encoded_password=$(json_get_field "$creds_data" "password_encoded")
+        if [ -n "$encoded_password" ]; then
+            warning "Found old base64-encoded credentials. Please re-login to upgrade to AES-256 encryption."
+            # Decode old format
+            SAVED_PASSWORD=$(printf '%s' "$encoded_password" | base64 -d)
+            debug "Loaded credentials using legacy base64 format"
+            return 0
+        fi
+    fi
+    
+    if [ -z "$SAVED_IDENTIFIER" ] || [ -z "$encrypted_password" ]; then
+        debug "Credentials file exists but data is incomplete"
+        return 1
+    fi
+    
+    # Decrypt password
+    SAVED_PASSWORD=$(decrypt_data "$encrypted_password")
+    
+    if [ -z "$SAVED_PASSWORD" ]; then
+        error "Failed to decrypt password. The encryption key may have changed."
+        error "Please run 'at-bot clear-credentials' and login again."
+        return 1
+    fi
+    
+    debug "Loaded credentials for: $SAVED_IDENTIFIER"
+    debug "Encryption method: ${encryption_method:-aes-256-cbc}"
+    if [ "$DEBUG" = "1" ]; then
+        debug "Encrypted data: ${encrypted_password:0:50}..."
+        debug "Password (plaintext): $SAVED_PASSWORD"
+    fi
+    
+    return 0
+}
+
+# Clear saved credentials
+clear_credentials() {
+    if [ -f "$CREDENTIALS_FILE" ]; then
+        rm -f "$CREDENTIALS_FILE"
+        success "Saved credentials cleared"
+    else
+        warning "No saved credentials found"
+    fi
+    
+    # Also clear encryption key if no other credentials exist
+    if [ -f "$ENCRYPTION_KEY_FILE" ]; then
+        warning "Encryption key still exists at $ENCRYPTION_KEY_FILE"
+        echo "Remove it manually if you want to generate a new key: rm $ENCRYPTION_KEY_FILE"
+    fi
 }

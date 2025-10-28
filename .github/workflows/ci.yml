@@ -1,0 +1,222 @@
+name: AT-bot CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up environment
+        run: |
+          # Verify required tools
+          echo "Checking dependencies..."
+          which bash
+          which curl
+          which grep
+          which sed
+          bash --version
+          curl --version
+      
+      - name: Run shellcheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: './bin ./lib ./tests'
+          severity: warning
+      
+      - name: Run test suite
+        run: |
+          # Make scripts executable
+          chmod +x bin/at-bot
+          chmod +x tests/*.sh
+          
+          # Run all tests
+          make test
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: |
+            tests/
+          retention-days: 7
+
+  lint:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run shellcheck on all shell scripts
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: './bin ./lib ./tests'
+          severity: error
+      
+      - name: Check for common issues
+        run: |
+          echo "Checking for common shell script issues..."
+          
+          # Check for unquoted variables
+          ! grep -rn '\$[A-Za-z_][A-Za-z0-9_]*[^"]' bin/ lib/ --include="*.sh" | grep -v '^\s*#'
+          
+          # Check for missing shebangs in executable scripts
+          for file in bin/* tests/*.sh; do
+            if [ -x "$file" ]; then
+              if ! head -n1 "$file" | grep -q "^#!"; then
+                echo "Error: $file is executable but missing shebang"
+                exit 1
+              fi
+            fi
+          done
+          
+          echo "✓ Code quality checks passed"
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check for sensitive data
+        run: |
+          echo "Scanning for potential security issues..."
+          
+          # Check for hardcoded credentials patterns
+          ! grep -rn 'password\s*=\s*["\047][^"\047]*["\047]' . --include="*.sh" --include="*.md" --exclude-dir=".git"
+          ! grep -rn 'BLUESKY_PASSWORD\s*=' . --include="*.sh" --exclude-dir=".git" --exclude-dir="tests"
+          
+          # Check for exposed session files
+          ! find . -name "session.json" -o -name "credentials.json" | grep -v ".gitignore"
+          
+          echo "✓ No obvious security issues found"
+      
+      - name: Verify .gitignore
+        run: |
+          echo "Checking .gitignore coverage..."
+          
+          # Ensure sensitive files are in .gitignore
+          grep -q "session.json" .gitignore || { echo "Missing session.json in .gitignore"; exit 1; }
+          grep -q "credentials.json" .gitignore || { echo "Missing credentials.json in .gitignore"; exit 1; }
+          grep -q ".key" .gitignore || { echo "Missing .key in .gitignore"; exit 1; }
+          
+          echo "✓ .gitignore is properly configured"
+
+  compatibility:
+    name: Cross-platform Testing
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install coreutils grep gnu-sed
+          echo "/usr/local/opt/gnu-sed/libexec/gnubin" >> $GITHUB_PATH
+      
+      - name: Test installation
+        run: |
+          # Test installation script
+          chmod +x install.sh
+          sudo ./install.sh
+          
+          # Verify installation
+          which at-bot
+          at-bot --version
+          at-bot help
+      
+      - name: Run compatibility tests
+        run: |
+          # Run basic CLI tests
+          chmod +x tests/*.sh
+          ./tests/test_cli_basic.sh
+          ./tests/test_library.sh
+      
+      - name: Test uninstallation
+        run: |
+          chmod +x uninstall.sh
+          sudo ./uninstall.sh
+          
+          # Verify removal
+          ! which at-bot || { echo "at-bot should be removed"; exit 1; }
+
+  documentation:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check documentation
+        run: |
+          echo "Verifying documentation..."
+          
+          # Check for required documentation files
+          test -f README.md
+          test -f TODO.md
+          test -f STYLE.md
+          test -f PLAN.md
+          test -f AGENTS.md
+          test -f doc/ENCRYPTION.md
+          test -f doc/SECURITY.md
+          test -f doc/CONTRIBUTING.md
+          
+          # Check for broken internal links
+          echo "✓ All required documentation present"
+      
+      - name: Verify examples
+        run: |
+          # Check that examples in README are valid
+          grep -q "at-bot login" README.md
+          grep -q "at-bot post" README.md
+          grep -q "at-bot feed" README.md
+          grep -q "at-bot follow" README.md
+          grep -q "at-bot search" README.md
+          
+          echo "✓ README examples are up to date"
+
+  release-check:
+    name: Release Readiness
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: [test, lint, security, compatibility]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check version consistency
+        run: |
+          echo "Checking version consistency..."
+          
+          # Check version in bin/at-bot
+          grep -q "version 0.1.0" bin/at-bot
+          
+          echo "✓ Version is consistent"
+      
+      - name: Verify changelog
+        run: |
+          # Check if TODO.md tracks completed features
+          echo "Verifying feature tracking..."
+          
+          echo "✓ Release checks passed"

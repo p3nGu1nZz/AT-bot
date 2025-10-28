@@ -213,15 +213,39 @@ AT-bot/
 │   ├── run_tests.sh  # Test runner
 │   ├── test_*.sh     # Individual test files
 │   └── fixtures/     # Test data
-├── doc/              # Documentation
-│   ├── *.md          # Various documentation files
+├── doc/              # Documentation hub
+│   ├── *.md          # Core documentation (ARCHITECTURE.md, QUICKREF.md, etc.)
+│   ├── sessions/     # Session summaries and work logs
+│   ├── progress/     # Progress reports and milestones
 │   └── examples/     # Usage examples
+├── mcp-server/       # MCP server implementation
+│   ├── docs/         # MCP-specific documentation
+│   └── src/          # MCP server source code
 ├── scripts/          # Build and automation scripts
 │   ├── install.sh    # Installation script
 │   └── package.sh    # Packaging script (future)
 └── config/           # Configuration templates
     └── default.conf  # Default configuration (future)
 ```
+
+### Documentation File Organization
+
+Files should be organized as follows:
+
+**Project Root** (`/`): Only essential files
+- Strategic/foundational docs: `README.md`, `PLAN.md`, `AGENTS.md`, `STYLE.md`, `TODO.md`
+- License and build files: `LICENSE`, `Makefile`, `install.sh`, `uninstall.sh`
+
+**`doc/` Directory**: Main documentation hub
+- **Core Documentation**: Feature docs (CONFIGURATION.md, DEBUGGING.md, SECURITY.md, TESTING.md, etc.)
+- **Architecture Documentation**: Design decisions and system architecture (ARCHITECTURE.md, QUICKREF.md)
+- **`doc/sessions/`**: Development session summaries and work logs (SESSION_SUMMARY_*.md files)
+- **`doc/progress/`**: Project tracking, milestone reports, and progress updates (PROGRESS_*.md, MILESTONE_REPORT.md, PROJECT_DASHBOARD.md)
+- **`doc/examples/`**: Usage examples and tutorials (example scripts)
+
+**`mcp-server/docs/` Directory**: MCP-specific documentation
+- MCP implementation guides (MCP_INTEGRATION.md, MCP_TOOLS.md, QUICKSTART_MCP.md)
+- MCP server examples and configuration documentation
 
 ### Module Organization
 
@@ -504,6 +528,80 @@ esac
 # Use appropriate config directories
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/at-bot"
 ```
+
+## Documentation Organization Guidelines
+
+### When Creating New Documentation
+
+Follow these guidelines to maintain a clean, organized documentation structure:
+
+#### Session Summaries & Work Logs
+**Location**: `doc/sessions/`
+**Pattern**: `SESSION_SUMMARY_YYYY-MM-DD*.md` or `WORK_LOG_*.md`
+**Purpose**: Record development sessions, code review notes, decision logs
+**Retention**: Archive old sessions periodically
+
+*Examples*:
+- `doc/sessions/SESSION_SUMMARY_2025-10-28.md`
+- `doc/sessions/SESSION_SUMMARY_2025-10-28_CONFIG.md`
+- `doc/sessions/WORK_LOG_feature-auth.md`
+
+#### Progress Reports & Milestones
+**Location**: `doc/progress/`
+**Pattern**: `PROGRESS_YYYY-MM-DD.md`, `MILESTONE_*.md`, `PROJECT_DASHBOARD.md`
+**Purpose**: Track project evolution, milestones, metrics, and status updates
+**Retention**: Keep recent reports; archive quarterly summaries
+
+*Examples*:
+- `doc/progress/PROGRESS_2025-10-28.md`
+- `doc/progress/MILESTONE_REPORT.md`
+- `doc/progress/PROJECT_DASHBOARD.md`
+
+#### Feature & Implementation Documentation
+**Location**: `doc/`
+**Pattern**: Feature name in uppercase (ENCRYPTION.md, DEBUG_MODE.md, etc.)
+**Purpose**: Document features, configuration, testing, security, packaging
+**Retention**: Permanent - update as features evolve
+
+*Examples*:
+- `doc/CONFIGURATION.md` - User configuration guide
+- `doc/ENCRYPTION.md` - Encryption implementation details
+- `doc/DEBUG_MODE.md` - Debugging guide
+- `doc/SECURITY.md` - Security guidelines
+- `doc/TESTING.md` - Testing procedures
+
+#### MCP-Specific Documentation
+**Location**: `mcp-server/docs/`
+**Pattern**: MCP-focused implementation and integration guides
+**Purpose**: MCP server setup, tools, integration patterns
+**Retention**: Permanent - update as MCP features evolve
+
+*Examples*:
+- `mcp-server/docs/MCP_TOOLS.md` - Available MCP tools
+- `mcp-server/docs/MCP_INTEGRATION.md` - Integration patterns
+- `mcp-server/docs/QUICKSTART_MCP.md` - MCP quickstart guide
+
+#### Root-Level Strategic Documents
+**Location**: Project root (`/`)
+**Files**: `README.md`, `PLAN.md`, `AGENTS.md`, `STYLE.md`, `TODO.md`
+**Purpose**: High-level project information and strategy
+**Never move these**: They're referenced externally and are foundational
+
+### File Naming Conventions for Documentation
+
+- **Session summaries**: `SESSION_SUMMARY_YYYY-MM-DD[_TOPIC].md`
+- **Progress reports**: `PROGRESS_YYYY-MM-DD.md` or `MILESTONE_*.md`
+- **Feature docs**: `FEATURE_NAME_IN_CAPS.md`
+- **Guides**: `SUBJECT_GUIDE.md` or `HOW_TO_SUBJECT.md`
+
+### Before Adding New Markdown Files
+
+Ask yourself:
+1. **Is this a strategic document?** → Keep at project root (README, PLAN, etc.)
+2. **Is this a session/work log?** → Move to `doc/sessions/`
+3. **Is this a progress/milestone report?** → Move to `doc/progress/`
+4. **Is this a feature/implementation guide?** → Keep in `doc/`
+5. **Is this MCP-specific?** → Move to `mcp-server/docs/`
 
 ## Git Commit Standards
 

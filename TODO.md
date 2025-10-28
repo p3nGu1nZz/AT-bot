@@ -41,16 +41,19 @@ This document tracks pending tasks, improvements, and features for the AT-bot pr
 ## Core Functionality
 
 ### Authentication & Session Management
+- [x] ✅ **COMPLETED** - Add secure token storage using AES-256-CBC encryption (upgraded from base64)
+- [x] ✅ **COMPLETED** - Implement debug mode for development (DEBUG=1 shows plaintext)
+- [x] ✅ **COMPLETED** - Add backward compatibility for old base64 credentials
 - [ ] Add session refresh capability for expired tokens
-- [ ] Implement secure token storage using system keyring (optional)
+- [ ] Implement secure token storage using system keyring (optional enhancement)
 - [ ] Add session validation before API calls
 - [ ] Support multiple user sessions/profiles
 - [ ] Add logout confirmation prompt
 - [ ] Implement session timeout handling
 
 ### AT Protocol Integration
-- [ ] Add post creation functionality (`at-bot post "message"`)
-- [ ] Implement timeline/feed reading capabilities
+- [x] ✅ **COMPLETED** - Add post creation functionality (`at-bot post "message"`)
+- [x] ✅ **COMPLETED** - Implement timeline/feed reading capabilities
 - [ ] Add follow/unfollow user commands
 - [ ] Support for image/media uploads in posts
 - [ ] Add reply functionality for posts
@@ -88,7 +91,7 @@ This document tracks pending tasks, improvements, and features for the AT-bot pr
 ## Development & Code Quality
 
 ### Testing
-- [ ] Expand test coverage for edge cases
+- [x] ✅ **COMPLETED** - Expand test coverage for edge cases (encryption test suite added)
 - [ ] Add integration tests with mock AT Protocol server
 - [ ] Implement automated testing in CI/CD pipeline
 - [ ] Add performance benchmarks and tests

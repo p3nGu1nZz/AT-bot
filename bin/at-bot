@@ -23,6 +23,8 @@ fi
 
 # shellcheck source=../lib/atproto.sh
 source "$LIB_DIR/atproto.sh"
+# shellcheck source=../lib/config.sh
+source "$LIB_DIR/config.sh"
 
 # Configuration
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/at-bot"
@@ -40,24 +42,65 @@ Usage: at-bot [COMMAND] [OPTIONS]
 Commands:
     login               Login to your Bluesky account
     logout              Logout and clear session
+    refresh             Refresh session token
     whoami              Display current authenticated user
+    post <text>         Create a new post
+    reply <uri> <text>  Reply to a post
+    like <uri>          Like a post
+    repost <uri>        Repost a post
+    feed [limit]        Read your timeline (default: 10 posts)
+    follow <handle>     Follow a user
+    unfollow <handle>   Unfollow a user
+    search <query>      Search for posts
+    config              Manage configuration
+    clear-credentials   Clear saved credentials
     help                Show this help message
+
+Config Commands:
+    config list         Show all configuration values
+    config get <key>    Get a configuration value
+    config set <key> <value>  Set a configuration value
+    config reset        Reset configuration to defaults
+    config validate     Validate configuration file
+
+Configuration Keys:
+    pds_endpoint        AT Protocol server URL
+    output_format       Output format (text, json)
+    color_output        Color output (auto, always, never)
+    feed_limit          Default feed limit
+    search_limit        Default search limit
+    debug               Debug mode (true, false)
 
 Options:
     -h, --help          Show this help message
     -v, --version       Show version information
 
 Examples:
-    at-bot login        # Interactive login
-    at-bot whoami       # Check current user
-    at-bot logout       # Clear session
+    at-bot login                    # Interactive login
+    at-bot whoami                   # Check current user
+    at-bot post "Hello Bluesky!"    # Create a post
+    at-bot reply at://... "Great!"  # Reply to a post
+    at-bot like at://...            # Like a post
+    at-bot repost at://...          # Repost a post
+    at-bot feed                     # Read timeline (10 posts)
+    at-bot feed 20                  # Read timeline (20 posts)
+    at-bot follow user.bsky.social  # Follow a user
+    at-bot unfollow user.bsky.social # Unfollow a user
+    at-bot search "bluesky" 20      # Search for posts
+    at-bot refresh                  # Refresh session
+    at-bot config list              # Show configuration
+    at-bot config set feed_limit 50 # Change default feed limit
+    at-bot logout                   # Clear session
 
 Environment Variables:
     BLUESKY_HANDLE      Your Bluesky handle (optional)
     BLUESKY_PASSWORD    Your Bluesky app password (optional)
+    ATP_PDS             AT Protocol server (default: https://bsky.social)
+    DEBUG               Set to 1 to enable debug output (shows plaintext passwords)
 
 Configuration:
     Session data is stored in: $CONFIG_DIR/session.json
+    Saved credentials (optional): $CONFIG_DIR/credentials.json
 
 For more information, visit: https://github.com/p3nGu1nZz/AT-bot
 EOF
@@ -83,8 +126,125 @@ main() {
         logout)
             atproto_logout
             ;;
+        refresh)
+            if refresh_session; then
+                success "Session refreshed successfully"
+            else
+                error "Failed to refresh session"
+                exit 1
+            fi
+            ;;
         whoami)
             atproto_whoami
+            ;;
+        post)
+            shift
+            if [ -z "$1" ]; then
+                error "Post text is required"
+                echo "Usage: at-bot post <text>" >&2
+                exit 1
+            fi
+            atproto_post "$@"
+            ;;
+        reply)
+            shift
+            if [ -z "$1" ] || [ -z "$2" ]; then
+                error "Reply requires post URI and text"
+                echo "Usage: at-bot reply <post-uri> <text>" >&2
+                exit 1
+            fi
+            local uri="$1"
+            shift
+            atproto_post "$*" "$uri"
+            ;;
+        like)
+            shift
+            if [ -z "$1" ]; then
+                error "Post URI is required"
+                echo "Usage: at-bot like <post-uri>" >&2
+                exit 1
+            fi
+            atproto_like "$@"
+            ;;
+        repost)
+            shift
+            if [ -z "$1" ]; then
+                error "Post URI is required"
+                echo "Usage: at-bot repost <post-uri>" >&2
+                exit 1
+            fi
+            atproto_repost "$@"
+            ;;
+        feed)
+            shift
+            atproto_feed "$@"
+            ;;
+        follow)
+            shift
+            if [ -z "$1" ]; then
+                error "User handle is required"
+                echo "Usage: at-bot follow <handle>" >&2
+                exit 1
+            fi
+            atproto_follow "$@"
+            ;;
+        unfollow)
+            shift
+            if [ -z "$1" ]; then
+                error "User handle is required"
+                echo "Usage: at-bot unfollow <handle>" >&2
+                exit 1
+            fi
+            atproto_unfollow "$@"
+            ;;
+        search)
+            shift
+            if [ -z "$1" ]; then
+                error "Search query is required"
+                echo "Usage: at-bot search <query> [limit]" >&2
+                exit 1
+            fi
+            atproto_search "$@"
+            ;;
+        config)
+            shift
+            case "${1:-list}" in
+                list)
+                    list_config
+                    ;;
+                get)
+                    shift
+                    if [ -z "$1" ]; then
+                        error "Configuration key required"
+                        echo "Usage: at-bot config get <key>" >&2
+                        exit 1
+                    fi
+                    get_config "$1"
+                    ;;
+                set)
+                    shift
+                    if [ -z "$1" ] || [ -z "$2" ]; then
+                        error "Both key and value required"
+                        echo "Usage: at-bot config set <key> <value>" >&2
+                        exit 1
+                    fi
+                    set_config "$1" "$2"
+                    ;;
+                reset)
+                    reset_config
+                    ;;
+                validate)
+                    validate_config
+                    ;;
+                *)
+                    error "Unknown config command: $1"
+                    echo "Usage: at-bot config [list|get|set|reset|validate]" >&2
+                    exit 1
+                    ;;
+            esac
+            ;;
+        clear-credentials)
+            clear_credentials
             ;;
         help|--help|-h)
             show_help

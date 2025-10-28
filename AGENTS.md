@@ -402,12 +402,41 @@ When implementing agent features, follow these guidelines:
    - Update [TODO.md](TODO.md) with completed/new items
    - Maintain [PLAN.md](PLAN.md) alignment with architecture
    - Document in copilot-instructions.md for developer guidance
+   - Place documentation files in correct locations per [STYLE.md](STYLE.md#documentation-organization-guidelines)
 
 4. **Testing**: Ensure quality
    - Write tests for new automation features
    - Test non-interactive workflows
    - Verify exit codes and output formats
    - Test security-sensitive operations
+
+## Documentation Organization
+
+### File Placement for Agent-Related Work
+
+When creating documentation for agent features, use these guidelines:
+
+**Session Summaries** → `doc/sessions/SESSION_SUMMARY_YYYY-MM-DD_TOPIC.md`
+- Record agent development and testing sessions
+- Document automation patterns discovered
+- Note integration decisions and challenges
+
+**Progress Reports** → `doc/progress/PROGRESS_YYYY-MM-DD.md`
+- Track agent feature implementation progress
+- Update project dashboard with agent metrics
+- Document milestone achievements for agents
+
+**Agent Documentation** → `doc/` (if core feature docs) or `AGENTS.md` (if pattern docs)
+- Core agent framework documentation → `doc/AGENTS_FRAMEWORK.md`
+- Specific agent guides → `doc/AGENT_*.md`
+- Agent patterns and best practices → Update [AGENTS.md](AGENTS.md)
+
+**MCP Server Documentation** → `mcp-server/docs/`
+- MCP tool definitions → `mcp-server/docs/MCP_TOOLS.md`
+- MCP server setup → `mcp-server/docs/QUICKSTART_MCP.md`
+- MCP integration guides → `mcp-server/docs/MCP_INTEGRATION.md`
+
+See [STYLE.md](STYLE.md) for comprehensive documentation organization guidelines.
 
 ## Resources
 
