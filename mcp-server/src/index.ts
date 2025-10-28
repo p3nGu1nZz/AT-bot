@@ -17,6 +17,10 @@ import { authTools } from './tools/auth-tools.js';
 import { contentTools } from './tools/content-tools.js';
 import { feedTools } from './tools/feed-tools.js';
 import { profileTools } from './tools/profile-tools.js';
+import { engagementTools } from './tools/engagement-tools.js';
+import { socialTools } from './tools/social-tools.js';
+import { searchTools } from './tools/search-tools.js';
+import { mediaTools } from './tools/media-tools.js';
 import { executeShellCommand } from './lib/shell-executor.js';
 
 /**
@@ -46,6 +50,10 @@ class ATBotMCPServer {
       ...contentTools,
       ...feedTools,
       ...profileTools,
+      ...engagementTools,
+      ...socialTools,
+      ...searchTools,
+      ...mediaTools,
     ];
     
     this.tools = new Map(allTools.map(tool => [tool.name, tool]));
