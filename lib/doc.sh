@@ -114,6 +114,7 @@ declare -a EXCLUDED_PATTERNS=(
     "dist/*"
     "node_modules/*"
     ".git/*"
+    ".github/*"
     ".vscode/*"
     "*/node_modules/*"
     "doc/sessions/*"
@@ -123,7 +124,6 @@ declare -a EXCLUDED_PATTERNS=(
     "*/tests/*"
     "*/test-*"
     "TODO.md"
-    
 )
 
 # Generate CSS for styling
