@@ -37,7 +37,6 @@ fi
 # Remove files
 echo "Removing files..."
 $SUDO rm -f "$BINDIR/at-bot"
-$SUDO rm -f "$BINDIR/at-bot-docs"
 $SUDO rm -rf "$LIBDIR"
 $SUDO rm -rf "$DOCDIR"
 
