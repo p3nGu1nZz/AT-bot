@@ -185,7 +185,15 @@ test_content() {
 test_profile() {
     print_section "👤 Profile Tests"
     
-    run_test "View own profile" "$AT_BOT profile"
+    # Get current user's handle for profile test
+    local current_user
+    current_user=$("$AT_BOT" whoami 2>/dev/null | grep "Handle:" | awk '{print $NF}')
+    
+    if [ -n "$current_user" ]; then
+        run_test "View own profile" "$AT_BOT profile $current_user"
+    else
+        run_test "View own profile" "$AT_BOT profile"
+    fi
 }
 
 # Search Tests
@@ -236,7 +244,7 @@ test_diagnostics() {
 print_summary() {
     echo ""
     echo -e "${CYAN}╔═══════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║${NC}  ${WHITE}Test Summary${NC}                                         ${CYAN}║${NC}"
+    echo -e "${CYAN}║${NC}  ${WHITE}Test Summary${NC}                                             ${CYAN}║${NC}"
     echo -e "${CYAN}╚═══════════════════════════════════════════════════════════╝${NC}"
     echo ""
     echo -e "  Total Tests:    ${WHITE}$TOTAL_TESTS${NC}"
