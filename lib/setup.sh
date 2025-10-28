@@ -97,6 +97,8 @@ check_core_dependencies() {
     check_dependency "sed" "sed" || missing=$((missing + 1))
     check_dependency "awk" "awk" || missing=$((missing + 1))
     check_dependency "openssl" "OpenSSL" || missing=$((missing + 1))
+    check_dependency "pandoc" "Pandoc" || missing=$((missing + 1))
+    check_dependency "wkhtmltopdf" "wkhtmltopdf" || missing=$((missing + 1))
     
     return $missing
 }
@@ -105,13 +107,6 @@ check_core_dependencies() {
 check_optional_dependencies() {
     info "Checking optional dependencies..."
     local missing=0
-    
-    if ! has_command "pandoc"; then
-        warning "pandoc is not installed (needed for 'make docs')"
-        missing=$((missing + 1))
-    else
-        success "pandoc is installed"
-    fi
     
     if ! has_command "jq"; then
         warning "jq is not installed (optional, useful for JSON processing)"
@@ -219,6 +214,22 @@ get_package_name() {
             ;;
         pandoc:*)
             echo "pandoc"
+            ;;
+        # wkhtmltopdf
+        wkhtmltopdf:ubuntu|wkhtmltopdf:debian)
+            echo "wkhtmltopdf"
+            ;;
+        wkhtmltopdf:fedora|wkhtmltopdf:rhel|wkhtmltopdf:centos)
+            echo "wkhtmltopdf"
+            ;;
+        wkhtmltopdf:macos)
+            echo "wkhtmltopdf"
+            ;;
+        wkhtmltopdf:alpine)
+            echo "wkhtmltopdf"
+            ;;
+        wkhtmltopdf:*)
+            echo "wkhtmltopdf"
             ;;
         # jq
         jq:*)

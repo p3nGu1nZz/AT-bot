@@ -1,7 +1,9 @@
 #!/bin/bash
 # AT-bot Documentation Compiler
 # Purpose: Compile all markdown documentation into a single, formatted PDF
-# Dependencies: pandoc (for MD->PDF conversion)
+# Dependencies: pandoc (markdown->HTML), wkhtmltopdf (HTML->PDF)
+# 
+# Conversion pipeline: Markdown files -> Compiled markdown -> HTML template -> PDF
 
 set -e
 
@@ -12,7 +14,6 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 # Output configuration
 OUTPUT_DIR="$PROJECT_ROOT/dist/docs"
 COMPILED_MD="$OUTPUT_DIR/AT-bot_Complete_Documentation.md"
-COMPILED_HTML="$OUTPUT_DIR/AT-bot_Complete_Documentation.html"
 COMPILED_PDF="$OUTPUT_DIR/AT-bot_Complete_Documentation.pdf"
 TOC_FILE="$OUTPUT_DIR/TOC.md"
 CSS_FILE="$OUTPUT_DIR/documentation.css"
@@ -46,13 +47,37 @@ error() {
 check_dependencies() {
     info "Checking dependencies..."
     
+    local missing=0
+    
     if ! command -v pandoc >/dev/null 2>&1; then
         error "pandoc is required but not installed"
         echo ""
         echo "Install pandoc:"
         echo "  Ubuntu/Debian: sudo apt-get install pandoc"
+        echo "  Fedora/RHEL: sudo dnf install pandoc"
         echo "  macOS: brew install pandoc"
+        echo "  Alpine: apk add pandoc"
         echo "  Other: https://pandoc.org/installing.html"
+        missing=$((missing + 1))
+    else
+        success "pandoc available"
+    fi
+    
+    if ! command -v wkhtmltopdf >/dev/null 2>&1; then
+        error "wkhtmltopdf is required but not installed"
+        echo ""
+        echo "Install wkhtmltopdf:"
+        echo "  Ubuntu/Debian: sudo apt-get install wkhtmltopdf"
+        echo "  Fedora/RHEL: sudo dnf install wkhtmltopdf"
+        echo "  macOS: brew install wkhtmltopdf"
+        echo "  Alpine: apk add wkhtmltopdf"
+        missing=$((missing + 1))
+    else
+        success "wkhtmltopdf available"
+    fi
+    
+    if [ $missing -gt 0 ]; then
+        error "Missing $missing required dependency/dependencies"
         return 1
     fi
     
@@ -595,47 +620,189 @@ compile_markdown() {
     echo "  Lines: $total_lines"
     echo "  Words: $total_words"
     echo "  Size: $file_size"
-    echo ""
 }
 
-# Convert markdown to HTML
-convert_to_html() {
-    info "Converting to HTML..."
+# Create HTML template with CSS styling for PDF conversion
+create_html_template() {
+    local template_file="$1"
     
-    pandoc "$COMPILED_MD" \
-        -f markdown+smart \
-        -t html5 \
+    cat > "$template_file" << 'TEMPLATE_EOF'
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AT-bot - Complete Documentation</title>
+    <style>
+        /* Base styling */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+            font-size: 11pt;
+        }
+
+        /* Headings with visual hierarchy */
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 30px;
+            font-size: 24pt;
+            page-break-after: avoid;
+        }
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #95a5a6;
+            padding-bottom: 8px;
+            margin-top: 25px;
+            font-size: 18pt;
+            page-break-after: avoid;
+        }
+        h3 {
+            color: #7f8c8d;
+            margin-top: 20px;
+            font-size: 14pt;
+            page-break-after: avoid;
+        }
+
+        /* Code blocks */
+        code {
+            background-color: #f6f8fa;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 9pt;
+            border: 1px solid #e1e4e8;
+        }
+        pre {
+            background-color: #f6f8fa;
+            padding: 12px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border-left: 4px solid #3498db;
+            border: 1px solid #d1d5da;
+            line-height: 1.4;
+            page-break-inside: avoid;
+        }
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            border: none;
+            font-size: 9pt;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 10pt;
+            page-break-inside: auto;
+        }
+        table thead {
+            background: #f1f3f5;
+            font-weight: bold;
+        }
+        table tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+        table th, table td {
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        /* Blockquotes */
+        blockquote {
+            background: #fffbea;
+            border-left: 4px solid #f39c12;
+            padding: 10px 15px;
+            margin: 15px 0;
+            font-style: italic;
+            page-break-inside: avoid;
+        }
+
+        /* Lists */
+        ul, ol {
+            page-break-inside: avoid;
+            margin: 10px 0;
+        }
+
+        /* Links */
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+$body$
+</body>
+</html>
+TEMPLATE_EOF
+
+    return 0
+}
+
+# Convert markdown to PDF using wkhtmltopdf backend
+convert_to_pdf() {
+    info "Converting to PDF using HTML->PDF pipeline..."
+    
+    local build_dir="dist/docs"
+    local html_template="$build_dir/template.html"
+    local html_intermediate="$build_dir/documentation.html"
+    local pdf_file="$build_dir/AT-bot_Complete_Documentation.pdf"
+    
+    # Create HTML template with CSS styling
+    if ! create_html_template "$html_template"; then
+        error "Failed to create HTML template"
+        return 1
+    fi
+    
+    # Step 1: Convert markdown to HTML using pandoc
+    info "Converting markdown to HTML..."
+    if ! pandoc "$COMPILED_MD" \
+        --from markdown \
+        --to html \
         --standalone \
         --toc \
         --toc-depth=3 \
-        -H <(echo '<link rel="stylesheet" href="documentation.css">') \
-        -V lang=en \
-        -o "$COMPILED_HTML" 2>&1 || true
-    
-    if [ -f "$COMPILED_HTML" ] && [ -s "$COMPILED_HTML" ]; then
-        success "HTML generated: $COMPILED_HTML"
-        local html_size=$(du -h "$COMPILED_HTML" | cut -f1)
-        info "HTML size: $html_size"
-    else
-        error "Failed to generate HTML"
+        --template "$html_template" \
+        --output "$html_intermediate" 2>/dev/null; then
+        error "Pandoc conversion to HTML failed"
         return 1
     fi
-}
-
-# Convert markdown to PDF
-convert_to_pdf() {
-    info "Converting to PDF (this may take a moment)..."
     
-    # PDF generation with LaTeX is known to have issues with unicode/emojis
-    # For now, we focus on HTML which supports all formatting
-    # PDF can be generated manually if needed with: pandoc -f markdown -t pdf input.md -o output.pdf
+    success "HTML generated successfully"
     
-    warning "PDF generation skipped (use HTML documentation instead)"
-    info "To generate PDF manually:"
-    echo "  pandoc $COMPILED_MD -f markdown -t pdf -o AT-bot_Complete_Documentation.pdf"
-    echo ""
-    info "Reason: LaTeX has limited Unicode/emoji support"
-    info "HTML documentation preserves all formatting and special characters"
+    # Step 2: Convert HTML to PDF using wkhtmltopdf
+    info "Converting HTML to PDF (this may take a moment)..."
+    if ! wkhtmltopdf \
+        --page-size A4 \
+        --margin-top 0.75in \
+        --margin-right 0.75in \
+        --margin-bottom 0.75in \
+        --margin-left 0.75in \
+        --encoding UTF-8 \
+        --enable-local-file-access \
+        "$html_intermediate" \
+        "$pdf_file" 2>/dev/null; then
+        error "wkhtmltopdf conversion failed"
+        error "Check that wkhtmltopdf is properly installed and has access to required libraries"
+        return 1
+    fi
+    
+    success "PDF generated successfully: $pdf_file"
+    
+    # Cleanup intermediate files
+    rm -f "$html_intermediate" "$html_template"
     
     return 0
 }
@@ -661,8 +828,7 @@ main() {
     # Compile documents
     compile_markdown
     
-    # Convert to formats
-    convert_to_html
+    # Convert to PDF
     convert_to_pdf
     
     # Summary
@@ -673,17 +839,9 @@ main() {
     echo ""
     echo "Generated files:"
     echo "  📝 Markdown: $COMPILED_MD"
-    echo "  🌐 HTML: $COMPILED_HTML"
-    
-    if [ -f "$COMPILED_PDF" ] && [ -s "$COMPILED_PDF" ]; then
-        echo "  📄 PDF: $COMPILED_PDF"
-        echo ""
-        echo "Share the PDF with: ${CYAN}$COMPILED_PDF${NC}"
-    else
-        echo "  📄 PDF: ${YELLOW}Not generated (LaTeX not available)${NC}"
-        echo ""
-        echo "Share the HTML with: ${CYAN}$COMPILED_HTML${NC}"
-    fi
+    echo "  📄 PDF: $COMPILED_PDF"
+    echo ""
+    echo "Share the PDF with: ${CYAN}$COMPILED_PDF${NC}"
     echo ""
 }
 
