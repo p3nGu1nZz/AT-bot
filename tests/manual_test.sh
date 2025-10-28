@@ -3,7 +3,8 @@
 # This script provides interactive testing of all major AT-bot features
 # with multi-level menu navigation and authentication onboarding
 
-set -e
+# Don't use set -e as it interferes with interactive menu and read commands
+# Instead, use proper error handling in critical sections
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
