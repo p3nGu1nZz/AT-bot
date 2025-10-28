@@ -68,6 +68,7 @@ prepare_output_directory() {
 }
 
 # Document ordering strategy - defines the logical flow of documentation
+# Documents are ordered by priority; unordered documents are discovered automatically
 declare -a DOC_ORDER=(
     # Cover and Introduction
     "README.md"
@@ -106,13 +107,23 @@ declare -a DOC_ORDER=(
     # Progress Tracking
     "doc/progress/PROJECT_DASHBOARD.md"
     "doc/progress/MILESTONE_REPORT.md"
+)
+
+# Excluded directories and patterns from auto-discovery
+declare -a EXCLUDED_PATTERNS=(
+    "dist/*"
+    "node_modules/*"
+    ".git/*"
+    ".vscode/*"
+    "*/node_modules/*"
+    "doc/sessions/*"
+    "doc/progress/*"
+    "*_old.md"
+    "*_backup.md"
+    "*/tests/*"
+    "*/test-*"
+    "TODO.md"
     
-    # Session Summaries (most recent first)
-    "doc/sessions/SESSION_SUMMARY_2025-10-28_ENGAGEMENT.md"
-    "doc/sessions/SESSION_SUMMARY_2025-10-28_FEATURES.md"
-    "doc/sessions/SESSION_SUMMARY_2025-10-28_ENCRYPTION.md"
-    "doc/sessions/SESSION_SUMMARY_2025-10-28_CONFIG.md"
-    "doc/sessions/SESSION_SUMMARY_2025-10-28.md"
 )
 
 # Generate CSS for styling
@@ -420,13 +431,9 @@ generate_cover_page() {
     cat > "$OUTPUT_DIR/cover.md" << EOF
 ---
 title: "AT-bot Complete Documentation"
-subtitle: "Command-Line Tool for AT Protocol & Bluesky Automation"
 author: "AT-bot Development Team"
 date: "$date"
-version: "$version"
 ---
-
-<div class="cover-page">
 
 # AT-bot
 
@@ -436,19 +443,33 @@ version: "$version"
 
 The Definitive Guide to AT Protocol Command-Line Automation
 
-<hr style="margin: 60pt 0;">
+---
 
 **Generated:** $date  
 **Project:** https://github.com/p3nGu1nZz/AT-bot  
 **License:** MIT
-
-</div>
 
 \\newpage
 
 EOF
     
     success "Cover page generated"
+}
+
+# Check if a path should be excluded from documentation
+should_exclude() {
+    local relative_path="$1"
+    
+    for pattern in "${EXCLUDED_PATTERNS[@]}"; do
+        # Handle glob patterns
+        case "$relative_path" in
+            $pattern)
+                return 0  # Should exclude
+                ;;
+        esac
+    done
+    
+    return 1  # Should not exclude
 }
 
 # Extract title from markdown file
@@ -522,25 +543,31 @@ compile_markdown() {
     done
     
     # Add any remaining markdown files not in the order list
-    info "Checking for additional markdown files..."
+    info "Discovering additional markdown files..."
+    local unordered_count=0
+    
     while IFS= read -r -d '' file; do
         local relative_path="${file#$PROJECT_ROOT/}"
         local canonical_path=$(realpath "$file")
         
-        # Skip if already processed or in excluded directories
-        if [ -z "${processed_files[$canonical_path]}" ]; then
-            case "$relative_path" in
-                dist/*|node_modules/*|.git/*|*/node_modules/*|*_old.md|*_backup.md)
-                    # Skip these
-                    ;;
-                *)
-                    warning "Found unordered document: $relative_path"
-                    process_document "$relative_path" "$COMPILED_MD" false
-                    processed_files[$canonical_path]=1
-                    ;;
-            esac
+        # Skip if already processed
+        if [ -n "${processed_files[$canonical_path]}" ]; then
+            continue
         fi
+        
+        # Skip if in excluded patterns
+        if should_exclude "$relative_path"; then
+            continue
+        fi
+        
+        # Process the unordered document
+        warning "Found unordered document: $relative_path"
+        process_document "$relative_path" "$COMPILED_MD" false
+        processed_files[$canonical_path]=1
+        ((unordered_count++))
     done < <(find "$PROJECT_ROOT" -name "*.md" -type f -print0)
+    
+    [ "$unordered_count" -gt 0 ] && info "Included $unordered_count additional unordered documents"
     
     success "Markdown compilation complete: $COMPILED_MD"
     
@@ -567,13 +594,14 @@ convert_to_html() {
         --standalone \
         --toc \
         --toc-depth=3 \
-        --css="$CSS_FILE" \
-        --metadata title="AT-bot Complete Documentation" \
-        --metadata-file=<(echo "{}") \
-        -o "$COMPILED_HTML" 2>&1 | grep -v "Unknown alias" || true
+        -H <(echo '<link rel="stylesheet" href="documentation.css">') \
+        -V lang=en \
+        -o "$COMPILED_HTML" 2>&1 || true
     
     if [ -f "$COMPILED_HTML" ] && [ -s "$COMPILED_HTML" ]; then
         success "HTML generated: $COMPILED_HTML"
+        local html_size=$(du -h "$COMPILED_HTML" | cut -f1)
+        info "HTML size: $html_size"
     else
         error "Failed to generate HTML"
         return 1
@@ -592,15 +620,17 @@ convert_to_pdf() {
         --toc-depth=3 \
         --number-sections \
         --highlight-style=tango \
-        --variable geometry:margin=2.5cm \
-        --variable fontsize=11pt \
-        --variable documentclass=report \
-        --variable papersize=a4 \
-        --variable colorlinks=true \
-        --variable linkcolor=blue \
-        --variable urlcolor=blue \
-        --variable toccolor=black \
-        -o "$COMPILED_PDF" 2>&1 | grep -v "Unknown alias" || true
+        -V geometry:margin=2.5cm \
+        -V fontsize=11pt \
+        -V documentclass=report \
+        -V papersize=a4 \
+        -V colorlinks=true \
+        -V linkcolor=blue \
+        -V urlcolor=blue \
+        -V toccolor=black \
+        -V mainfont="Liberation Serif" \
+        -V monofont="Liberation Mono" \
+        -o "$COMPILED_PDF" 2>&1 || true
     
     if [ -f "$COMPILED_PDF" ] && [ -s "$COMPILED_PDF" ]; then
         success "PDF generated: $COMPILED_PDF"
