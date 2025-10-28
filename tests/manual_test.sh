@@ -41,14 +41,14 @@ clear_screen() {
 print_header() {
     clear_screen
     echo -e "${CYAN}╔═══════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║${NC}  ${WHITE}AT-bot Comprehensive Test Suite${NC}             ${CYAN}║${NC}"
+    echo -e "${CYAN}║${NC}  ${WHITE}AT-bot Comprehensive Test Suite${NC}                          ${CYAN}║${NC}"
     echo -e "${CYAN}╚═══════════════════════════════════════════════════════════╝${NC}"
 }
 
 print_section() {
     echo ""
     echo -e "${CYAN}╔═══════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║${NC}  $1"
+    printf "${CYAN}║${NC}  %-56s${CYAN}║${NC}\n" "$1"
     echo -e "${CYAN}╚═══════════════════════════════════════════════════════════╝${NC}"
 }
 
