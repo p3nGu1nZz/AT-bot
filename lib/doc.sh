@@ -541,8 +541,8 @@ process_document() {
     local title=$(get_document_title "$PROJECT_ROOT/$file")
     echo "<!-- Document: $file -->" >> "$output"
     
-    # Append document content, stripping YAML front matter and converting --- to ~~~ 
-    # (to prevent pandoc from misinterpreting embedded --- as YAML blocks)
+    # Append document content, stripping YAML front matter
+    # Convert standalone --- to ~~~ to avoid confusion with document separators
     tail -n +1 "$PROJECT_ROOT/$file" | awk '
     /^---$/ && NR==1 { in_frontmatter=1; next }
     /^---$/ && in_frontmatter==1 { in_frontmatter=0; next }
