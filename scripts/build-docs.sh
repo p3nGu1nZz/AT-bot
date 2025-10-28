@@ -9,12 +9,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 DOC_COMPILER="$PROJECT_ROOT/lib/doc.sh"
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+# Source reporter library for console display functions
+if [ -f "$PROJECT_ROOT/lib/reporter.sh" ]; then
+    source "$PROJECT_ROOT/lib/reporter.sh"
+else
+    echo "Error: reporter.sh not found" >&2
+    exit 1
+fi
 
 # Parse command-line arguments
 CLEAN_BUILD=false

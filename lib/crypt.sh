@@ -19,34 +19,14 @@ PBKDF2_ITERATIONS=100000  # High iteration count for security
 KEY_LENGTH=32              # 256 bits for AES-256
 SALT_LENGTH=32             # 256 bits salt
 
-# Color output for error messages (if not already defined)
-if [ -z "$RED" ]; then
-    if [ -t 1 ]; then
-        RED='\033[0;31m'
-        GREEN='\033[0;32m'
-        YELLOW='\033[1;33m'
-        NC='\033[0m'
-    else
-        RED=''
-        GREEN=''
-        YELLOW=''
-        NC=''
-    fi
-fi
-
-# Output functions (if not already defined)
-if ! type error >/dev/null 2>&1; then
-    error() {
-        echo -e "${RED}Error:${NC} $*" >&2
-    }
-fi
-
-if ! type debug >/dev/null 2>&1; then
-    debug() {
-        if [ "${DEBUG:-0}" = "1" ]; then
-            echo -e "${YELLOW}[DEBUG]${NC} $*" >&2
-        fi
-    }
+# Source reporter library for console display functions
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/reporter.sh" ]; then
+    source "$SCRIPT_DIR/reporter.sh"
+else
+    # Fallback if reporter.sh not found (for standalone usage)
+    error() { echo "Error: $*" >&2; }
+    debug() { [ "${DEBUG:-0}" = "1" ] && echo "[DEBUG] $*" >&2; }
 fi
 
 if ! type warning >/dev/null 2>&1; then

@@ -8,9 +8,20 @@ SESSION_FILE="$CONFIG_DIR/session.json"
 CREDENTIALS_FILE="$CONFIG_DIR/credentials.json"
 ENCRYPTION_KEY_FILE="$CONFIG_DIR/.key"
 
-# Source encryption library
+# Source required libraries
+# shellcheck source=./reporter.sh
 # shellcheck source=./crypt.sh
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Source reporter library (console display functions)
+if [ -f "$SCRIPT_DIR/reporter.sh" ]; then
+    source "$SCRIPT_DIR/reporter.sh"
+else
+    echo "Error: reporter.sh not found in $SCRIPT_DIR" >&2
+    exit 1
+fi
+
+# Source encryption library
 if [ -f "$SCRIPT_DIR/crypt.sh" ]; then
     source "$SCRIPT_DIR/crypt.sh"
 else
@@ -54,40 +65,8 @@ DEBUG=$(get_config_value "debug" "DEBUG" "0")
 DEFAULT_FEED_LIMIT=$(get_config_value "feed_limit" "ATP_FEED_LIMIT" "10")
 DEFAULT_SEARCH_LIMIT=$(get_config_value "search_limit" "ATP_SEARCH_LIMIT" "10")
 
-# Color output support
-if [ -t 1 ]; then
-    RED='\033[0;31m'
-    GREEN='\033[0;32m'
-    YELLOW='\033[1;33m'
-    NC='\033[0m' # No Color
-else
-    RED=''
-    GREEN=''
-    YELLOW=''
-    NC=''
-fi
-
-# Print error message
-error() {
-    echo -e "${RED}Error:${NC} $*" >&2
-}
-
-# Print success message
-success() {
-    echo -e "${GREEN}$*${NC}"
-}
-
-# Print warning message
-warning() {
-    echo -e "${YELLOW}Warning:${NC} $*" >&2
-}
-
-# Print debug message
-debug() {
-    if [ "$DEBUG" = "1" ]; then
-        echo -e "${YELLOW}[DEBUG]${NC} $*" >&2
-    fi
-}
+# Note: Color definitions and logging functions (error, success, warning, debug)
+# are now provided by lib/reporter.sh which is sourced above
 
 # Check if JSON output format is enabled
 is_json_output() {
