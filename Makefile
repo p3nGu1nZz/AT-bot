@@ -7,7 +7,7 @@ LIBDIR = $(PREFIX)/lib/at-bot
 DOCDIR = $(PREFIX)/share/doc/at-bot
 MANDIR = $(PREFIX)/share/man/man1
 
-.PHONY: all install uninstall test clean docs help
+.PHONY: all install uninstall test test-manual test-e2e clean docs help
 
 all: help
 
@@ -16,7 +16,9 @@ help:
 	@echo ""
 	@echo "  make install      Install AT-bot to $(PREFIX)"
 	@echo "  make uninstall    Remove AT-bot from $(PREFIX)"
-	@echo "  make test         Run tests"
+	@echo "  make test         Run all tests (unit + e2e)"
+	@echo "  make test-manual  Run interactive manual test suite"
+	@echo "  make test-e2e     Run automated end-to-end integration tests"
 	@echo "  make docs         Generate complete documentation (PDF/HTML)"
 	@echo "  make clean        Clean temporary files"
 	@echo "  make help         Show this help message"
@@ -49,8 +51,16 @@ uninstall:
 	@echo "AT-bot uninstalled successfully."
 
 test:
-	@echo "Running tests..."
+	@echo "Running all tests..."
 	@bash tests/run_tests.sh
+
+test-manual:
+	@echo "Starting interactive manual test suite..."
+	@bash tests/manual_test.sh
+
+test-e2e:
+	@echo "Running automated end-to-end integration tests..."
+	@bash tests/atp_test.sh
 
 docs:
 	@echo "Generating documentation..."
