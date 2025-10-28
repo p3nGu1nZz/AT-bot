@@ -2,38 +2,13 @@
 # AT-bot Configuration Management
 # Handles user preferences and configuration persistence
 
-# Color output support (if not already defined)
-if [ -z "$RED" ]; then
-    if [ -t 1 ]; then
-        RED='\033[0;31m'
-        GREEN='\033[0;32m'
-        YELLOW='\033[1;33m'
-        NC='\033[0m' # No Color
-    else
-        RED=''
-        GREEN=''
-        YELLOW=''
-        NC=''
-    fi
-fi
-
-# Output functions (if not already defined)
-if ! type error >/dev/null 2>&1; then
-    error() {
-        echo -e "${RED}Error:${NC} $*" >&2
-    }
-fi
-
-if ! type success >/dev/null 2>&1; then
-    success() {
-        echo -e "${GREEN}$*${NC}"
-    }
-fi
-
-if ! type warning >/dev/null 2>&1; then
-    warning() {
-        echo -e "${YELLOW}Warning:${NC} $*" >&2
-    }
+# Source reporter library for console display functions
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/reporter.sh" ]; then
+    source "$SCRIPT_DIR/reporter.sh"
+else
+    echo "Error: reporter.sh not found in $SCRIPT_DIR" >&2
+    exit 1
 fi
 
 # Configuration file location

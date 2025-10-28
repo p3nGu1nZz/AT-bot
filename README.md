@@ -252,11 +252,22 @@ at-bot post "📊 Daily Stats: $(generate_stats)" | jq -r '.uri' >> posted_uris.
 
 ### Running Tests
 
+Run the automated unit test suite:
+
 ```bash
-make test
+make test-unit
 # or
-bash tests/run_tests.sh
+bash scripts/test-unit.sh
 ```
+
+**Test Options:**
+```bash
+scripts/test-unit.sh --list          # List all 12 unit tests
+scripts/test-unit.sh --verbose       # Show detailed test output
+scripts/test-unit.sh test_cli        # Run specific tests
+```
+
+For more testing options and details, see **[TESTING.md](doc/TESTING.md)**.
 
 ### Project Structure
 
@@ -266,10 +277,13 @@ AT-bot/
 │   └── at-bot    # Main CLI tool
 ├── lib/          # Library functions
 │   └── atproto.sh # AT Protocol implementation
-├── tests/        # Test suite
+├── scripts/      # Build and utility scripts
+│   └── test-unit.sh # Unit test runner
+├── tests/        # Unit test suite (12 tests)
 │   ├── run_tests.sh
 │   ├── test_cli_basic.sh
-│   └── test_library.sh
+│   ├── test_encryption.sh
+│   └── ... (10 more tests)
 ├── doc/          # Documentation
 ├── Makefile      # Build/install automation
 ├── install.sh    # Installation script

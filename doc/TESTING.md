@@ -1,10 +1,37 @@
 # AT-bot Testing Guide
 
-This guide explains how to test AT-bot securely without exposing your credentials.
+This guide explains the complete testing approach for AT-bot, including automated unit tests, interactive manual testing, and end-to-end integration tests.
 
 ## Quick Start
 
-### Manual Testing
+### Unit Tests (Automated)
+
+Run the automated unit test suite:
+
+```bash
+make test-unit
+```
+
+Or with options:
+
+```bash
+# Run with verbose output
+bash scripts/test-unit.sh --verbose
+
+# List all available tests
+bash scripts/test-unit.sh --list
+
+# Run specific test (e.g., tests matching 'cli')
+bash scripts/test-unit.sh test_cli
+```
+
+**Test Suite Summary:**
+- **12 unit tests** covering all major features
+- **~5 seconds** to run complete suite
+- **91% success rate** (manual_test.sh requires interactive input)
+- Tests: Authentication, Content, Social, Configuration, Integration
+
+### Interactive Manual Testing
 
 Use the interactive test helper:
 
@@ -12,10 +39,204 @@ Use the interactive test helper:
 ./tests/manual_test.sh
 ```
 
+Or via make:
+
+```bash
+make test-manual
+```
+
 This script will:
 1. Prompt you to login (if not already logged in)
 2. Offer to save your credentials securely (optional)
 3. Provide an interactive menu to test all features
+
+## Test Runner Reference (`scripts/test-unit.sh`)
+
+The `test-unit.sh` script provides a comprehensive unit test runner with multiple options and features.
+
+### Usage
+
+```bash
+scripts/test-unit.sh [options] [test_pattern]
+```
+
+### Options
+
+| Option | Description |
+|--------|-------------|
+| `-v, --verbose` | Show detailed test output and logs |
+| `-q, --quiet` | Suppress output, only show results |
+| `-c, --coverage` | Show test coverage information |
+| `-l, --list` | List available tests without running |
+| `-f, --failed-only` | Only show failed tests in final report |
+| `-h, --help` | Show help message and usage |
+
+### Examples
+
+```bash
+# Run all tests
+scripts/test-unit.sh
+
+# List available tests
+scripts/test-unit.sh --list
+
+# Run tests matching pattern
+scripts/test-unit.sh test_cli
+
+# Verbose output with details
+scripts/test-unit.sh --verbose
+
+# Show coverage information
+scripts/test-unit.sh --coverage
+
+# Only show failures
+scripts/test-unit.sh --failed-only
+```
+
+### Test Categories
+
+The test suite is organized into five categories:
+
+**Authentication Tests** (3 tests, 539 lines)
+- `test_cli_basic.sh` - Basic CLI functionality (help, version, commands)
+- `test_encryption.sh` - Encryption and credential storage
+- `test_profile.sh` - User profile retrieval and management
+
+**Content Management Tests** (2 tests, 401 lines)
+- `test_post_feed.sh` - Post creation and feed operations
+- `test_media_upload.sh` - Media upload and attachment handling
+
+**Social Operations Tests** (3 tests, 338 lines)
+- `test_follow.sh` - Follow and relationship management
+- `test_followers.sh` - Follower/following list operations
+- `test_search.sh` - Post and user search functionality
+
+**Configuration Tests** (2 tests, 285 lines)
+- `test_config.sh` - Configuration management
+- `test_library.sh` - Library function testing
+
+**Integration Tests** (3 tests, 1,368 lines)
+- `atp_test.sh` - Comprehensive AT Protocol integration
+- `manual_test.sh` - Manual testing utilities (interactive)
+- `debug_demo.sh` - Debug mode demonstrations
+
+### Exit Codes
+
+| Code | Meaning |
+|------|---------|
+| 0 | All tests passed |
+| 1 | Some tests failed |
+| 2 | Invalid arguments |
+
+### Environment Variables
+
+| Variable | Effect |
+|----------|--------|
+| `AT_BOT_TEST_VERBOSE` | Enable verbose output |
+| `AT_BOT_TEST_TIMEOUT` | Test timeout in seconds (default: 60) |
+| `AT_BOT_DEBUG` | Enable debug mode for tests |
+
+### CI/CD Integration
+
+The test runner is designed for CI/CD pipelines:
+
+```bash
+#!/bin/bash
+# Example GitHub Actions workflow
+
+# Run unit tests
+bash scripts/test-unit.sh --quiet
+exit_code=$?
+
+if [ $exit_code -eq 0 ]; then
+    echo "✓ All tests passed"
+else
+    echo "✗ Tests failed"
+    bash scripts/test-unit.sh --verbose  # Show details
+    exit 1
+fi
+```
+
+## Makefile Test Commands
+
+You can run all tests using make commands:
+
+| Command | Description |
+|---------|-------------|
+| `make test` | Run all tests (unit + e2e) |
+| `make test-unit` | Run unit test suite (12 tests) |
+| `make test-manual` | Run interactive manual test suite |
+| `make test-e2e` | Run end-to-end integration tests |
+| `make help` | Show all available make targets |
+
+### Examples
+
+```bash
+# Run unit tests (fastest, ~5 seconds)
+make test-unit
+
+# Run manual tests (interactive)
+make test-manual
+
+# Run integration tests
+make test-e2e
+
+# Run all tests
+make test
+```
+
+### With Environment Variables
+
+```bash
+# Run tests with verbose output
+AT_BOT_TEST_VERBOSE=1 make test-unit
+
+# Run tests with custom timeout (60 seconds default)
+AT_BOT_TEST_TIMEOUT=30 make test-unit
+
+# Run with debug mode enabled
+AT_BOT_DEBUG=1 make test-unit
+```
+
+## Complete Test Suite
+
+### Running All Tests
+
+```bash
+make test
+```
+
+This runs:
+1. `tests/run_tests.sh` - Basic test runner
+2. Includes all 12 unit tests
+
+### Running Unit Tests (Recommended)
+
+```bash
+make test-unit
+```
+
+Or directly:
+
+```bash
+bash scripts/test-unit.sh
+```
+
+### Running Manual Tests
+
+```bash
+make test-manual
+```
+
+For interactive testing with full feature exploration.
+
+### Running End-to-End Tests
+
+```bash
+make test-e2e
+```
+
+For comprehensive AT Protocol integration testing.
 
 ### Secure Credential Storage
 
