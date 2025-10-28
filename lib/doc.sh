@@ -880,22 +880,130 @@ EOF
     return 0
 }
 
+# Create HTML header template for wkhtmltopdf
+create_header_template() {
+    local header_file="$1"
+    
+    cat > "$header_file" << 'HEADER_EOF'
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { 
+            margin: 0; 
+            padding: 5px 10px;
+            font-family: Arial, sans-serif;
+            font-size: 9px;
+            color: #666;
+        }
+        table { 
+            width: 100%; 
+            border-bottom: 2px solid #3498db;
+            border-spacing: 0;
+            padding-bottom: 3px;
+        }
+        td { padding: 0 5px; }
+        .left { text-align: left; font-weight: bold; }
+        .center { text-align: center; }
+        .right { text-align: right; }
+    </style>
+</head>
+<body>
+    <table>
+        <tr>
+            <td class="left">PROJECT_NAME</td>
+            <td class="center">TITLE</td>
+            <td class="right">VERSION</td>
+        </tr>
+    </table>
+</body>
+</html>
+HEADER_EOF
+
+    # Replace placeholders
+    sed -i "s|PROJECT_NAME|$CONFIG_PROJECT_NAME|g" "$header_file"
+    sed -i "s|TITLE|$CONFIG_TITLE|g" "$header_file"
+    sed -i "s|VERSION|v$CONFIG_VERSION|g" "$header_file"
+}
+
+# Create HTML footer template for wkhtmltopdf
+create_footer_template() {
+    local footer_file="$1"
+    
+    cat > "$footer_file" << 'FOOTER_EOF'
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { 
+            margin: 0; 
+            padding: 5px 10px;
+            font-family: Arial, sans-serif;
+            font-size: 8px;
+            color: #999;
+        }
+        table { 
+            width: 100%; 
+            border-top: 1px solid #ddd;
+            border-spacing: 0;
+            padding-top: 3px;
+        }
+        td { padding: 0 5px; }
+        .left { text-align: left; }
+        .center { text-align: center; font-style: italic; }
+        .right { text-align: right; }
+    </style>
+</head>
+<body>
+    <table>
+        <tr>
+            <td class="left">© AUTHOR</td>
+            <td class="center">DOCUMENT_TITLE</td>
+            <td class="right"><span class="page"></span>/<span class="topage"></span></td>
+        </tr>
+    </table>
+</body>
+</html>
+FOOTER_EOF
+
+    # Replace placeholders
+    sed -i "s|AUTHOR|$CONFIG_AUTHOR|g" "$footer_file"
+    sed -i "s|DOCUMENT_TITLE|$CONFIG_TITLE|g" "$footer_file"
+}
+
 # Convert markdown to PDF using wkhtmltopdf
 convert_to_pdf() {
     info "Converting to PDF using wkhtmltopdf..."
     
     local build_dir="dist/docs"
     local html_template="$build_dir/template.html"
+    local header_template="$build_dir/header.html"
+    local footer_template="$build_dir/footer.html"
     local html_intermediate="$build_dir/documentation.html"
     local pdf_file="$build_dir/AT-bot_Complete_Documentation.pdf"
     
     # Convert to absolute paths for wkhtmltopdf compatibility
     local abs_html_intermediate="$(cd "$(dirname "$html_intermediate")" && pwd)/$(basename "$html_intermediate")"
+    local abs_header_template="$(cd "$(dirname "$header_template")" && pwd)/$(basename "$header_template")"
+    local abs_footer_template="$(cd "$(dirname "$footer_template")" && pwd)/$(basename "$footer_template")"
     local abs_pdf_file="$(cd "$(dirname "$pdf_file")" && pwd)/$(basename "$pdf_file")"
     
     # Create HTML template with CSS styling
     if ! create_html_template "$html_template"; then
         error "Failed to create HTML template"
+        return 1
+    fi
+    
+    # Create header and footer templates
+    if ! create_header_template "$header_template"; then
+        error "Failed to create header template"
+        return 1
+    fi
+    
+    if ! create_footer_template "$footer_template"; then
+        error "Failed to create footer template"
         return 1
     fi
     
@@ -921,19 +1029,30 @@ convert_to_pdf() {
     # Capture wkhtmltopdf output to check for errors
     local wkhtmltopdf_output
     # Run wkhtmltopdf from the output directory so relative image paths work
+    # Note: This system has unpatched wkhtmltopdf, so we use text-based headers/footers
     wkhtmltopdf_output=$(cd "$OUTPUT_DIR" && wkhtmltopdf \
         --page-size A4 \
-        --margin-top 0.75in \
+        --margin-top 1in \
         --margin-right 0.75in \
-        --margin-bottom 0.75in \
+        --margin-bottom 1in \
         --margin-left 0.75in \
+        --header-line \
+        --header-left "$CONFIG_PROJECT_NAME" \
+        --header-center "$CONFIG_TITLE" \
+        --header-right "v$CONFIG_VERSION" \
+        --header-font-size 9 \
+        --footer-line \
+        --footer-left "© $CONFIG_AUTHOR" \
+        --footer-center "$CONFIG_TITLE" \
+        --footer-right "Page [page] of [topage]" \
+        --footer-font-size 8 \
         --encoding UTF-8 \
         --enable-local-file-access \
         "file://$abs_html_intermediate" \
         "$abs_pdf_file" 2>&1) || {
         error "wkhtmltopdf failed to generate PDF"
         echo "$wkhtmltopdf_output" >&2
-        rm -f "$abs_html_intermediate" "$html_template"
+        rm -f "$abs_html_intermediate" "$html_template" "$abs_header_template" "$abs_footer_template"
         return 1
     }
     
@@ -941,14 +1060,14 @@ convert_to_pdf() {
     if echo "$wkhtmltopdf_output" | grep -q "Failed to load"; then
         error "PDF generation failed: Image load error"
         echo "$wkhtmltopdf_output" | grep "Failed to load" | sed 's/^/  /' >&2
-        rm -f "$abs_html_intermediate" "$html_template" "$abs_pdf_file"
+        rm -f "$abs_html_intermediate" "$html_template" "$abs_header_template" "$abs_footer_template" "$abs_pdf_file"
         return 1
     fi
     
     success "PDF generated successfully: $pdf_file"
     
     # Cleanup intermediate files
-    rm -f "$abs_html_intermediate" "$html_template"
+    rm -f "$abs_html_intermediate" "$html_template" "$abs_header_template" "$abs_footer_template"
     
     return 0
 }
