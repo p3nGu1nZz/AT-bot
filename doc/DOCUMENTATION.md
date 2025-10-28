@@ -32,6 +32,31 @@ source lib/doc.sh
 main
 ```
 
+## What Gets Generated
+
+Three comprehensive documentation files are created in `dist/docs/`:
+
+1. **AT-bot_Complete_Documentation.md** (361KB+)
+   - All markdown files compiled into one
+   - Logical document ordering
+   - No duplicates
+
+2. **AT-bot_Complete_Documentation.html**
+   - Styled HTML with custom CSS
+   - Clickable table of contents
+   - Syntax-highlighted code blocks
+
+3. **AT-bot_Complete_Documentation.pdf**
+   - Professional PDF format
+   - Auto-generated table of contents
+   - Perfect for sharing and offline use
+
+**Current Statistics:**
+- **Lines**: ~13,000+
+- **Words**: ~45,000+
+- **Size**: 361KB+ (markdown), varies for HTML/PDF
+- **Documents**: 30+ files combined
+
 ## Requirements
 
 ### Required Dependencies
@@ -63,6 +88,20 @@ The compilation process generates three files in `dist/docs/`:
 1. **AT-bot_Complete_Documentation.md** - Combined markdown source
 2. **AT-bot_Complete_Documentation.html** - Styled HTML version
 3. **AT-bot_Complete_Documentation.pdf** - Final PDF output (recommended for sharing)
+
+Additionally created:
+- **cover.md** - Generated cover page
+- **documentation.css** - Custom styling for HTML/PDF
+
+## Key Features
+
+✅ **Smart Ordering** - Documents organized logically  
+✅ **Duplicate Prevention** - Each file included once  
+✅ **Auto TOC** - Table of contents generated automatically  
+✅ **Professional Styling** - Custom CSS for clean presentation  
+✅ **Syntax Highlighting** - Code blocks properly formatted  
+✅ **Page Breaks** - Logical document separation  
+✅ **Coverage Detection** - Finds all markdown files
 
 ## Document Organization
 

@@ -1,0 +1,155 @@
+# AT-bot Documentation Build Configuration
+# Controls which files and directories are included/excluded from documentation builds
+
+# Exclude patterns (glob patterns, one per line)
+# Files matching these patterns will NOT be included in documentation builds
+exclude:
+  # Hidden directories (copilot instructions, VSCode config, etc)
+  - .github/**
+  - .vscode/**
+  - .idea/**
+  - .git/**
+  
+  # Copilot and AI instructions (not user documentation)
+  - "**/*copilot-instructions*"
+  - "**/*agents-instructions*"
+  
+  # Development/tooling files
+  - node_modules/**
+  - dist/**
+  - coverage/**
+  - .npm/**
+  - .DS_Store
+  
+  # Build artifacts and compiled outputs
+  - mcp-server/dist/**
+  - mcp-server/node_modules/**
+  - mcp-server/coverage/**
+  
+  # Temporary files
+  - "*.tmp"
+  - "*.log"
+  - "*~"
+  - ".swp"
+  - ".swo"
+  
+  # Session-specific/transient docs (keep but don't include in main build)
+  - doc/sessions/**
+  - doc/progress/**
+  
+  # Test files (reference code, not user docs)
+  - tests/**
+  - "**/*.test.sh"
+  - "**/*.spec.ts"
+
+# Include patterns (explicit list of what to include)
+# If specified, ONLY files matching these patterns will be included
+# This is an allowlist approach - everything else is excluded unless listed here
+include:
+  # Core project documentation
+  - README.md
+  - PLAN.md
+  - AGENTS.md
+  - STYLE.md
+  - TODO.md
+  - LICENSE
+  - CONTRIBUTING.md
+  
+  # Feature and implementation documentation
+  - doc/**/*.md
+  - doc/examples/**/*.sh
+  - doc/examples/**/*.bash
+  
+  # MCP documentation
+  - mcp-server/README.md
+  - mcp-server/docs/**/*.md
+  
+  # Source code for reference (optional)
+  - lib/atproto.sh
+  - lib/config.sh
+  - lib/cli-utils.sh
+  - bin/at-bot
+  
+  # Scripts and tools
+  - scripts/install-completions.sh
+  - Makefile
+  - install.sh
+
+# Output configuration
+output:
+  # Output format (html, markdown, pdf, etc.)
+  format: html
+  
+  # Output directory relative to project root
+  directory: dist/docs
+  
+  # Generate table of contents
+  toc: true
+  
+  # Generate index
+  index: true
+  
+  # Navigation structure
+  generate_nav: true
+  
+  # Theme/styling
+  theme: default
+  
+  # CSS file for custom styling (optional)
+  css: null
+
+# Build options
+build:
+  # Include file metadata (timestamps, file paths, etc.)
+  include_metadata: true
+  
+  # Generate code syntax highlighting
+  syntax_highlighting: true
+  
+  # Include examples and code snippets
+  include_examples: true
+  
+  # Verbose output during build
+  verbose: false
+  
+  # Generate sitemap
+  generate_sitemap: true
+  
+  # Clean output directory before building
+  clean_before_build: true
+
+# Search and indexing
+search:
+  # Enable full-text search index generation
+  enabled: true
+  
+  # Searchable fields
+  fields:
+    - title
+    - content
+    - keywords
+
+# Analytics (optional)
+analytics:
+  enabled: false
+  google_analytics_id: null
+
+# Metadata
+metadata:
+  # Project name
+  project_name: AT-bot
+  
+  # Project description
+  description: "A simple CLI tool for Bluesky AT Protocol automation"
+  
+  # Version (can be read from package.json or set manually)
+  version: "0.1.0"
+  
+  # Author
+  author: "AT-bot Contributors"
+  
+  # License
+  license: "MIT"
+  
+  # Repository URL
+  repository: "https://github.com/p3nGu1nZz/AT-bot"

@@ -12,3 +12,6 @@ LIB_DIR="$PROJECT_ROOT/lib"
 # Source the documentation compiler
 # shellcheck source=../lib/doc.sh
 source "$LIB_DIR/doc.sh"
+
+# Execute main function
+main "$@"

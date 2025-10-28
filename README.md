@@ -327,6 +327,29 @@ AT-bot takes security seriously:
 
 > **Production Note:** For production deployments, use environment variables or dedicated secret management services. The encrypted credential storage is designed for development and testing on personal machines. See [doc/ENCRYPTION.md](doc/ENCRYPTION.md) for threat model and security details.
 
+## Documentation
+
+### Complete Documentation Package
+
+Generate a comprehensive, professionally formatted PDF containing all project documentation:
+
+```bash
+make docs
+```
+
+This creates:
+- **PDF** - Complete documentation in a single shareable file
+- **HTML** - Web-friendly version with styling
+- **Markdown** - Combined source document
+
+The generated "AT-bot Complete Documentation" PDF is perfect for:
+- Onboarding new contributors
+- Offline reference
+- Project presentations
+- Archive distribution
+
+See [doc/DOCUMENTATION.md](doc/DOCUMENTATION.md) for details.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit issues and pull requests.

@@ -89,6 +89,7 @@ declare -a DOC_ORDER=(
     "doc/QUICKSTART.md"
     "doc/QUICKREF.md"
     "doc/CONFIGURATION.md"
+    "doc/DOCUMENTATION.md"
     
     # Feature Documentation
     "doc/ENCRYPTION.md"
@@ -435,7 +436,7 @@ version: "$version"
 
 The Definitive Guide to AT Protocol Command-Line Automation
 
----
+<hr style="margin: 60pt 0;">
 
 **Generated:** $date  
 **Project:** https://github.com/p3nGu1nZz/AT-bot  
@@ -561,16 +562,17 @@ convert_to_html() {
     info "Converting to HTML..."
     
     pandoc "$COMPILED_MD" \
-        -f markdown \
+        -f markdown+smart \
         -t html5 \
         --standalone \
         --toc \
         --toc-depth=3 \
         --css="$CSS_FILE" \
         --metadata title="AT-bot Complete Documentation" \
-        -o "$COMPILED_HTML"
+        --metadata-file=<(echo "{}") \
+        -o "$COMPILED_HTML" 2>&1 | grep -v "Unknown alias" || true
     
-    if [ $? -eq 0 ]; then
+    if [ -f "$COMPILED_HTML" ] && [ -s "$COMPILED_HTML" ]; then
         success "HTML generated: $COMPILED_HTML"
     else
         error "Failed to generate HTML"
@@ -583,7 +585,7 @@ convert_to_pdf() {
     info "Converting to PDF (this may take a moment)..."
     
     pandoc "$COMPILED_MD" \
-        -f markdown \
+        -f markdown+smart \
         -t pdf \
         --pdf-engine=xelatex \
         --toc \
@@ -598,9 +600,9 @@ convert_to_pdf() {
         --variable linkcolor=blue \
         --variable urlcolor=blue \
         --variable toccolor=black \
-        -o "$COMPILED_PDF"
+        -o "$COMPILED_PDF" 2>&1 | grep -v "Unknown alias" || true
     
-    if [ $? -eq 0 ]; then
+    if [ -f "$COMPILED_PDF" ] && [ -s "$COMPILED_PDF" ]; then
         success "PDF generated: $COMPILED_PDF"
         
         # Display file size

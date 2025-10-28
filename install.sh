@@ -39,7 +39,11 @@ $SUDO mkdir -p "$DOCDIR"
 # Install files
 echo "Installing files..."
 $SUDO install -m 755 "$SCRIPT_DIR/bin/at-bot" "$BINDIR/at-bot"
+$SUDO install -m 755 "$SCRIPT_DIR/bin/at-bot-docs" "$BINDIR/at-bot-docs"
 $SUDO install -m 644 "$SCRIPT_DIR/lib/atproto.sh" "$LIBDIR/atproto.sh"
+$SUDO install -m 644 "$SCRIPT_DIR/lib/config.sh" "$LIBDIR/config.sh"
+$SUDO install -m 644 "$SCRIPT_DIR/lib/crypt.sh" "$LIBDIR/crypt.sh"
+$SUDO install -m 755 "$SCRIPT_DIR/lib/doc.sh" "$LIBDIR/doc.sh"
 $SUDO install -m 644 "$SCRIPT_DIR/README.md" "$DOCDIR/README.md"
 $SUDO install -m 644 "$SCRIPT_DIR/LICENSE" "$DOCDIR/LICENSE"
 

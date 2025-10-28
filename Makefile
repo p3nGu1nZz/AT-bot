@@ -30,12 +30,17 @@ install:
 	install -d $(LIBDIR)
 	install -d $(DOCDIR)
 	install -m 755 bin/at-bot $(BINDIR)/at-bot
+	install -m 755 bin/at-bot-docs $(BINDIR)/at-bot-docs
 	install -m 644 lib/atproto.sh $(LIBDIR)/atproto.sh
+	install -m 644 lib/config.sh $(LIBDIR)/config.sh
+	install -m 644 lib/crypt.sh $(LIBDIR)/crypt.sh
+	install -m 755 lib/doc.sh $(LIBDIR)/doc.sh
 	install -m 644 README.md $(DOCDIR)/README.md
 	install -m 644 LICENSE $(DOCDIR)/LICENSE
 	@echo "AT-bot installed successfully!"
 	@echo ""
 	@echo "Run 'at-bot help' to get started."
+	@echo "Run 'at-bot-docs' or 'make docs' to generate documentation."
 
 uninstall:
 	@echo "Uninstalling AT-bot..."

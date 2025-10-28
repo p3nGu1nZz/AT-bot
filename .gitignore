@@ -46,6 +46,9 @@ session.json
 *~
 .DS_Store
 
+# Documentation build artifacts
+dist/docs/
+
 # Test artifacts
 tests/tmp/
 tests/*.log

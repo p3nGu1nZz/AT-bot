@@ -81,6 +81,10 @@ This document tracks pending tasks, improvements, and features for the AT-bot pr
 - [ ] Add color output configuration options
 
 ### Documentation & Help
+- [x] ✅ **COMPLETED** - Documentation compilation system (`lib/doc.sh`)
+- [x] ✅ **COMPLETED** - Generate combined markdown from all project docs
+- [x] ✅ **COMPLETED** - Create `make docs` and `at-bot-docs` commands
+- [ ] Debug pandoc HTML/PDF conversion (YAML parsing issue)
 - [ ] Add man page generation
 - [ ] Create comprehensive usage examples
 - [ ] Add troubleshooting guide to documentation
