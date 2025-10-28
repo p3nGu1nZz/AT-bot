@@ -7,7 +7,7 @@ LIBDIR = $(PREFIX)/lib/at-bot
 DOCDIR = $(PREFIX)/share/doc/at-bot
 MANDIR = $(PREFIX)/share/man/man1
 
-.PHONY: all install uninstall test clean help
+.PHONY: all install uninstall test clean docs help
 
 all: help
 
@@ -17,6 +17,7 @@ help:
 	@echo "  make install      Install AT-bot to $(PREFIX)"
 	@echo "  make uninstall    Remove AT-bot from $(PREFIX)"
 	@echo "  make test         Run tests"
+	@echo "  make docs         Generate complete documentation (PDF/HTML)"
 	@echo "  make clean        Clean temporary files"
 	@echo "  make help         Show this help message"
 	@echo ""
@@ -47,8 +48,15 @@ test:
 	@echo "Running tests..."
 	@bash tests/run_tests.sh
 
+docs:
+	@echo "Generating documentation..."
+	@bash bin/at-bot-docs
+	@echo ""
+	@echo "Documentation available in dist/docs/"
+
 clean:
 	@echo "Cleaning temporary files..."
 	@find . -name '*~' -delete
 	@find . -name '*.swp' -delete
+	@rm -rf dist/docs
 	@echo "Clean complete."

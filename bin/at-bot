@@ -25,6 +25,8 @@ fi
 source "$LIB_DIR/atproto.sh"
 # shellcheck source=../lib/config.sh
 source "$LIB_DIR/config.sh"
+# shellcheck source=../lib/cli-utils.sh
+source "$LIB_DIR/cli-utils.sh"
 
 # Configuration
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/at-bot"
@@ -164,6 +166,10 @@ main() {
                         image_file="$1"
                         shift
                         ;;
+                    --help)
+                        get_help_for_command "post"
+                        exit 0
+                        ;;
                     *)
                         # Collect remaining args as text
                         if [ -z "$text" ]; then
@@ -177,9 +183,16 @@ main() {
             done
             
             if [ -z "$text" ]; then
-                error "Post text is required"
-                echo "Usage: at-bot post [--image <file>] <text>" >&2
-                exit 1
+                error_with_suggestion "$ERR_INVALID_INPUT" \
+                    "Post text is required" \
+                    "Run 'at-bot help post' for usage"
+                exit "$ERR_INVALID_INPUT"
+            fi
+            
+            validate_post_text "$text" || exit "$ERR_INVALID_INPUT"
+            
+            if [ -n "$image_file" ]; then
+                validate_file_exists "$image_file" || exit "$ERR_NOT_FOUND"
             fi
             
             atproto_post "$text" "" "$image_file"
@@ -339,7 +352,16 @@ main() {
             clear_credentials
             ;;
         help|--help|-h)
-            show_help
+            if [ -n "$2" ]; then
+                # Command-specific help
+                get_help_for_command "$2"
+            else
+                # General help
+                show_help
+            fi
+            ;;
+        commands)
+            list_commands
             ;;
         --version|-v)
             show_version
