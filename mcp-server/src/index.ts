@@ -41,12 +41,14 @@ class ATBotMCPServer {
     );
 
     // Register all tools
-    this.tools = new Map([
+    const allTools = [
       ...authTools,
       ...contentTools,
       ...feedTools,
       ...profileTools,
-    ]);
+    ];
+    
+    this.tools = new Map(allTools.map(tool => [tool.name, tool]));
 
     this.setupHandlers();
   }
@@ -61,7 +63,7 @@ class ATBotMCPServer {
     }));
 
     // Execute tool
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    this.server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       const tool = this.tools.get(request.params.name);
       
       if (!tool) {
