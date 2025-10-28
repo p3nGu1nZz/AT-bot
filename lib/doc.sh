@@ -50,8 +50,8 @@ check_dependencies() {
         error "pandoc is required but not installed"
         echo ""
         echo "Install pandoc:"
-        echo "  Ubuntu/Debian: sudo apt-get install pandoc texlive-xetex"
-        echo "  macOS: brew install pandoc basictex"
+        echo "  Ubuntu/Debian: sudo apt-get install pandoc"
+        echo "  macOS: brew install pandoc"
         echo "  Other: https://pandoc.org/installing.html"
         return 1
     fi
@@ -652,7 +652,7 @@ convert_to_pdf() {
         error "Failed to generate PDF"
         echo ""
         warning "PDF generation requires XeLaTeX. Install with:"
-        echo "  Ubuntu/Debian: sudo apt-get install texlive-xetex"
+        echo "  Ubuntu/Debian: sudo apt-get install texlive-xetex texlive-fonts-recommended texlive-latex-extra"
         echo "  macOS: brew install basictex"
         return 1
     fi
