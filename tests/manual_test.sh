@@ -87,7 +87,7 @@ press_enter() {
 check_authentication() {
     if [ -f "$SESSION_FILE" ]; then
         if output=$("$AT_BOT" whoami 2>&1); then
-            CURRENT_USER=$(echo "$output" | head -n 1 | grep -oP '(?<=Handle: ).*' || echo "User")
+            CURRENT_USER=$(echo "$output" | grep "Handle:" | grep -oP '(?<=Handle: ).*' || echo "User")
             return 0
         fi
     fi
@@ -123,7 +123,7 @@ show_auth_onboarding() {
         echo -e "${GREEN}✓ Authentication successful!${NC}"
         
         if output=$("$AT_BOT" whoami 2>&1); then
-            CURRENT_USER=$(echo "$output" | head -n 1 | grep -oP '(?<=Handle: ).*' || echo "User")
+            CURRENT_USER=$(echo "$output" | grep "Handle:" | grep -oP '(?<=Handle: ).*' || echo "User")
             print_success "Logged in as: $CURRENT_USER"
         fi
         
