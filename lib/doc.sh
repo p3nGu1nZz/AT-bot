@@ -99,6 +99,7 @@ declare -a DOC_ORDER=(
     "doc/ENCRYPTION.md"
     "doc/DEBUG_MODE.md"
     "doc/TESTING.md"
+    "doc/TESTING_GUIDE.md"
     "doc/PACKAGING.md"
     
     # MCP Server Documentation
