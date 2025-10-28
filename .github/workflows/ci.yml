@@ -101,13 +101,13 @@ jobs:
           echo "Scanning for potential security issues..."
           
           # Check for hardcoded credentials patterns (but allow in tests and examples)
-          if grep -rn 'password\s*=\s*["\047][^"\047]\{3,\}["\047]' bin/ lib/ --include="*.sh" 2>/dev/null; then
+          if grep -rn -E 'password\s*=\s*["'"'"'][^"'"'"']{3,}["'"'"']' bin/ lib/ --include="*.sh" 2>/dev/null; then
             echo "Found potential hardcoded passwords in source files"
             exit 1
           fi
           
-          # Check for exposed session files
-          if find . -name "session.json" -o -name "credentials.json" 2>/dev/null | grep -v ".gitignore" | grep -v "\.git" | grep .; then
+          # Check for exposed session files (excluding .git and .gitignore)
+          if find . \( -name "session.json" -o -name "credentials.json" \) -not -path "*/.git/*" -not -name ".gitignore" 2>/dev/null | grep .; then
             echo "Found exposed session or credential files"
             exit 1
           fi
