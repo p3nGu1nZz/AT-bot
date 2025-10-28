@@ -125,6 +125,8 @@ This document tracks pending tasks, improvements, and features for the AT-bot pr
 ## Packaging & Distribution
 
 ### Installation
+- [x] ✅ **COMPLETED** - Create dependency setup script (`lib/setup.sh`) with OS detection and package manager support
+- [x] ✅ **COMPLETED** - Integrate setup script into `install.sh` for automatic dependency checking
 - [ ] Create Debian package (.deb)
 - [ ] Add Homebrew formula for macOS
 - [ ] Create Snap package for Linux
