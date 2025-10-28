@@ -89,6 +89,16 @@ api_request() {
     curl "${curl_opts[@]}" "$url"
 }
 
+# Extract JSON field value (simple implementation, works for flat JSON)
+# Usage: json_get_field '{"key":"value"}' "key"
+json_get_field() {
+    local json="$1"
+    local field="$2"
+    
+    # Use sed for more robust extraction
+    echo "$json" | sed -n 's/.*"'"$field"'":"\([^"]*\)".*/\1/p' | head -n1
+}
+
 # Login to Bluesky
 atproto_login() {
     local identifier="${BLUESKY_HANDLE:-}"
@@ -132,8 +142,11 @@ EOF
     # Check for errors
     if echo "$response" | grep -q '"error"'; then
         local error_msg
-        error_msg=$(echo "$response" | grep -o '"message":"[^"]*"' | cut -d'"' -f4)
-        error "Login failed: ${error_msg:-Unknown error}"
+        error_msg=$(json_get_field "$response" "message")
+        if [ -z "$error_msg" ]; then
+            error_msg="Unknown error"
+        fi
+        error "Login failed: $error_msg"
         return 1
     fi
     
@@ -142,7 +155,10 @@ EOF
     chmod 600 "$SESSION_FILE"
     
     local handle
-    handle=$(echo "$response" | grep -o '"handle":"[^"]*"' | cut -d'"' -f4)
+    handle=$(json_get_field "$response" "handle")
+    if [ -z "$handle" ]; then
+        handle="unknown"
+    fi
     success "Successfully logged in as: $handle"
     
     return 0
@@ -166,13 +182,14 @@ atproto_whoami() {
         return 1
     fi
     
-    local handle did
-    handle=$(grep -o '"handle":"[^"]*"' "$SESSION_FILE" | cut -d'"' -f4)
-    did=$(grep -o '"did":"[^"]*"' "$SESSION_FILE" | cut -d'"' -f4)
+    local session_data handle did
+    session_data=$(cat "$SESSION_FILE")
+    handle=$(json_get_field "$session_data" "handle")
+    did=$(json_get_field "$session_data" "did")
     
     echo "Logged in as:"
-    echo "  Handle: $handle"
-    echo "  DID: $did"
+    echo "  Handle: ${handle:-unknown}"
+    echo "  DID: ${did:-unknown}"
 }
 
 # Get access token from session
@@ -181,5 +198,7 @@ get_access_token() {
         return 1
     fi
     
-    grep -o '"accessJwt":"[^"]*"' "$SESSION_FILE" | cut -d'"' -f4
+    local session_data
+    session_data=$(cat "$SESSION_FILE")
+    json_get_field "$session_data" "accessJwt"
 }
