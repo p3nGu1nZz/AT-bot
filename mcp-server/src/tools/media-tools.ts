@@ -69,7 +69,7 @@ export const mediaTools: ToolDefinition[] = [
         return {
           success: true,
           message: `Media file '${args.filepath}' would be uploaded to Bluesky blob service`,
-          note: 'Actual blob upload handled by at-bot post command with --image flag',
+          note: 'Actual blob upload handled by atproto post command with --image flag',
         };
       } catch (error) {
         return {

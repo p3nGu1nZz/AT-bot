@@ -1,6 +1,6 @@
 #!/bin/bash
-# AT-bot - A simple CLI tool for Bluesky AT Protocol automation
-# Copyright (c) 2025 AT-bot Contributors
+# atproto - A simple CLI tool for Bluesky AT Protocol automation
+# Copyright (c) 2025 atproto Contributors
 
 set -e
 
@@ -12,12 +12,12 @@ INSTALL_PREFIX="$(dirname "$SCRIPT_DIR")"
 if [ -f "$SCRIPT_DIR/../lib/atproto.sh" ]; then
     # Development/source tree
     LIB_DIR="$SCRIPT_DIR/../lib"
-elif [ -f "$INSTALL_PREFIX/lib/at-bot/atproto.sh" ]; then
-    # Installed with PREFIX
-    LIB_DIR="$INSTALL_PREFIX/lib/at-bot"
+elif [ -f "$INSTALL_PREFIX/lib/atproto/atproto.sh" ]; then
+    # Installed version
+    LIB_DIR="$INSTALL_PREFIX/lib/atproto"
 else
-    echo "Error: Cannot find AT-bot library files" >&2
-    echo "Looked in: $SCRIPT_DIR/../lib and $INSTALL_PREFIX/lib/at-bot" >&2
+    echo "Error: Cannot find atproto library files" >&2
+    echo "Looked in: $SCRIPT_DIR/../lib and $INSTALL_PREFIX/lib/atproto" >&2
     exit 1
 fi
 
@@ -29,7 +29,7 @@ source "$LIB_DIR/config.sh"
 source "$LIB_DIR/cli-utils.sh"
 
 # Configuration
-CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/at-bot"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/atproto"
 # SESSION_FILE is used by sourced library
 # shellcheck disable=SC2034
 SESSION_FILE="$CONFIG_DIR/session.json"
@@ -37,9 +37,9 @@ SESSION_FILE="$CONFIG_DIR/session.json"
 # Display usage information
 show_help() {
     cat << EOF
-AT-bot - A simple CLI tool for Bluesky AT Protocol automation
+atproto - A simple CLI tool for Bluesky AT Protocol automation
 
-Usage: at-bot [COMMAND] [OPTIONS]
+Usage: atproto [COMMAND] [OPTIONS]
 
 Commands:
     login               Login to your Bluesky account
@@ -60,6 +60,7 @@ Commands:
     profile-edit        Edit your profile
     config              Manage configuration
     clear-credentials   Clear saved credentials
+    mcp-server          Launch MCP server for AI agents
     help                Show this help message
 
 Config Commands:
@@ -82,30 +83,31 @@ Options:
     -v, --version       Show version information
 
 Examples:
-    at-bot login                    # Interactive login
-    at-bot whoami                   # Check current user
-    at-bot post "Hello Bluesky!"    # Create a post
-    at-bot post --image photo.jpg "Check this out!"  # Post with image
-    at-bot reply at://... "Great!"  # Reply to a post
-    at-bot like at://...            # Like a post
-    at-bot repost at://...          # Repost a post
-    at-bot feed                     # Read timeline (10 posts)
-    at-bot feed 20                  # Read timeline (20 posts)
-    at-bot follow user.bsky.social  # Follow a user
-    at-bot unfollow user.bsky.social # Unfollow a user
-    at-bot followers                # View your followers
-    at-bot followers user.bsky.social # View another user's followers
-    at-bot following                # View who you follow
-    at-bot following user.bsky.social 100 # View who another user follows (limit 100)
-    at-bot search "bluesky" 20      # Search for posts
-    at-bot profile                  # View your profile
-    at-bot profile user.bsky.social # View another user's profile
-    at-bot profile-edit --name "My Name" --bio "My bio"  # Update profile
-    at-bot profile-edit --avatar avatar.png --banner banner.jpg  # Update images
-    at-bot refresh                  # Refresh session
-    at-bot config list              # Show configuration
-    at-bot config set feed_limit 50 # Change default feed limit
-    at-bot logout                   # Clear session
+    atproto login                    # Interactive login
+    atproto whoami                   # Check current user
+    atproto post "Hello Bluesky!"    # Create a post
+    atproto post --image photo.jpg "Check this out!"  # Post with image
+    atproto reply at://... "Great!"  # Reply to a post
+    atproto like at://...            # Like a post
+    atproto repost at://...          # Repost a post
+    atproto feed                     # Read timeline (10 posts)
+    atproto feed 20                  # Read timeline (20 posts)
+    atproto follow user.bsky.social  # Follow a user
+    atproto unfollow user.bsky.social # Unfollow a user
+    atproto followers                # View your followers
+    atproto followers user.bsky.social # View another user's followers
+    atproto following                # View who you follow
+    atproto following user.bsky.social 100 # View who another user follows (limit 100)
+    atproto search "bluesky" 20      # Search for posts
+    atproto profile                  # View your profile
+    atproto profile user.bsky.social # View another user's profile
+    atproto profile-edit --name "My Name" --bio "My bio"  # Update profile
+    atproto profile-edit --avatar avatar.png --banner banner.jpg  # Update images
+    atproto refresh                  # Refresh session
+    atproto config list              # Show configuration
+    atproto config set feed_limit 50 # Change default feed limit
+    atproto logout                   # Clear session
+    atproto mcp-server               # Launch MCP server for AI agents
 
 Environment Variables:
     BLUESKY_HANDLE      Your Bluesky handle (optional)
@@ -117,14 +119,58 @@ Configuration:
     Session data is stored in: $CONFIG_DIR/session.json
     Saved credentials (optional): $CONFIG_DIR/credentials.json
 
-For more information, visit: https://github.com/p3nGu1nZz/AT-bot
+For more information, visit: https://github.com/p3nGu1nZz/atproto
 EOF
 }
 
 # Display version information
 show_version() {
-    echo "AT-bot version 0.1.0"
+    echo "atproto version 0.1.0"
     echo "AT Protocol CLI tool for Bluesky"
+}
+
+# Launch MCP server mode
+launch_mcp_server() {
+    local project_root
+    project_root="$(dirname "$SCRIPT_DIR")"
+    local mcp_server="$project_root/mcp-server/dist/index.js"
+    
+    # Check if MCP server exists
+    if [ ! -f "$mcp_server" ]; then
+        error "MCP server not found at $mcp_server"
+        echo "Please run 'cd mcp-server && npm run build' first" >&2
+        exit 1
+    fi
+    
+    # Find node executable (check common locations)
+    local node_cmd=""
+    if command -v node &> /dev/null; then
+        node_cmd="node"
+    elif [ -x "/root/.nvm/versions/node/v22.16.0/bin/node" ]; then
+        node_cmd="/root/.nvm/versions/node/v22.16.0/bin/node"
+    elif [ -x "$HOME/.nvm/versions/node/v22.16.0/bin/node" ]; then
+        node_cmd="$HOME/.nvm/versions/node/v22.16.0/bin/node"
+    elif [ -x "/usr/bin/node" ]; then
+        node_cmd="/usr/bin/node"
+    elif [ -x "/usr/local/bin/node" ]; then
+        node_cmd="/usr/local/bin/node"
+    else
+        error "Node.js not found"
+        echo "Please install Node.js 18+ from https://nodejs.org/" >&2
+        exit 1
+    fi
+    
+    # Set up environment for MCP server
+    export ATP_PDS="${ATP_PDS:-https://bsky.social}"
+    export MCP_LOG_LEVEL="${MCP_LOG_LEVEL:-info}"
+    
+    # Ensure atproto is in PATH for MCP server shell calls
+    if ! command -v atproto &> /dev/null; then
+        export PATH="$project_root/bin:$PATH"
+    fi
+    
+    # Launch MCP server
+    exec "$node_cmd" "$mcp_server" "$@"
 }
 
 # Main command dispatcher
@@ -185,7 +231,7 @@ main() {
             if [ -z "$text" ]; then
                 error_with_suggestion "$ERR_INVALID_INPUT" \
                     "Post text is required" \
-                    "Run 'at-bot help post' for usage"
+                    "Run 'atproto help post' for usage"
                 exit "$ERR_INVALID_INPUT"
             fi
             
@@ -201,7 +247,7 @@ main() {
             shift
             if [ -z "$1" ] || [ -z "$2" ]; then
                 error "Reply requires post URI and text"
-                echo "Usage: at-bot reply <post-uri> <text>" >&2
+                echo "Usage: atproto reply <post-uri> <text>" >&2
                 exit 1
             fi
             local uri="$1"
@@ -212,7 +258,7 @@ main() {
             shift
             if [ -z "$1" ]; then
                 error "Post URI is required"
-                echo "Usage: at-bot like <post-uri>" >&2
+                echo "Usage: atproto like <post-uri>" >&2
                 exit 1
             fi
             atproto_like "$@"
@@ -221,7 +267,7 @@ main() {
             shift
             if [ -z "$1" ]; then
                 error "Post URI is required"
-                echo "Usage: at-bot repost <post-uri>" >&2
+                echo "Usage: atproto repost <post-uri>" >&2
                 exit 1
             fi
             atproto_repost "$@"
@@ -234,7 +280,7 @@ main() {
             shift
             if [ -z "$1" ]; then
                 error "User handle is required"
-                echo "Usage: at-bot follow <handle>" >&2
+                echo "Usage: atproto follow <handle>" >&2
                 exit 1
             fi
             atproto_follow "$@"
@@ -243,7 +289,7 @@ main() {
             shift
             if [ -z "$1" ]; then
                 error "User handle is required"
-                echo "Usage: at-bot unfollow <handle>" >&2
+                echo "Usage: atproto unfollow <handle>" >&2
                 exit 1
             fi
             atproto_unfollow "$@"
@@ -252,7 +298,7 @@ main() {
             shift
             if [ -z "$1" ]; then
                 error "Search query is required"
-                echo "Usage: at-bot search <query> [limit]" >&2
+                echo "Usage: atproto search <query> [limit]" >&2
                 exit 1
             fi
             atproto_search "$@"
@@ -267,7 +313,7 @@ main() {
                     shift
                     if [ -z "$1" ]; then
                         error "Configuration key required"
-                        echo "Usage: at-bot config get <key>" >&2
+                        echo "Usage: atproto config get <key>" >&2
                         exit 1
                     fi
                     get_config "$1"
@@ -351,6 +397,11 @@ main() {
         clear-credentials)
             clear_credentials
             ;;
+        mcp-server)
+            # Launch MCP server mode
+            shift
+            launch_mcp_server "$@"
+            ;;
         help|--help|-h)
             if [ -n "$2" ]; then
                 # Command-specific help
@@ -368,7 +419,7 @@ main() {
             ;;
         *)
             echo "Error: Unknown command '$1'" >&2
-            echo "Run 'at-bot help' for usage information." >&2
+            echo "Run 'atproto help' for usage information." >&2
             exit 1
             ;;
     esac

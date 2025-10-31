@@ -1,0 +1,13 @@
+{
+  "github.copilot.chat.mcp.enabled": true,
+  "github.copilot.chat.mcp.servers": {
+    "at-bot": {
+      "command": "/mnt/c/Users/3nigma/source/repos/AT-bot/bin/at-bot-mcp-server",
+      "args": [],
+      "env": {
+        "ATP_PDS": "https://bsky.social",
+        "MCP_LOG_LEVEL": "info"
+      }
+    }
+  }
+}

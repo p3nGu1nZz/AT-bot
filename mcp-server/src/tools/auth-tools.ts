@@ -1,7 +1,7 @@
 /**
  * Authentication tools for MCP
  * 
- * These tools handle Bluesky authentication through AT-bot CLI
+ * These tools handle Bluesky authentication through atproto CLI
  */
 
 import { executeATBotCommand } from '../lib/shell-executor.js';

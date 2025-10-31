@@ -25,7 +25,7 @@ This guide will help you get started with AT-bot quickly.
 Clone and install:
 
 ```bash
-git clone https://github.com/p3nGu1nZz/AT-bot.git
+git clone https://github.com/p3nGu1nZz/atproto.git
 cd AT-bot
 ./install.sh
 ```

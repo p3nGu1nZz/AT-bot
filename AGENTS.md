@@ -14,8 +14,8 @@ This document outlines how AI agents and automated systems can enhance the AT-bo
 
 AT-bot serves as a foundational infrastructure layer for AT Protocol interactions. The project provides two primary interfaces:
 
-1. **CLI Interface** (`bin/at-bot`): Direct command-line access for users and scripts
-2. **MCP Server Interface** (`at-bot-mcp-server`): Standardized JSON-RPC interface for AI agents
+1. **CLI Interface** (`atproto`): Direct command-line access for users and scripts
+2. **MCP Server Interface** (`atproto mcp-server`): Standardized JSON-RPC interface for AI agents
 
 This document explores opportunities for integrating intelligent agents through MCP, enabling next-generation automation workflows where agents collaborate with Bluesky as a native communication and coordination platform.
 
@@ -192,7 +192,8 @@ The AT-bot MCP server exposes tools organized by category:
 {
   "mcpServers": {
     "at-bot": {
-      "command": "at-bot-mcp-server",
+      "command": "atproto",
+      "args": ["mcp-server"],
       "args": ["--config", "~/.config/at-bot/mcp.json"],
       "env": {
         "ATP_PDS": "https://bsky.social"

@@ -2,6 +2,20 @@
 
 This document tracks pending tasks, improvements, and features for the AT-bot project. Items are organized by priority and category.
 
+## 🚀 Current Focus: MCP Server Activation (October 31, 2025)
+
+**Priority Goal**: Get the MCP server operational to accelerate development through AI-assisted workflows.
+
+**Why This Matters**: Once the MCP server is working, we can use it directly in Claude/Copilot conversations to:
+- Test features interactively during development
+- Automate common development tasks
+- Rapidly prototype and validate new functionality
+- Enable true agent-driven development workflows
+
+**See Active Todo List Below** for detailed implementation steps.
+
+---
+
 ## MCP (Model Context Protocol) Server Implementation
 
 ### MCP Server Architecture & Design
@@ -18,11 +32,25 @@ This document tracks pending tasks, improvements, and features for the AT-bot pr
 - [x] ✅ **COMPLETED** - Implement content tools (post_create, post_reply, post_like, post_repost, post_delete)
 - [x] ✅ **COMPLETED** - Implement feed tools (feed_read, feed_search, feed_timeline, feed_notifications)
 - [x] ✅ **COMPLETED** - Implement profile tools (profile_get, profile_follow, profile_unfollow, profile_block)
+- [ ] **HIGH PRIORITY** - Install Node.js dependencies and build MCP server
+- [ ] **HIGH PRIORITY** - Test MCP server with stdio transport
+- [ ] **HIGH PRIORITY** - Verify shell command execution from MCP tools
+- [ ] **HIGH PRIORITY** - Test end-to-end authentication flow via MCP
+- [ ] **HIGH PRIORITY** - Create MCP server configuration file template
+- [ ] **HIGH PRIORITY** - Add MCP server to system PATH or create wrapper script
+- [ ] **HIGH PRIORITY** - Test MCP server integration with Claude Desktop/VS Code
 - [ ] Add batch operation support (batch_post, batch_follow, batch_schedule)
-- [ ] Add MCP server configuration and startup system
 - [ ] Add MCP server logging and debugging capabilities
+- [ ] Add error recovery and retry logic for shell commands
+- [ ] Implement MCP server health check endpoint
 
 ### MCP Server Testing & Documentation
+- [ ] **HIGH PRIORITY** - Write basic smoke tests for MCP server startup
+- [ ] **HIGH PRIORITY** - Test tool discovery (list_tools request)
+- [ ] **HIGH PRIORITY** - Test tool execution (call_tool request) for each category
+- [ ] **HIGH PRIORITY** - Create quickstart guide for MCP server setup
+- [ ] **HIGH PRIORITY** - Document MCP server configuration options
+- [ ] **HIGH PRIORITY** - Create example MCP client configuration (Claude Desktop, VS Code)
 - [ ] Write integration tests for MCP server
 - [ ] Create MCP server configuration guide
 - [ ] Write MCP client examples and tutorials

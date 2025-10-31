@@ -122,7 +122,7 @@ Environment Variables:
   AT_BOT_TEST_TIMEOUT  - Test timeout in seconds (default: 60)
   AT_BOT_DEBUG         - Enable debug mode for tests
 
-For more information, visit: https://github.com/p3nGu1nZz/AT-bot
+For more information, visit: https://github.com/p3nGu1nZz/atproto
 
 EOF
 }

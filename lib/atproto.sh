@@ -3,7 +3,7 @@
 # Provides core functionality for interacting with Bluesky's AT Protocol
 
 # Configuration
-CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/at-bot"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/atproto"
 SESSION_FILE="$CONFIG_DIR/session.json"
 CREDENTIALS_FILE="$CONFIG_DIR/credentials.json"
 ENCRYPTION_KEY_FILE="$CONFIG_DIR/.key"
@@ -192,7 +192,7 @@ atproto_login() {
     
     # Check if already logged in
     if [ -f "$SESSION_FILE" ]; then
-        warning "Already logged in. Use 'at-bot logout' first to login with a different account."
+        warning "Already logged in. Use 'atproto logout' first to login with a different account."
         return 0
     fi
     

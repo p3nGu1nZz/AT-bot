@@ -256,15 +256,15 @@ make docs
 ## Contribution & Updates
 
 - **Contributing:** See [CONTRIBUTING.md](../CONTRIBUTING.md) or main [PLAN.md](../PLAN.md)
-- **Reporting Issues:** https://github.com/p3nGu1nZz/AT-bot/issues
-- **Discussions:** https://github.com/p3nGu1nZz/AT-bot/discussions
+- **Reporting Issues:** https://github.com/p3nGu1nZz/atproto/issues
+- **Discussions:** https://github.com/p3nGu1nZz/atproto/discussions
 
 ---
 
 ## Quick Links
 
-- **GitHub Repository:** https://github.com/p3nGu1nZz/AT-bot
-- **Issue Tracker:** https://github.com/p3nGu1nZz/AT-bot/issues
+- **GitHub Repository:** https://github.com/p3nGu1nZz/atproto
+- **Issue Tracker:** https://github.com/p3nGu1nZz/atproto/issues
 - **AT Protocol Docs:** https://atproto.com/
 - **Bluesky:** https://bsky.app/
 

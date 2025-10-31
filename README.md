@@ -27,17 +27,13 @@ It provides simple authentication and session management, making it easy to auto
 
 ## Installation
 
-### Quick Installation
-
-Clone the repository and run the installation script:
+### Quick Install (Recommended)
 
 ```bash
-git clone https://github.com/p3nGu1nZz/AT-bot.git
-cd AT-bot
-./install.sh
+git clone https://github.com/p3nGu1nZz/atproto.git
+cd atproto
+sudo ./install.sh
 ```
-
-This will install AT-bot to `/usr/local/bin` by default. You may need sudo permissions.
 
 ### Custom Installation Location
 
@@ -398,7 +394,7 @@ See the [LICENSE](LICENSE) file for details.
 
 - [AT Protocol Documentation](https://atproto.com/)
 - [Bluesky](https://bsky.app/)
-- [Project Repository](https://github.com/p3nGu1nZz/AT-bot)
+- [Project Repository](https://github.com/p3nGu1nZz/atproto)
 
 ## Troubleshooting
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * AT-bot MCP Server
+ * atproto MCP Server
  * 
  * Model Context Protocol server that exposes AT Protocol/Bluesky
  * functionality to AI agents through standardized tool interfaces.
@@ -24,7 +24,7 @@ import { mediaTools } from './tools/media-tools.js';
 import { executeShellCommand } from './lib/shell-executor.js';
 
 /**
- * AT-bot MCP Server
+ * atproto MCP Server
  * Provides tool-based access to Bluesky/AT Protocol functionality
  */
 class ATBotMCPServer {
@@ -34,7 +34,7 @@ class ATBotMCPServer {
   constructor() {
     this.server = new Server(
       {
-        name: 'at-bot-mcp-server',
+        name: 'atproto-mcp-server',
         version: '0.1.0',
       },
       {
@@ -79,7 +79,7 @@ class ATBotMCPServer {
       }
 
       try {
-        // Execute the tool by calling the AT-bot CLI
+        // Execute the tool by calling the atproto CLI
         const result = await tool.handler(request.params.arguments);
         
         return {
@@ -112,7 +112,7 @@ class ATBotMCPServer {
     await this.server.connect(transport);
     
     // Log to stderr (stdout is reserved for MCP protocol)
-    console.error('AT-bot MCP Server started successfully');
+    console.error('atproto MCP Server started successfully');
     console.error(`Registered ${this.tools.size} tools`);
   }
 }

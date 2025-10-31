@@ -1,6 +1,6 @@
 /**
  * Shell command executor
- * Executes AT-bot CLI commands and returns results
+ * Executes atproto CLI commands and returns results
  */
 
 import { exec } from 'child_process';
@@ -35,12 +35,12 @@ export async function executeShellCommand(command: string): Promise<string> {
 }
 
 /**
- * Execute AT-bot CLI command
+ * Execute atproto CLI command
  */
 export async function executeATBotCommand(
   command: string,
   ...args: string[]
 ): Promise<string> {
-  const fullCommand = `at-bot ${command} ${args.join(' ')}`;
+  const fullCommand = `atproto ${command} ${args.join(' ')}`;
   return executeShellCommand(fullCommand);
 }

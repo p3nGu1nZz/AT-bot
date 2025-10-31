@@ -546,7 +546,7 @@ generate_cover_page() {
     local title="${CONFIG_TITLE:-AT Protocol Bot}"
     local author="${CONFIG_AUTHOR:-AT-bot Development Team}"
     local version="${CONFIG_VERSION:-0.1.0}"
-    local repository="${CONFIG_REPOSITORY:-https://github.com/p3nGu1nZz/AT-bot}"
+    local repository="${CONFIG_REPOSITORY:-https://github.com/p3nGu1nZz/atproto}"
     local license="${CONFIG_LICENSE:-CC0 1.0 Universal}"
     local date=$(date "+%B %d, %Y")
     

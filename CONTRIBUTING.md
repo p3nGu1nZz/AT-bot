@@ -7,7 +7,7 @@ Thank you for your interest in contributing to AT-bot! This document provides gu
 1. Fork the repository
 2. Clone your fork:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/AT-bot.git
+   git clone https://github.com/YOUR_USERNAME/atproto.git
    cd AT-bot
    ```
 
