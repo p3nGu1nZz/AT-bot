@@ -1,4 +1,4 @@
-# AT-bot Phase 2 - Immediate Action Items
+# atproto Phase 2 - Immediate Action Items
 
 **Generated**: October 28, 2025  
 **Priority**: HIGH - Required for v0.4.0 Release  
@@ -49,7 +49,7 @@
 **Difficulty**: Medium | **Time**: 1-2 hours | **Impact**: CRITICAL
 
 - [ ] Configure MCP client (VS Code Copilot, Claude Projects, etc.)
-- [ ] Point to at-bot-mcp-server executable
+- [ ] Point to atproto-mcp-server executable
 - [ ] Test tool discovery: should list 27 tools
 - [ ] Execute auth_whoami tool
 - [ ] Execute post_create tool with sample text
@@ -70,7 +70,7 @@
 **Difficulty**: Medium | **Time**: 6-8 hours | **Impact**: HIGH
 
 **Phase A: Core Implementation**
-- [ ] Add `--format json` flag parsing to bin/at-bot
+- [ ] Add `--format json` flag parsing to bin/atproto
 - [ ] Modify lib/atproto.sh functions to return structured data
 - [ ] Create json_output() helper in lib/cli-utils.sh
 - [ ] Test each command with `--format json`
@@ -84,11 +84,11 @@
 
 **Commands to Support**:
 ```
-at-bot whoami --format json
-at-bot feed --format json --limit 5
-at-bot profile <handle> --format json
-at-bot search <query> --format json
-at-bot followers <handle> --format json
+atproto whoami --format json
+atproto feed --format json --limit 5
+atproto profile <handle> --format json
+atproto search <query> --format json
+atproto followers <handle> --format json
 ... (all commands)
 ```
 
@@ -115,13 +115,13 @@ at-bot followers <handle> --format json
 - [ ] Consider: GitHub releases or PPA
 
 **Expected Output**:
-- at-bot_0.4.0_all.deb
+- atproto_0.4.0_all.deb
 - Installation to /usr/local/bin/ and /usr/local/lib/
 
 **Success Criteria**:
 - ✅ .deb package builds without errors
 - ✅ Package installs cleanly
-- ✅ at-bot command available after install
+- ✅ atproto command available after install
 - ✅ Uninstalls cleanly without orphaned files
 
 ---
@@ -129,23 +129,23 @@ at-bot followers <handle> --format json
 ### 6. Homebrew Formula
 **Difficulty**: Low | **Time**: 3-4 hours | **Impact**: HIGH
 
-- [ ] Create homebrew-at-bot tap repository
-- [ ] Write Formula/at-bot.rb
+- [ ] Create homebrew-atproto tap repository
+- [ ] Write Formula/atproto.rb
 - [ ] Include version and sha256 checksum
-- [ ] Test installation: `brew tap p3nGu1nZz/at-bot`
-- [ ] Test install: `brew install at-bot`
-- [ ] Test uninstall: `brew uninstall at-bot`
+- [ ] Test installation: `brew tap p3nGu1nZz/atproto`
+- [ ] Test install: `brew install atproto`
+- [ ] Test uninstall: `brew uninstall atproto`
 - [ ] Document in README
 
 **Expected Command**:
 ```bash
-brew tap p3nGu1nZz/at-bot
-brew install at-bot
+brew tap p3nGu1nZz/atproto
+brew install atproto
 ```
 
 **Success Criteria**:
 - ✅ Formula installs cleanly
-- ✅ at-bot command works after install
+- ✅ atproto command works after install
 - ✅ Uninstalls cleanly
 - ✅ Can be installed on fresh macOS system
 
@@ -186,9 +186,9 @@ brew install at-bot
 
 **Example Usage**:
 ```bash
-at-bot batch-post @daily-posts.txt
-at-bot batch-follow @users-to-follow.json
-at-bot schedule @weekly-schedule.json
+atproto batch-post @daily-posts.txt
+atproto batch-follow @users-to-follow.json
+atproto schedule @weekly-schedule.json
 ```
 
 ---
@@ -196,12 +196,12 @@ at-bot schedule @weekly-schedule.json
 ### 9. Advanced Configuration
 **Difficulty**: Medium | **Time**: 6-8 hours | **Impact**: Medium
 
-- [ ] Create ~/.config/at-bot/config.json template
+- [ ] Create ~/.config/atproto/config.json template
 - [ ] Support environment variable interpolation
 - [ ] Add profile management (work/personal)
 - [ ] Add preset commands for workflows
 - [ ] Write configuration guide
-- [ ] Add `at-bot config` command
+- [ ] Add `atproto config` command
 
 ---
 
@@ -281,7 +281,7 @@ Before releasing v0.4.0, ensure:
 
 1. **Immediate Setup** (5 minutes)
    ```bash
-   cd /mnt/c/Users/3nigma/source/repos/AT-bot
+   cd /mnt/c/Users/3nigma/source/repos/atproto
    cd mcp-server && npm install && npm run build
    npm start  # Test the server
    ```

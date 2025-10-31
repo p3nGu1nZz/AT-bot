@@ -1,5 +1,5 @@
 #!/bin/bash
-# Test runner for AT-bot
+# Test runner for atproto
 # Runs all tests in the tests directory
 
 set -e
@@ -20,7 +20,7 @@ NC='\033[0m'
 # Print test header
 print_header() {
     echo -e "${BLUE}================================${NC}"
-    echo -e "${BLUE}AT-bot Test Suite${NC}"
+    echo -e "${BLUE}atproto Test Suite${NC}"
     echo -e "${BLUE}================================${NC}"
     echo ""
 }

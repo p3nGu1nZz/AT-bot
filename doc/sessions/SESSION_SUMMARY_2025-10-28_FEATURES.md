@@ -5,7 +5,7 @@
 
 ## Session Overview
 
-This session focused on expanding AT-bot's core functionality with essential social media features:follow/unfollow user management and post search capabilities. Additionally, we established a comprehensive CI/CD pipeline to ensure code quality and cross-platform compatibility.
+This session focused on expanding atproto's core functionality with essential social media features:follow/unfollow user management and post search capabilities. Additionally, we established a comprehensive CI/CD pipeline to ensure code quality and cross-platform compatibility.
 
 ## 🎯 Objectives Achieved
 
@@ -19,7 +19,7 @@ This session focused on expanding AT-bot's core functionality with essential soc
   
 - **Files Modified**:
   - `lib/atproto.sh`: Added `atproto_follow()` and `atproto_unfollow()` functions
-  - `bin/at-bot`: Added `follow` and `unfollow` command routing
+  - `bin/atproto`: Added `follow` and `unfollow` command routing
   - Help text updated with examples
 
 ### 2. ✅ Search Functionality
@@ -32,7 +32,7 @@ This session focused on expanding AT-bot's core functionality with essential soc
   
 - **Files Modified**:
   - `lib/atproto.sh`: Added `atproto_search()` function
-  - `bin/at-bot`: Added `search` command with validation
+  - `bin/atproto`: Added `search` command with validation
   - Help text updated with search examples
 
 ### 3. ✅ MCP Tools Expansion
@@ -173,7 +173,7 @@ CI Jobs:          6 defined
 $ make test
 
 ================================
-AT-bot Test Suite
+atproto Test Suite
 ================================
 
 ✓ test_cli_basic
@@ -214,7 +214,7 @@ All tests passed!
    - Added `user_unfollow` tool documentation
    - Complete schema definitions for all new tools
 
-3. **bin/at-bot** (Help Text)
+3. **bin/atproto** (Help Text)
    - Updated command list
    - Added examples for new commands
    - Maintained consistent formatting
@@ -243,14 +243,14 @@ All tests passed!
 ### CLI Features
 ```bash
 # Complete workflow example
-at-bot login                         # Authenticate
-at-bot whoami                        # Check identity
-at-bot post "Hello Bluesky!"        # Create content
-at-bot feed 20                       # Read timeline
-at-bot search "AT Protocol" 15       # Discover content
-at-bot follow user.bsky.social       # Build network
-at-bot unfollow user.bsky.social     # Manage follows
-at-bot logout                        # Clean exit
+atproto login                         # Authenticate
+atproto whoami                        # Check identity
+atproto post "Hello Bluesky!"        # Create content
+atproto feed 20                       # Read timeline
+atproto search "AT Protocol" 15       # Discover content
+atproto follow user.bsky.social       # Build network
+atproto unfollow user.bsky.social     # Manage follows
+atproto logout                        # Clean exit
 ```
 
 ### MCP Integration

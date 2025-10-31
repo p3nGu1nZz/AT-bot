@@ -15,13 +15,13 @@
 **Commit**: `84e291e` - "fix: remove set -e from manual_test.sh to prevent premature exit"
 
 ### 2. User Handle Display Issue
-**Problem**: After login, manual test showed "User" instead of actual Bluesky handle (e.g., "at-bot.bsky.social")
+**Problem**: After login, manual test showed "User" instead of actual Bluesky handle (e.g., "atproto.bsky.social")
 
 **Root Cause**: The grep pattern was looking at first line of `whoami` output instead of the line containing "Handle:"
 - Output format: 
   ```
   Logged in as:
-    Handle: at-bot.bsky.social
+    Handle: atproto.bsky.social
     DID: did:plc:...
   ```
 - Old parsing: `echo "$output" | head -n 1 | grep "Handle:"`  (looked at "Logged in as:" line)
@@ -59,8 +59,8 @@ print_section() {
 **Key Features**:
 
 1. **Automatic Authentication**
-   - Checks for existing session (`~/.config/at-bot/session.json`)
-   - Loads saved test credentials if available (`~/.config/at-bot/.test_credentials`)
+   - Checks for existing session (`~/.config/atproto/session.json`)
+   - Loads saved test credentials if available (`~/.config/atproto/.test_credentials`)
    - Falls back to interactive login if needed
    - Optionally saves credentials for future runs (encrypted)
 
@@ -154,7 +154,7 @@ Added new targets for testing:
 3. Script prompts for Bluesky handle and password
 4. Authenticates with AT Protocol
 5. Asks if user wants to save credentials for automation
-6. If yes, saves in `~/.config/at-bot/.test_credentials` (mode 600)
+6. If yes, saves in `~/.config/atproto/.test_credentials` (mode 600)
 7. Runs tests
 
 ### Subsequent Runs

@@ -1,4 +1,4 @@
-# 📊 AT-bot Development Workflow & Decision Tree
+# 📊 atproto Development Workflow & Decision Tree
 
 **Purpose**: Quick visual guide for "what should I work on next?"  
 **Date**: October 28, 2025
@@ -81,7 +81,7 @@ Choose ONE item, do it completely, then move to next.
 
 ```bash
 # Step 1: Navigate
-cd /mnt/c/Users/3nigma/source/repos/AT-bot/mcp-server
+cd /mnt/c/Users/3nigma/source/repos/atproto/mcp-server
 
 # Step 2: Install
 npm install
@@ -91,7 +91,7 @@ npm run build
 
 # Step 4: Test
 npm start
-# Should see: "AT-bot MCP Server started successfully"
+# Should see: "atproto MCP Server started successfully"
 # Should see: "Registered 27 tools"
 
 # Step 5: Verify
@@ -125,15 +125,15 @@ git push origin main
 ```bash
 # Step 1: Understand the goal
 # Add --format json to ALL commands
-# at-bot whoami --format json
-# at-bot feed --format json
+# atproto whoami --format json
+# atproto feed --format json
 
 # Step 2: Plan the implementation
 # Edit lib/atproto.sh:
 #   - Add function output_json() 
 #   - Modify all functions to return structured data
 #
-# Edit bin/at-bot:
+# Edit bin/atproto:
 #   - Parse --format flag
 #   - Route output through formatter
 #   - Maintain backward compatibility
@@ -145,9 +145,9 @@ git push origin main
 #   3. All others
 
 # Step 4: Test each command
-at-bot whoami --format json | jq .           # Test parsing
-at-bot post "hello" --format json | jq .     # Test parsing
-at-bot feed --format json | jq '.' | head    # Test parsing
+atproto whoami --format json | jq .           # Test parsing
+atproto post "hello" --format json | jq .     # Test parsing
+atproto feed --format json | jq '.' | head    # Test parsing
 
 # Step 5: Write tests
 # Create tests/test_json_output.sh
@@ -184,13 +184,13 @@ cd debian
 
 # Step 2: Create files
 cat > control << 'EOF'
-Package: at-bot
+Package: atproto
 Version: 0.4.0
 Architecture: all
 Depends: bash, curl, jq
-Maintainer: AT-bot Contributors <mail@example.com>
+Maintainer: atproto Contributors <mail@example.com>
 Description: Bluesky/AT Protocol CLI tool
- AT-bot provides a simple command-line interface for
+ atproto provides a simple command-line interface for
  interacting with Bluesky and the AT Protocol.
 EOF
 
@@ -205,8 +205,8 @@ chmod 755 rules
 
 cat > postinst << 'EOF'
 #!/bin/bash
-# Make sure at-bot is executable
-chmod 755 /usr/local/bin/at-bot
+# Make sure atproto is executable
+chmod 755 /usr/local/bin/atproto
 EOF
 chmod 755 postinst
 
@@ -215,13 +215,13 @@ cd ..
 dpkg-buildpackage
 
 # Step 4: Test installation
-sudo dpkg -i ../at-bot_0.4.0_all.deb
+sudo dpkg -i ../atproto_0.4.0_all.deb
 
 # Step 5: Verify
-at-bot help
+atproto help
 
 # Step 6: Test uninstallation
-sudo dpkg -r at-bot
+sudo dpkg -r atproto
 
 # Step 7: Commit
 git add debian/
@@ -233,7 +233,7 @@ git push origin main
 - ✅ debian/ directory created with config
 - ✅ .deb package builds without errors
 - ✅ Package installs cleanly
-- ✅ at-bot command works after install
+- ✅ atproto command works after install
 - ✅ Uninstalls cleanly
 
 **Next**: Move to Item 4
@@ -245,56 +245,56 @@ git push origin main
 
 ```bash
 # Step 1: Create tap repository (one-time)
-# Go to GitHub, create repo: homebrew-at-bot
-git clone https://github.com/<YOU>/homebrew-at-bot
-cd homebrew-at-bot
+# Go to GitHub, create repo: homebrew-atproto
+git clone https://github.com/<YOU>/homebrew-atproto
+cd homebrew-atproto
 
 # Step 2: Create formula
 mkdir -p Formula
-cat > Formula/at-bot.rb << 'EOF'
+cat > Formula/atproto.rb << 'EOF'
 class AtBot < Formula
   desc "Bluesky/AT Protocol CLI tool"
-  homepage "https://github.com/p3nGu1nZz/AT-bot"
-  url "https://github.com/p3nGu1nZz/AT-bot/releases/download/v0.4.0/at-bot-0.4.0.tar.gz"
+  homepage "https://github.com/p3nGu1nZz/atproto"
+  url "https://github.com/p3nGu1nZz/atproto/releases/download/v0.4.0/atproto-0.4.0.tar.gz"
   sha256 "abc123..."  # Get real sha256: shasum -a 256 file.tar.gz
   
   def install
-    bin.install "at-bot"
-    man1.install "at-bot.1" if File.exist?("at-bot.1")
+    bin.install "atproto"
+    man1.install "atproto.1" if File.exist?("atproto.1")
   end
   
   test do
-    system "#{bin}/at-bot", "help"
+    system "#{bin}/atproto", "help"
   end
 end
 EOF
 
 # Step 3: Test formula
 cd ..
-brew install --build-from-source ./homebrew-at-bot/Formula/at-bot.rb
+brew install --build-from-source ./homebrew-atproto/Formula/atproto.rb
 
 # Step 4: Verify
-at-bot help
+atproto help
 
 # Step 5: Commit to tap repo
-cd homebrew-at-bot
+cd homebrew-atproto
 git add Formula/
-git commit -m "add: at-bot formula"
+git commit -m "add: atproto formula"
 git push origin main
 
 # Step 6: Make tap discoverable
 # GitHub Actions or manual setup for tap
 
-# Step 7: Document in main AT-bot repo
-# Add to README: brew tap p3nGu1nZz/at-bot && brew install at-bot
+# Step 7: Document in main atproto repo
+# Add to README: brew tap p3nGu1nZz/atproto && brew install atproto
 git commit -m "docs: add Homebrew installation instructions"
 git push origin main
 ```
 
 **Success Criteria**:
-- ✅ homebrew-at-bot tap created
+- ✅ homebrew-atproto tap created
 - ✅ Formula installs cleanly
-- ✅ at-bot command works after install
+- ✅ atproto command works after install
 - ✅ Formula can be found via GitHub
 - ✅ Installation instructions in README
 
@@ -307,7 +307,7 @@ git push origin main
 
 ```bash
 # Step 1: Test build system
-cd /mnt/c/Users/3nigma/source/repos/AT-bot
+cd /mnt/c/Users/3nigma/source/repos/atproto
 scripts/build-docs.sh
 
 # Step 2: Verify output
@@ -328,7 +328,7 @@ open docs/index.html
 # Wait 5 minutes for deploy
 
 # Step 6: Verify online
-# Visit: https://p3nGu1nZz.github.io/AT-bot/
+# Visit: https://p3nGu1nZz.github.io/atproto/
 
 # Step 7: Update README
 # Add link to documentation site
@@ -421,12 +421,12 @@ cd mcp-server
 npm publish
 
 # Announce
-# - Twitter/Bluesky (via AT-bot!)
+# - Twitter/Bluesky (via atproto!)
 # - GitHub discussions
 # - Community channels
 
 # Celebrate! 🎉
-at-bot post "🎉 AT-bot v0.4.0 released! MCP server, JSON output, and packages! https://github.com/p3nGu1nZz/AT-bot"
+atproto post "🎉 atproto v0.4.0 released! MCP server, JSON output, and packages! https://github.com/p3nGu1nZz/atproto"
 ```
 
 ---
@@ -475,7 +475,7 @@ npm run build
 ### JSON output not parsing?
 ```bash
 # Verify it's valid JSON
-at-bot whoami --format json | jq '.' 
+atproto whoami --format json | jq '.' 
 
 # If fails, check for console.error() statements
 # stdout must contain only valid JSON

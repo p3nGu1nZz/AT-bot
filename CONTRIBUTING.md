@@ -1,6 +1,6 @@
-# Contributing to AT-bot
+# Contributing to atproto
 
-Thank you for your interest in contributing to AT-bot! This document provides guidelines and information for contributors.
+Thank you for your interest in contributing to atproto! This document provides guidelines and information for contributors.
 
 ## Development Setup
 
@@ -8,7 +8,7 @@ Thank you for your interest in contributing to AT-bot! This document provides gu
 2. Clone your fork:
    ```bash
    git clone https://github.com/YOUR_USERNAME/atproto.git
-   cd AT-bot
+   cd atproto
    ```
 
 3. Create a development branch:
@@ -19,9 +19,9 @@ Thank you for your interest in contributing to AT-bot! This document provides gu
 ## Project Structure
 
 ```
-AT-bot/
+atproto/
 ├── bin/          # Executable scripts
-│   └── at-bot    # Main CLI tool
+│   └── atproto    # Main CLI tool
 ├── lib/          # Library functions
 │   └── atproto.sh # AT Protocol implementation
 ├── tests/        # Test suite
@@ -60,7 +60,7 @@ Always add tests for new functionality:
 
 To add a new command to the CLI:
 
-1. Add the command handler in `bin/at-bot`
+1. Add the command handler in `bin/atproto`
 2. Implement the functionality in `lib/atproto.sh` (if AT Protocol related)
 3. Update the help text in `show_help()` function
 4. Add tests for the new command
@@ -95,7 +95,7 @@ To add a new command to the CLI:
 
 When reporting issues, please include:
 
-- AT-bot version (`at-bot --version`)
+- atproto version (`atproto --version`)
 - Operating system and version
 - Steps to reproduce
 - Expected vs actual behavior
@@ -109,4 +109,4 @@ If you discover a security vulnerability, please email the maintainers directly 
 
 Feel free to open an issue for questions or discussion.
 
-Thank you for contributing to AT-bot!
+Thank you for contributing to atproto!

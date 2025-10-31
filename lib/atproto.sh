@@ -296,7 +296,7 @@ atproto_logout() {
 # Display current user
 atproto_whoami() {
     if [ ! -f "$SESSION_FILE" ]; then
-        error "Not logged in. Run 'at-bot login' first."
+        error "Not logged in. Run 'atproto login' first."
         return 1
     fi
     
@@ -341,7 +341,7 @@ atproto_upload_blob() {
     fi
     
     if [ ! -f "$SESSION_FILE" ]; then
-        error "Not logged in. Run 'at-bot login' first."
+        error "Not logged in. Run 'atproto login' first."
         return 1
     fi
     
@@ -463,7 +463,7 @@ atproto_post() {
     fi
     
     if [ ! -f "$SESSION_FILE" ]; then
-        error "Not logged in. Run 'at-bot login' first."
+        error "Not logged in. Run 'atproto login' first."
         return 1
     fi
     
@@ -624,7 +624,7 @@ atproto_feed() {
     local limit="${2:-$DEFAULT_FEED_LIMIT}"
     
     if [ ! -f "$SESSION_FILE" ]; then
-        error "Not logged in. Run 'at-bot login' first."
+        error "Not logged in. Run 'atproto login' first."
         return 1
     fi
     
@@ -705,13 +705,13 @@ atproto_follow() {
     
     if [ -z "$target" ]; then
         error "User handle or DID is required"
-        echo "Usage: at-bot follow <handle>"
+        echo "Usage: atproto follow <handle>"
         return 1
     fi
     
     # Check if logged in
     if [ ! -f "$SESSION_FILE" ]; then
-        error "Not logged in. Use 'at-bot login' first."
+        error "Not logged in. Use 'atproto login' first."
         return 1
     fi
     
@@ -809,13 +809,13 @@ atproto_unfollow() {
     
     if [ -z "$target" ]; then
         error "User handle or DID is required"
-        echo "Usage: at-bot unfollow <handle>"
+        echo "Usage: atproto unfollow <handle>"
         return 1
     fi
     
     # Check if logged in
     if [ ! -f "$SESSION_FILE" ]; then
-        error "Not logged in. Use 'at-bot login' first."
+        error "Not logged in. Use 'atproto login' first."
         return 1
     fi
     
@@ -923,13 +923,13 @@ atproto_like() {
     
     if [ -z "$post_uri" ]; then
         error "Post URI is required"
-        echo "Usage: at-bot like <post-uri>"
+        echo "Usage: atproto like <post-uri>"
         return 1
     fi
     
     # Check if logged in
     if [ ! -f "$SESSION_FILE" ]; then
-        error "Not logged in. Use 'at-bot login' first."
+        error "Not logged in. Use 'atproto login' first."
         return 1
     fi
     
@@ -1021,13 +1021,13 @@ atproto_repost() {
     
     if [ -z "$post_uri" ]; then
         error "Post URI is required"
-        echo "Usage: at-bot repost <post-uri>"
+        echo "Usage: atproto repost <post-uri>"
         return 1
     fi
     
     # Check if logged in
     if [ ! -f "$SESSION_FILE" ]; then
-        error "Not logged in. Use 'at-bot login' first."
+        error "Not logged in. Use 'atproto login' first."
         return 1
     fi
     
@@ -1127,7 +1127,7 @@ atproto_search() {
     
     if [ -z "$query" ]; then
         error "Search query is required"
-        echo "Usage: at-bot search <query> [limit]"
+        echo "Usage: atproto search <query> [limit]"
         return 1
     fi
     
@@ -1139,7 +1139,7 @@ atproto_search() {
     
     # Check if logged in
     if [ ! -f "$SESSION_FILE" ]; then
-        error "Not logged in. Use 'at-bot login' first."
+        error "Not logged in. Use 'atproto login' first."
         return 1
     fi
     
@@ -1457,7 +1457,7 @@ load_credentials() {
     
     if [ -z "$SAVED_PASSWORD" ]; then
         error "Failed to decrypt password. The encryption key may have changed."
-        error "Please run 'at-bot clear-credentials' and login again."
+        error "Please run 'atproto clear-credentials' and login again."
         return 1
     fi
     
@@ -1509,7 +1509,7 @@ atproto_get_profile() {
     # Get access token
     local access_token
     access_token=$(get_access_token) || {
-        error "Not logged in. Use 'at-bot login' first."
+        error "Not logged in. Use 'atproto login' first."
         return 1
     }
     
@@ -1671,7 +1671,7 @@ atproto_update_profile() {
     # Get access token
     local access_token
     access_token=$(get_access_token) || {
-        error "Not logged in. Use 'at-bot login' first."
+        error "Not logged in. Use 'atproto login' first."
         return 1
     }
     
@@ -1785,7 +1785,7 @@ atproto_get_followers() {
     # Get access token
     local access_token
     access_token=$(get_access_token) || {
-        error "Not logged in. Use 'at-bot login' first."
+        error "Not logged in. Use 'atproto login' first."
         return 1
     }
     
@@ -1875,7 +1875,7 @@ atproto_get_following() {
     # Get access token
     local access_token
     access_token=$(get_access_token) || {
-        error "Not logged in. Use 'at-bot login' first."
+        error "Not logged in. Use 'atproto login' first."
         return 1
     }
     

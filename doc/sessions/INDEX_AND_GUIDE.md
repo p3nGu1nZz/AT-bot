@@ -1,4 +1,4 @@
-# 📚 AT-bot Project Review - Complete Documentation Index
+# 📚 atproto Project Review - Complete Documentation Index
 
 **Review Date**: October 28, 2025  
 **Status**: Phase 1 ✅ Complete | Phase 2 🚀 Ready to Start  
@@ -282,7 +282,7 @@ By end of Phase 2 (v0.4.0):
 
 ## 🎉 Summary
 
-**AT-bot has successfully completed Phase 1** with:
+**atproto has successfully completed Phase 1** with:
 - Solid foundation (27 MCP tools, 20+ CLI commands)
 - Excellent code quality (100% tests passing)
 - Comprehensive documentation

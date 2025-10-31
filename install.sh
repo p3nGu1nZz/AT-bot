@@ -1,5 +1,5 @@
 #!/bin/bash
-# Installation script for AT-bot
+# Installation script for atproto
 # Simple installation for users without make
 
 set -e
@@ -7,8 +7,8 @@ set -e
 # Default installation prefix
 PREFIX="${PREFIX:-/usr/local}"
 BINDIR="$PREFIX/bin"
-LIBDIR="$PREFIX/lib/at-bot"
-DOCDIR="$PREFIX/share/doc/at-bot"
+LIBDIR="$PREFIX/lib/atproto"
+DOCDIR="$PREFIX/share/doc/atproto"
 
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -40,7 +40,7 @@ while [[ $# -gt 0 ]]; do
             echo "  PREFIX          Installation prefix (default: /usr/local)"
             echo ""
             echo "Examples:"
-            echo "  ./install.sh                Install AT-bot CLI only"
+            echo "  ./install.sh                Install atproto CLI only"
             echo "  ./install.sh --mcp          Install CLI + MCP server"
             echo "  PREFIX=~/.local ./install.sh  Install to custom location"
             exit 0
@@ -69,8 +69,8 @@ elif [ -x "/root/.nvm/versions/node/v22.16.0/bin/node" ]; then
     NODE_PATH="/root/.nvm/versions/node/v22.16.0/bin/node"
 fi
 
-echo "AT-bot Installation Script"
-echo "=========================="
+echo "atproto Installation Script"
+echo "==========================="
 echo ""
 echo "Installing to: $PREFIX"
 echo ""
@@ -104,7 +104,7 @@ $SUDO mkdir -p "$DOCDIR"
 
 # Install files
 echo "Installing files..."
-$SUDO install -m 755 "$SCRIPT_DIR/bin/at-bot" "$BINDIR/at-bot"
+$SUDO install -m 755 "$SCRIPT_DIR/bin/atproto" "$BINDIR/atproto"
 $SUDO install -m 644 "$SCRIPT_DIR/lib/atproto.sh" "$LIBDIR/atproto.sh"
 $SUDO install -m 644 "$SCRIPT_DIR/lib/config.sh" "$LIBDIR/config.sh"
 $SUDO install -m 644 "$SCRIPT_DIR/lib/crypt.sh" "$LIBDIR/crypt.sh"
@@ -116,7 +116,7 @@ $SUDO install -m 644 "$SCRIPT_DIR/README.md" "$DOCDIR/README.md"
 $SUDO install -m 644 "$SCRIPT_DIR/LICENSE" "$DOCDIR/LICENSE"
 
 echo ""
-echo -e "${GREEN}✓ AT-bot CLI installed successfully!${NC}"
+echo -e "${GREEN}✓ atproto CLI installed successfully!${NC}"
 
 # Ask about MCP server installation if not specified via flag
 if [ $INSTALL_MCP -eq 0 ] && [ $AUTO_YES -eq 0 ]; then
@@ -178,10 +178,9 @@ if [ $INSTALL_MCP -eq 1 ]; then
         echo -e "${YELLOW}{"
         echo '  "github.copilot.chat.mcp.enabled": true,'
         echo '  "github.copilot.chat.mcp.servers": {'
-        echo '    "at-bot": {'
+        echo '    "atproto": {'
         echo "      \"command\": \"$BINDIR/atproto\","
-        echo "      \"args\": [\"mcp-server\"],"
-        echo '      "args": []'
+        echo "      \"args\": [\"mcp-server\"]"
         echo '    }'
         echo '  }'
         echo -e "}${NC}"
@@ -193,14 +192,14 @@ fi
 echo ""
 echo -e "${GREEN}Installation complete!${NC}"
 echo ""
-echo "AT-bot is now installed. Try running:"
-echo "  at-bot help"
+echo "atproto is now installed. Try running:"
+echo "  atproto help"
 if [ $INSTALL_MCP -eq 1 ] && command -v node &> /dev/null; then
     echo "  atproto mcp-server (for AI agents)"
 fi
 echo ""
 echo "To uninstall, run:"
-echo "  $SUDO rm -f $BINDIR/at-bot"
+echo "  $SUDO rm -f $BINDIR/atproto"
 if [ $INSTALL_MCP -eq 1 ]; then
     # MCP server functionality is now integrated
 fi

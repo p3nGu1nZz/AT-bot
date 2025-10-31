@@ -1,8 +1,8 @@
-# AT-bot Encryption & Security Details
+# atproto Encryption & Security Details
 
 ## Overview
 
-AT-bot uses a comprehensive encryption system implemented in `lib/crypt.sh` to protect sensitive data like session tokens and credentials. The system provides **AES-256-CBC** encryption with **PBKDF2** key derivation, offering production-grade security for credential storage.
+atproto uses a comprehensive encryption system implemented in `lib/crypt.sh` to protect sensitive data like session tokens and credentials. The system provides **AES-256-CBC** encryption with **PBKDF2** key derivation, offering production-grade security for credential storage.
 
 **Key Features:**
 - AES-256-CBC encryption with PBKDF2 (100,000 iterations)
@@ -19,7 +19,7 @@ For comprehensive API documentation, see the detailed sections below.
 ```
 ┌─────────────────────────────────────────────────┐
 │          Application Layer                       │
-│  (at-bot CLI, lib/atproto.sh, lib/config.sh)   │
+│  (atproto CLI, lib/atproto.sh, lib/config.sh)   │
 └─────────────────┬───────────────────────────────┘
                   │
                   ▼
@@ -93,12 +93,12 @@ The encryption module provides 20+ functions organized into categories:
 
 ### Method 1: Random Key-Based Encryption (Default)
 
-This is the default method used by AT-bot for session token storage:
+This is the default method used by atproto for session token storage:
 
 ```
 1. Key Generation (first time only)
    └─> OpenSSL generates 32 random bytes from /dev/urandom
-   └─> Key stored as 64 hex characters in ~/.config/at-bot/encryption.key
+   └─> Key stored as 64 hex characters in ~/.config/atproto/encryption.key
    └─> File permissions set to 600 (owner only)
 
 2. Encryption Process
@@ -136,7 +136,7 @@ For enhanced security or config file encryption:
 ```
 1. Salt Generation (first time only)
    └─> OpenSSL generates 32 random bytes
-   └─> Salt stored as 64 hex characters in ~/.config/at-bot/encryption.salt
+   └─> Salt stored as 64 hex characters in ~/.config/atproto/encryption.salt
    └─> File permissions set to 600
 
 2. Key Derivation (PBKDF2)
@@ -178,7 +178,7 @@ For enhanced security or config file encryption:
 ### Configuration Directory
 
 ```
-~/.config/at-bot/
+~/.config/atproto/
 ├── session.json          # Encrypted session tokens
 ├── config.json           # User preferences (can be encrypted)
 ├── encryption.key        # 32-byte encryption key (600 permissions)
@@ -295,7 +295,7 @@ f1e2d3c4b5a6908172635449506a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a
 
 ```bash
 #!/bin/bash
-source /usr/local/lib/at-bot/crypt.sh
+source /usr/local/lib/atproto/crypt.sh
 
 # Encrypt sensitive data (uses random key from encryption.key)
 plaintext="my-session-token-12345"
@@ -319,7 +319,7 @@ secure_erase decrypted
 
 ```bash
 #!/bin/bash
-source /usr/local/lib/at-bot/crypt.sh
+source /usr/local/lib/atproto/crypt.sh
 
 # Encrypt configuration with user password
 password="MyStrongPassphrase123!"
@@ -346,7 +346,7 @@ secure_erase password
 
 ```bash
 #!/bin/bash
-source /usr/local/lib/at-bot/crypt.sh
+source /usr/local/lib/atproto/crypt.sh
 
 # Create sensitive configuration file
 cat > /tmp/secrets.conf << EOF
@@ -379,7 +379,7 @@ encrypt_file "/tmp/secrets.conf"
 
 ```bash
 #!/bin/bash
-source /usr/local/lib/at-bot/crypt.sh
+source /usr/local/lib/atproto/crypt.sh
 
 # Derive encryption key from user password
 user_password="SecurePassword123"
@@ -406,11 +406,11 @@ secure_erase user_password
 secure_erase derived_key
 ```
 
-### Example 5: Integration with AT-bot Session Management
+### Example 5: Integration with atproto Session Management
 
 ```bash
 #!/bin/bash
-source /usr/local/lib/at-bot/crypt.sh
+source /usr/local/lib/atproto/crypt.sh
 
 # Save session with encrypted tokens
 save_session() {
@@ -426,7 +426,7 @@ save_session() {
     encrypted_refresh=$(encrypt_data "$refresh_token")
     
     # Save to session file
-    cat > "$HOME/.config/at-bot/session.json" << EOF
+    cat > "$HOME/.config/atproto/session.json" << EOF
 {
   "handle": "$handle",
   "did": "$did",
@@ -435,7 +435,7 @@ save_session() {
 }
 EOF
     
-    chmod 600 "$HOME/.config/at-bot/session.json"
+    chmod 600 "$HOME/.config/atproto/session.json"
     
     # Secure erase
     secure_erase access_token
@@ -444,7 +444,7 @@ EOF
 
 # Load session with decrypted tokens
 load_session() {
-    local session_file="$HOME/.config/at-bot/session.json"
+    local session_file="$HOME/.config/atproto/session.json"
     
     if [ ! -f "$session_file" ]; then
         echo "No session found" >&2
@@ -481,7 +481,7 @@ load_session() {
 
 ```bash
 #!/bin/bash
-source /usr/local/lib/at-bot/crypt.sh
+source /usr/local/lib/atproto/crypt.sh
 
 # Generate strong app password
 app_password=$(generate_secure_password 32)
@@ -696,7 +696,7 @@ echo "Result: '$decrypted'"  # Shows empty string
 **Solutions:**
 ```bash
 # Check if encryption key exists
-ls -la ~/.config/at-bot/encryption.key
+ls -la ~/.config/atproto/encryption.key
 
 # Try with explicit password
 decrypted=$(decrypt_data "$encrypted" "known-password")
@@ -705,7 +705,7 @@ decrypted=$(decrypt_data "$encrypted" "known-password")
 openssl version
 
 # Re-generate encryption key (WARNING: loses all encrypted data)
-rm ~/.config/at-bot/encryption.key
+rm ~/.config/atproto/encryption.key
 # Then re-encrypt all data
 ```
 
@@ -775,19 +775,19 @@ This is **intentional behavior** for security. PBKDF2 with 100,000 iterations is
 
 **Symptoms:**
 ```bash
-ls ~/.config/at-bot/
+ls ~/.config/atproto/
 # Shows: config.json.backup, session.json.backup, etc.
 ```
 
 **Solutions:**
 ```bash
 # Remove old backups manually
-rm ~/.config/at-bot/*.backup
+rm ~/.config/atproto/*.backup
 
 # Or use cleanup function
-source /usr/local/lib/at-bot/crypt.sh
+source /usr/local/lib/atproto/crypt.sh
 # Note: No automatic cleanup function exists yet
-# Manually: find ~/.config/at-bot -name "*.backup" -mtime +7 -delete
+# Manually: find ~/.config/atproto -name "*.backup" -mtime +7 -delete
 ```
 
 ### Debugging
@@ -796,10 +796,10 @@ source /usr/local/lib/at-bot/crypt.sh
 
 ```bash
 # Show detailed encryption operations
-DEBUG=1 source /usr/local/lib/at-bot/crypt.sh
+DEBUG=1 source /usr/local/lib/atproto/crypt.sh
 
-# Example with at-bot
-DEBUG=1 at-bot login
+# Example with atproto
+DEBUG=1 atproto login
 # Shows: Key generation, encryption process, etc.
 ```
 
@@ -807,7 +807,7 @@ DEBUG=1 at-bot login
 
 ```bash
 # Check if key file exists and has correct format
-key_file="$HOME/.config/at-bot/encryption.key"
+key_file="$HOME/.config/atproto/encryption.key"
 
 if [ -f "$key_file" ]; then
     key=$(cat "$key_file")
@@ -835,7 +835,7 @@ echo "$encrypted" | openssl enc -aes-256-cbc -d -a -pass pass:"testkey"
 
 ```bash
 # Verify encryption files have correct permissions
-ls -l ~/.config/at-bot/ | grep -E "(encryption\.(key|salt)|session\.json)"
+ls -l ~/.config/atproto/ | grep -E "(encryption\.(key|salt)|session\.json)"
 
 # Expected output (permissions should be 600):
 # -rw------- 1 user user  64 Oct 28 10:00 encryption.key
@@ -843,9 +843,9 @@ ls -l ~/.config/at-bot/ | grep -E "(encryption\.(key|salt)|session\.json)"
 # -rw------- 1 user user 256 Oct 28 10:00 session.json
 
 # Fix permissions if wrong
-chmod 600 ~/.config/at-bot/encryption.key
-chmod 600 ~/.config/at-bot/encryption.salt
-chmod 600 ~/.config/at-bot/session.json
+chmod 600 ~/.config/atproto/encryption.key
+chmod 600 ~/.config/atproto/encryption.salt
+chmod 600 ~/.config/atproto/session.json
 ```
 
 ### Recovery Procedures
@@ -860,15 +860,15 @@ chmod 600 ~/.config/at-bot/session.json
 1. No recovery possible without backup of `encryption.key`
 2. Must re-authenticate:
    ```bash
-   at-bot logout  # Clear corrupted session
-   at-bot login   # Re-authenticate (creates new encryption key)
+   atproto logout  # Clear corrupted session
+   atproto login   # Re-authenticate (creates new encryption key)
    ```
 3. **Prevention:** Backup encryption key securely:
    ```bash
    # Backup to encrypted external storage
    gpg --encrypt --recipient your@email.com \
-       ~/.config/at-bot/encryption.key \
-       > ~/secure-backup/at-bot-key.gpg
+       ~/.config/atproto/encryption.key \
+       > ~/secure-backup/atproto-key.gpg
    ```
 
 #### Corrupted Session Data
@@ -878,10 +878,10 @@ chmod 600 ~/.config/at-bot/session.json
 **Recovery:**
 ```bash
 # Remove corrupted session
-rm ~/.config/at-bot/session.json
+rm ~/.config/atproto/session.json
 
 # Re-login
-at-bot login
+atproto login
 ```
 
 #### Key Rotation After Compromise
@@ -891,15 +891,15 @@ at-bot login
 **Procedure:**
 ```bash
 # 1. Backup current encrypted data
-cp ~/.config/at-bot/session.json ~/session.json.backup
+cp ~/.config/atproto/session.json ~/session.json.backup
 
 # 2. Decrypt all data
-source /usr/local/lib/at-bot/crypt.sh
+source /usr/local/lib/atproto/crypt.sh
 access_token=$(grep -o '"accessJwt":"[^"]*"' ~/session.json.backup | cut -d'"' -f4)
 decrypted_token=$(decrypt_data "$access_token")
 
 # 3. Generate new key
-rm ~/.config/at-bot/encryption.key
+rm ~/.config/atproto/encryption.key
 new_key=$(generate_or_get_key)
 
 # 4. Re-encrypt with new key
@@ -982,8 +982,8 @@ rm ~/session.json.backup
 
 **Operations:**
 - ✅ Monitor OpenSSL security advisories
-- ✅ Use personal, secure machines for AT-bot
-- ✅ Clear sessions when done: `at-bot logout`
+- ✅ Use personal, secure machines for atproto
+- ✅ Clear sessions when done: `atproto logout`
 - ✅ Keep encryption module updated
 - ✅ Document custom encryption workflows
 
@@ -1010,8 +1010,8 @@ rm ~/session.json.backup
 **Operations:**
 - ❌ Use outdated OpenSSL versions with known vulnerabilities
 - ❌ Ignore decryption failures
-- ❌ Run AT-bot with elevated privileges unnecessarily
-- ❌ Store production credentials with AT-bot encryption (use dedicated secret managers)
+- ❌ Run atproto with elevated privileges unnecessarily
+- ❌ Store production credentials with atproto encryption (use dedicated secret managers)
 
 ## Compliance & Legal
 
@@ -1028,7 +1028,7 @@ rm ~/session.json.backup
 - ✅ Right to portability: Session data in JSON format
 - ⚠️ Right to rectification: Manual update required
 
-**AT-bot Compliance:**
+**atproto Compliance:**
 - Minimal data collection (only session tokens)
 - User-controlled encryption keys
 - Local storage (no third-party processors)
@@ -1074,7 +1074,7 @@ For SOC 2 compliance, use enterprise-grade secret management systems.
 
 ## Conclusion
 
-AT-bot's encryption system (`lib/crypt.sh`) provides **production-grade security** for session token storage and credential protection. The system combines industry-standard AES-256-CBC encryption with PBKDF2 key derivation, offering a comprehensive security solution.
+atproto's encryption system (`lib/crypt.sh`) provides **production-grade security** for session token storage and credential protection. The system combines industry-standard AES-256-CBC encryption with PBKDF2 key derivation, offering a comprehensive security solution.
 
 ### Key Strengths
 
@@ -1139,7 +1139,7 @@ AT-bot's encryption system (`lib/crypt.sh`) provides **production-grade security
 ### Support & Resources
 
 - **Security Issues**: See [doc/SECURITY.md](SECURITY.md) for responsible disclosure
-- **Bug Reports**: https://github.com/yourusername/AT-bot/issues
+- **Bug Reports**: https://github.com/yourusername/atproto/issues
 - **Feature Requests**: Contribute to [TODO.md](../TODO.md)
 - **Discussions**: GitHub Discussions or project chat
 
@@ -1151,7 +1151,7 @@ AT-bot's encryption system (`lib/crypt.sh`) provides **production-grade security
 **OpenSSL Version:** 1.1.1+ or 3.x recommended  
 **Test Coverage:** 95% (10/10 tests passing)
 
-**For comprehensive AT-bot documentation, see:**
+**For comprehensive atproto documentation, see:**
 - [README.md](../README.md) - Project overview
 - [QUICKSTART.md](QUICKSTART.md) - Getting started guide
 - [PLAN.md](../PLAN.md) - Strategic roadmap

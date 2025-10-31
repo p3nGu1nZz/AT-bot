@@ -1,23 +1,23 @@
-# Quick Start: AT-bot MCP Server
+# Quick Start: atproto MCP Server
 
-Get up and running with AT-bot MCP server in 5 minutes.
+Get up and running with atproto MCP server in 5 minutes.
 
 ## What is MCP?
 
-**Model Context Protocol** is a standard way for AI agents (like Claude) to interact with tools and data sources. With AT-bot's MCP server, agents can post to Bluesky, read feeds, follow users, and more.
+**Model Context Protocol** is a standard way for AI agents (like Claude) to interact with tools and data sources. With atproto's MCP server, agents can post to Bluesky, read feeds, follow users, and more.
 
 ## Installation
 
 ### Prerequisites
 
 - Node.js 16+ or Python 3.8+
-- AT-bot installed (`/usr/local/bin/at-bot` or development version)
+- atproto installed (`/usr/local/bin/atproto` or development version)
 - Bluesky account with app password
 
 ### Install MCP Server
 
 ```bash
-# From AT-bot repository
+# From atproto repository
 cd mcp-server
 npm install              # or: pip install -r requirements.txt
 
@@ -29,14 +29,14 @@ npm run install          # or: make install
 
 ```bash
 # Homebrew (coming soon)
-brew install at-bot-mcp-server
+brew install atproto-mcp-server
 
 # npm global
-npm install -g at-bot-mcp-server
+npm install -g atproto-mcp-server
 
 # Standalone executable
 # Download from releases page
-chmod +x at-bot-mcp-server
+chmod +x atproto-mcp-server
 ```
 
 ## Configure Bluesky Authentication
@@ -48,23 +48,23 @@ chmod +x at-bot-mcp-server
 3. Create new app password
 4. Copy the password (you'll only see it once!)
 
-### Step 2: Authenticate AT-bot
+### Step 2: Authenticate atproto
 
 ```bash
 # Option A: Interactive
-at-bot login
+atproto login
 # Prompts for handle and password
 
 # Option B: Environment variables (for automation)
 export BLUESKY_HANDLE="yourhandle.bsky.social"
 export BLUESKY_PASSWORD="xxxx-xxxx-xxxx-xxxx"
-at-bot login
+atproto login
 ```
 
 ### Step 3: Verify Authentication
 
 ```bash
-at-bot whoami
+atproto whoami
 # Should show your profile info
 ```
 
@@ -80,8 +80,8 @@ Create or update `.vscode/settings.json`:
     "*": true
   },
   "mcp.servers": {
-    "at-bot": {
-      "command": "at-bot-mcp-server",
+    "atproto": {
+      "command": "atproto-mcp-server",
       "args": [],
       "env": {
         "ATP_PDS": "https://bsky.social"
@@ -91,15 +91,15 @@ Create or update `.vscode/settings.json`:
 }
 ```
 
-Restart VS Code and Copilot will automatically discover AT-bot tools.
+Restart VS Code and Copilot will automatically discover atproto tools.
 
 ### Option 2: Claude Projects (Claude.ai)
 
 1. Create new Claude project
 2. Go to Project Settings → MCP Servers
 3. Add server:
-   - Name: `at-bot`
-   - Command: `at-bot-mcp-server`
+   - Name: `atproto`
+   - Command: `atproto-mcp-server`
    - Keep args and env as shown above
 4. Click "Connect"
 
@@ -109,7 +109,7 @@ If using a custom MCP client:
 
 ```bash
 # Start MCP server manually (connects via stdio)
-at-bot-mcp-server
+atproto-mcp-server
 
 # In your agent code, connect to stdio
 # and discover tools
@@ -121,13 +121,13 @@ at-bot-mcp-server
 
 ```bash
 # Create a post
-at-bot post "Hello world! 🚀"
+atproto post "Hello world! 🚀"
 
 # Read your timeline
-at-bot feed
+atproto feed
 
 # Follow someone
-at-bot follow alice.bsky.social
+atproto follow alice.bsky.social
 ```
 
 ### Via Copilot (MCP)
@@ -223,13 +223,13 @@ I'll use profile_get and profile_follow to:
 
 ```bash
 # Check if session exists
-at-bot whoami
+atproto whoami
 
 # If not, log in
-at-bot login
+atproto login
 
 # Verify session file
-ls -la ~/.config/at-bot/session.json
+ls -la ~/.config/atproto/session.json
 ```
 
 ### MCP Server Won't Start
@@ -237,7 +237,7 @@ ls -la ~/.config/at-bot/session.json
 ```bash
 # Check logs
 export MCP_LOG_LEVEL=debug
-at-bot-mcp-server
+atproto-mcp-server
 
 # Verify tools are discoverable
 curl http://localhost:3000/_meta/capabilities
@@ -247,10 +247,10 @@ curl http://localhost:3000/_meta/capabilities
 
 ```bash
 # Make sure script is executable
-chmod +x /usr/local/bin/at-bot-mcp-server
+chmod +x /usr/local/bin/atproto-mcp-server
 
 # Check file permissions
-ls -la /usr/local/lib/at-bot/
+ls -la /usr/local/lib/atproto/
 ```
 
 ### Agent Can't Find Tools
@@ -258,10 +258,10 @@ ls -la /usr/local/lib/at-bot/
 ```bash
 # Restart VS Code or Claude
 # Check MCP server is running
-ps aux | grep at-bot-mcp
+ps aux | grep atproto-mcp
 
 # Verify configuration
-cat ~/.config/at-bot/mcp.json
+cat ~/.config/atproto/mcp.json
 ```
 
 ## Next Steps
@@ -291,12 +291,12 @@ cat ~/.config/at-bot/mcp.json
    - Rotate passwords regularly
 
 2. **Protect Session Files**
-   - Session stored at `~/.config/at-bot/session.json`
+   - Session stored at `~/.config/atproto/session.json`
    - File permissions set to 600 (owner only)
    - Never commit session files to git
 
 3. **Monitor Activity**
-   - Check logs regularly: `~/.config/at-bot/logs/`
+   - Check logs regularly: `~/.config/atproto/logs/`
    - Review notification logs
    - Set rate limits on agent actions
 
@@ -326,7 +326,7 @@ See [PLAN.md](PLAN.md) for full roadmap.
 
 **Ready to control Bluesky with AI?** 🚀
 
-Start by authenticating: `at-bot login`
+Start by authenticating: `atproto login`
 
 Then configure with Copilot and begin building amazing AI workflows!
 

@@ -1,6 +1,6 @@
-# AT-bot Strategic Development Plan
+# atproto Strategic Development Plan
 
-This document outlines the strategic direction, architecture decisions, and development roadmap for the AT-bot project. It serves as a high-level guide for project evolution and decision-making.
+This document outlines the strategic direction, architecture decisions, and development roadmap for the atproto project. It serves as a high-level guide for project evolution and decision-making.
 
 ## Project Vision
 
@@ -21,7 +21,7 @@ This document outlines the strategic direction, architecture decisions, and deve
 ### Current Architecture (v0.1.0)
 
 ```
-AT-bot Current Architecture
+atproto Current Architecture
 
 ┌─────────────────┐
 │   User (CLI)    │
@@ -29,7 +29,7 @@ AT-bot Current Architecture
           │
           ▼
 ┌─────────────────┐
-│    bin/at-bot   │  # Main CLI dispatcher
+│    bin/atproto   │  # Main CLI dispatcher
 │  (Entry Point)  │
 └─────────┬───────┘
           │
@@ -49,13 +49,13 @@ AT-bot Current Architecture
 ### Target Architecture (v1.0+) - Dual Interface Model
 
 ```
-AT-bot Target Architecture (Dual Interface: CLI + MCP)
+atproto Target Architecture (Dual Interface: CLI + MCP)
 
 ┌──────────────────────────────────────────────────────────┐
 │           Multiple Interface Layer                         │
 ├────────────────────┬──────────────────────────────────────┤
 │  CLI Interface     │    MCP Server Interface              │
-│  (bin/at-bot)      │    (at-bot-mcp-server)              │
+│  (bin/atproto)      │    (atproto-mcp-server)              │
 └────────┬───────────┴──────────────┬──────────────────────┘
          │                          │
          └──────────┬───────────────┘
@@ -81,7 +81,7 @@ AT-bot Target Architecture (Dual Interface: CLI + MCP)
 AI Agents (Claude, ChatGPT, etc.) via MCP Protocol
              ↓ JSON-RPC 2.0 / stdio
    ┌─────────────────────────────┐
-   │   AT-bot MCP Server         │
+   │   atproto MCP Server         │
    │ (Tool Discovery/Execution)  │
    ├─────────────────────────────┤
    │ Tools:                      │
@@ -168,7 +168,7 @@ AI Agents (Claude, ChatGPT, etc.) via MCP Protocol
 - Enable advanced automation and agent workflows
 - Create extensible plugin architecture  
 - Achieve enterprise-grade reliability
-- Establish AT-bot as definitive AT Protocol infrastructure
+- Establish atproto as definitive AT Protocol infrastructure
 - **[NEW] Build enterprise-grade MCP features**
 
 **Key Features:**
@@ -278,7 +278,7 @@ plugins/
 
 #### Session and State Management
 ```
-~/.config/at-bot/
+~/.config/atproto/
 ├── sessions/
 │   ├── default.json     # Default user session
 │   ├── work.json        # Work account session
@@ -352,10 +352,10 @@ plugins/
 5. **Standards**: POSIX compliance, broad compatibility
 
 #### Competitive Landscape
-- **Web interfaces**: AT-bot provides programmable access
-- **Desktop apps**: AT-bot enables server automation
-- **Other CLIs**: AT-bot focuses on AT Protocol specifically
-- **Custom solutions**: AT-bot provides standardized tooling
+- **Web interfaces**: atproto provides programmable access
+- **Desktop apps**: atproto enables server automation
+- **Other CLIs**: atproto focuses on AT Protocol specifically
+- **Custom solutions**: atproto provides standardized tooling
 
 ## Risk Management
 
@@ -440,9 +440,9 @@ plugins/
 
 ## Conclusion
 
-AT-bot is positioned to become the definitive command-line tool for AT Protocol interactions. With a focus on simplicity, security, and extensibility, the project can serve diverse user needs while maintaining its core principles.
+atproto is positioned to become the definitive command-line tool for AT Protocol interactions. With a focus on simplicity, security, and extensibility, the project can serve diverse user needs while maintaining its core principles.
 
-The phased development approach ensures sustainable growth while delivering value at each stage. By building a strong community and maintaining technical excellence, AT-bot can achieve its vision of enabling seamless AT Protocol automation and integration.
+The phased development approach ensures sustainable growth while delivering value at each stage. By building a strong community and maintaining technical excellence, atproto can achieve its vision of enabling seamless AT Protocol automation and integration.
 
 ---
 

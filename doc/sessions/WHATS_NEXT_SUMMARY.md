@@ -1,4 +1,4 @@
-# 🎯 AT-bot: "What To Do Next" - Executive Summary
+# 🎯 atproto: "What To Do Next" - Executive Summary
 
 **Date**: October 28, 2025  
 **Status**: Phase 1 ✅ Complete | Phase 2 🚀 Ready to Start  
@@ -8,7 +8,7 @@
 
 ## The Bottom Line
 
-**AT-bot has successfully completed Phase 1.** The project now has:
+**atproto has successfully completed Phase 1.** The project now has:
 - ✅ Working CLI tool with 20+ commands
 - ✅ 27 MCP tools for AI agent integration
 - ✅ Secure authentication with AES-256-CBC encryption
@@ -27,7 +27,7 @@
 Why? It's code-complete but not compiled. This enables AI agent integration.
 
 ```bash
-cd /mnt/c/Users/3nigma/source/repos/AT-bot/mcp-server
+cd /mnt/c/Users/3nigma/source/repos/atproto/mcp-server
 npm install        # Install dependencies
 npm run build      # Compile TypeScript
 npm start          # Test it works
@@ -43,14 +43,14 @@ Why? Verify the server works with real AI agents.
 
 ```bash
 # Configure your MCP client to use:
-# Command: /path/to/at-bot-mcp-server/dist/index.js
+# Command: /path/to/atproto-mcp-server/dist/index.js
 
 # Test tool discovery
 # Test sample operations
 # Document what works/breaks
 ```
 
-✅ When done: AI agent can call AT-bot tools  
+✅ When done: AI agent can call atproto tools  
 💾 Save: notes on issues/successes
 
 ---
@@ -61,13 +61,13 @@ Why? Enables scripting and automation. Blocks v0.4.0 release.
 The work:
 - Add `--format json` flag to commands
 - Parse JSON in lib/atproto.sh functions
-- Update bin/at-bot to route to JSON output
+- Update bin/atproto to route to JSON output
 - Test all commands with format flag
 
 ```bash
-at-bot whoami --format json          # Should output JSON
-at-bot post "hello" --format json    # Should output JSON response
-at-bot feed --format json            # Should output JSON array
+atproto whoami --format json          # Should output JSON
+atproto post "hello" --format json    # Should output JSON response
+atproto feed --format json            # Should output JSON array
 ```
 
 ✅ When done: All commands support structured output  
@@ -83,8 +83,8 @@ Why? Linux users can install via apt.
 ```bash
 # Create debian/ directory and config files
 # Build package: dpkg-buildpackage
-# Result: at-bot_0.4.0_all.deb
-# Test: dpkg -i && at-bot whoami
+# Result: atproto_0.4.0_all.deb
+# Test: dpkg -i && atproto whoami
 ```
 
 ✅ When done: Linux users can install easily  
@@ -96,9 +96,9 @@ Why? Linux users can install via apt.
 Why? macOS users can install via brew.
 
 ```bash
-# Create homebrew-at-bot tap
-# Write Formula/at-bot.rb
-# Result: brew install at-bot
+# Create homebrew-atproto tap
+# Write Formula/atproto.rb
+# Result: brew install atproto
 ```
 
 ✅ When done: macOS users can install easily  
@@ -137,7 +137,7 @@ Documentation ← Makes it discoverable
 
 ### Quick Status Check
 ```bash
-cd /mnt/c/Users/3nigma/source/repos/AT-bot
+cd /mnt/c/Users/3nigma/source/repos/atproto
 
 # See what's been done
 git log --oneline -10
@@ -178,11 +178,11 @@ cat doc/sessions/PHASE2_ACTION_ITEMS.md
 
 ## The Big Picture
 
-AT-bot is positioned to be **the definitive CLI tool for AT Protocol automation**, competing with:
-- Web interfaces (AT-bot provides CLI)
-- Desktop apps (AT-bot enables servers)
-- Other CLIs (AT-bot is AT Protocol-specific)
-- Custom solutions (AT-bot provides standardized tooling)
+atproto is positioned to be **the definitive CLI tool for AT Protocol automation**, competing with:
+- Web interfaces (atproto provides CLI)
+- Desktop apps (atproto enables servers)
+- Other CLIs (atproto is AT Protocol-specific)
+- Custom solutions (atproto provides standardized tooling)
 
 **Competitive advantages**:
 1. ✅ Simple - no complex dependencies
@@ -196,7 +196,7 @@ AT-bot is positioned to be **the definitive CLI tool for AT Protocol automation*
 ## Architecture (For Context)
 
 ```
-AT-bot Architecture
+atproto Architecture
 ━━━━━━━━━━━━━━━━━━━━
 
 ┌──────────────────────────────────────┐
@@ -211,7 +211,7 @@ AT-bot Architecture
 └──────────────┬───────────────────────┘
                ↓
 ┌──────────────────────────────────────┐
-│    CLI Tool (bin/at-bot)             │
+│    CLI Tool (bin/atproto)             │
 │   - 20+ commands                     │
 │   - Session management               │
 │   - User-friendly output             │
@@ -235,10 +235,10 @@ AT-bot Architecture
 
 ```bash
 # Core commands to remember
-at-bot login                    # Authenticate
-at-bot post "hello world"       # Create post
-at-bot feed                     # Read timeline
-at-bot help                     # Show commands
+atproto login                    # Authenticate
+atproto post "hello world"       # Create post
+atproto feed                     # Read timeline
+atproto help                     # Show commands
 
 # Test commands
 make test                       # Run all tests
@@ -301,7 +301,7 @@ npm start                       # Run MCP server
 
 ## Summary in One Sentence
 
-> **Build the MCP server, add JSON output, and package for distribution to move AT-bot from Phase 1 (foundation) to Phase 2 (adoption).**
+> **Build the MCP server, add JSON output, and package for distribution to move atproto from Phase 1 (foundation) to Phase 2 (adoption).**
 
 ---
 

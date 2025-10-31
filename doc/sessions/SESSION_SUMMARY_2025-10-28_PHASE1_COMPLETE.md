@@ -1,4 +1,4 @@
-# AT-bot Development Session Summary
+# atproto Development Session Summary
 **Date**: October 28, 2025  
 **Focus**: MCP Tool Implementation, Documentation Build System, and CLI Enhancements  
 **Status**: ✅ Phase 1 Core Features Complete
@@ -7,7 +7,7 @@
 
 ## Session Overview
 
-This session focused on completing Phase 1 of AT-bot development, including comprehensive MCP tool implementation, documentation infrastructure, and CLI user experience improvements.
+This session focused on completing Phase 1 of atproto development, including comprehensive MCP tool implementation, documentation infrastructure, and CLI user experience improvements.
 
 ### Key Achievements
 
@@ -22,16 +22,16 @@ This session focused on completing Phase 1 of AT-bot development, including comp
 - **Total: 27 MCP tools implemented and compiled**
 
 **2. ✅ Shell Completion System**
-- Created `scripts/at-bot-completion.bash` for bash users
-- Created `scripts/at-bot-completion.zsh` for zsh users
+- Created `scripts/atproto-completion.bash` for bash users
+- Created `scripts/atproto-completion.zsh` for zsh users
 - Added `scripts/install-completions.sh` for easy installation
 - Supports system-wide and user-local installation
 - Enables command and option tab-completion
 
 **3. ✅ Enhanced CLI Error Handling**
 - Added `lib/cli-utils.sh` with standardized error codes
-- Implemented command-specific help: `at-bot help <command>`
-- Added `at-bot commands` to list all available commands
+- Implemented command-specific help: `atproto help <command>`
+- Added `atproto commands` to list all available commands
 - Improved error messages with helpful suggestions
 - Added input validation functions (handle, URI, post text, file)
 
@@ -88,14 +88,14 @@ The `docs.config.yaml` file controls documentation building with:
 ### CLI Enhancements
 
 **New Features:**
-- `at-bot help <command>` for command-specific documentation
-- `at-bot commands` to list all available commands
+- `atproto help <command>` for command-specific documentation
+- `atproto commands` to list all available commands
 - Input validation with helpful error suggestions
 - Consistent error codes for scripting (ERR_NOT_AUTHENTICATED, ERR_INVALID_INPUT, etc.)
 - Better error messages with suggestions for common failures
 
 **Files Modified:**
-- `bin/at-bot`: Added support for command-specific help
+- `bin/atproto`: Added support for command-specific help
 - `lib/cli-utils.sh`: New utility library for error handling
 - Shell scripts now validate input before API calls
 
@@ -107,7 +107,7 @@ The `docs.config.yaml` file controls documentation building with:
 - **Total MCP tools**: 27 (across 7 modules)
 - **CLI test suites**: 10 (100% passing)
 - **Total CLI tests**: 86+ tests
-- **Code lines**: atproto.sh ~1,850 lines, bin/at-bot ~359 lines
+- **Code lines**: atproto.sh ~1,850 lines, bin/atproto ~359 lines
 - **Shell scripts**: 50+ shell scripts/functions
 
 ### Build & Deployment
@@ -129,8 +129,8 @@ The `docs.config.yaml` file controls documentation building with:
 ### New Files Created
 1. `docs.config.yaml` - Documentation build configuration
 2. `scripts/build-docs.sh` - Documentation build script
-3. `scripts/at-bot-completion.bash` - Bash completion
-4. `scripts/at-bot-completion.zsh` - Zsh completion
+3. `scripts/atproto-completion.bash` - Bash completion
+4. `scripts/atproto-completion.zsh` - Zsh completion
 5. `scripts/install-completions.sh` - Completion installation script
 6. `lib/cli-utils.sh` - CLI error handling utilities
 7. `mcp-server/tests/test-tools.sh` - MCP tool validation tests
@@ -141,7 +141,7 @@ The `docs.config.yaml` file controls documentation building with:
 
 ### Files Modified
 1. `mcp-server/src/index.ts` - Added tool imports and registration
-2. `bin/at-bot` - Enhanced help system, error handling
+2. `bin/atproto` - Enhanced help system, error handling
 3. `mcp-server/docs/MCP_TOOLS.md` - Updated with all 22+ tool specifications
 4. `mcp-server/docs/MCP_INTEGRATION.md` - Updated Phase 1 completion status
 
@@ -248,7 +248,7 @@ Total: 27/27 tools compiled successfully
 All tools follow a consistent pattern:
 1. Parse input parameters
 2. Validate using CLI utility functions
-3. Execute AT-bot CLI command with proper error handling
+3. Execute atproto CLI command with proper error handling
 4. Format and return response
 5. Handle errors with meaningful messages
 
@@ -298,7 +298,7 @@ All tools follow a consistent pattern:
 
 ## Summary
 
-This session successfully completed Phase 1 of AT-bot development with:
+This session successfully completed Phase 1 of atproto development with:
 - ✅ 27 MCP tools fully implemented and tested
 - ✅ Enhanced CLI with completions and better error handling
 - ✅ Documentation build system with flexible configuration

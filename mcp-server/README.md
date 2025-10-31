@@ -1,10 +1,10 @@
-# AT-bot MCP Server
+# atproto MCP Server
 
-This directory contains the MCP (Model Context Protocol) server implementation for AT-bot, enabling AI agents to control Bluesky through standardized tool interfaces.
+This directory contains the MCP (Model Context Protocol) server implementation for atproto, enabling AI agents to control Bluesky through standardized tool interfaces.
 
 ## Overview
 
-The MCP server acts as a bridge between AI agents (Claude, ChatGPT, etc.) and the AT-bot core library, exposing Bluesky/AT Protocol capabilities as discoverable MCP tools.
+The MCP server acts as a bridge between AI agents (Claude, ChatGPT, etc.) and the atproto core library, exposing Bluesky/AT Protocol capabilities as discoverable MCP tools.
 
 ## Architecture
 
@@ -180,7 +180,7 @@ make build
 The MCP server reads configuration from:
 
 1. Environment variables (highest priority)
-2. `~/.config/at-bot/mcp.json`
+2. `~/.config/atproto/mcp.json`
 3. Default configuration
 
 **Key Configuration Options:**
@@ -205,7 +205,7 @@ npm run dev
 {
   "_meta": {
     "apiVersion": "2024-11-05",
-    "name": "at-bot-mcp-server",
+    "name": "atproto-mcp-server",
     "version": "0.1.0"
   },
   "tools": [

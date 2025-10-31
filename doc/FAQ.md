@@ -1,6 +1,6 @@
-# AT-bot Frequently Asked Questions (FAQ)
+# atproto Frequently Asked Questions (FAQ)
 
-Quick answers to common questions about installing, using, and troubleshooting AT-bot.
+Quick answers to common questions about installing, using, and troubleshooting atproto.
 
 ## Table of Contents
 
@@ -16,7 +16,7 @@ Quick answers to common questions about installing, using, and troubleshooting A
 
 ### Q: What are the system requirements?
 
-**A:** AT-bot requires:
+**A:** atproto requires:
 - Bash 4.0 or higher
 - curl (for HTTP requests)
 - Standard Unix tools (grep, sed, awk)
@@ -26,13 +26,13 @@ Optional for advanced features:
 - Node.js 18+ (for MCP server development)
 - pandoc (for documentation generation)
 
-### Q: How do I install AT-bot?
+### Q: How do I install atproto?
 
 **A:** Simple installation:
 
 ```bash
-git clone https://github.com/p3nGu1nZz/AT-bot.git
-cd AT-bot
+git clone https://github.com/p3nGu1nZz/atproto.git
+cd atproto
 ./install.sh
 ```
 
@@ -41,7 +41,7 @@ Or to a custom location:
 PREFIX=$HOME/.local ./install.sh
 ```
 
-### Q: How do I uninstall AT-bot?
+### Q: How do I uninstall atproto?
 
 **A:** If you used the default installation:
 ```bash
@@ -50,11 +50,11 @@ sudo /usr/local/bin/uninstall.sh
 
 Or manually remove:
 ```bash
-sudo rm /usr/local/bin/at-bot
-sudo rm -rf /usr/local/lib/at-bot
+sudo rm /usr/local/bin/atproto
+sudo rm -rf /usr/local/lib/atproto
 ```
 
-### Q: Does AT-bot work on Windows?
+### Q: Does atproto work on Windows?
 
 **A:** Yes! Use Windows Subsystem for Linux (WSL2):
 ```bash
@@ -62,13 +62,13 @@ wsl --install
 # Then follow Linux installation steps
 ```
 
-### Q: Does AT-bot work on macOS?
+### Q: Does atproto work on macOS?
 
 **A:** Yes! Install via:
 ```bash
 ./install.sh  # Standard installation
 # or with Homebrew when available
-brew install at-bot
+brew install atproto
 ```
 
 ## Getting Started
@@ -77,7 +77,7 @@ brew install at-bot
 
 **A:** Use the login command:
 ```bash
-at-bot login
+atproto login
 ```
 
 Then enter:
@@ -91,7 +91,7 @@ Then enter:
 **A:** An app password is a special password for third-party apps:
 1. Go to Settings > App Passwords in Bluesky
 2. Generate a new app password
-3. Use it with AT-bot instead of your main password
+3. Use it with atproto instead of your main password
 
 Benefits:
 - More secure than using your main password
@@ -102,7 +102,7 @@ Benefits:
 
 **A:** Use the whoami command:
 ```bash
-at-bot whoami
+atproto whoami
 ```
 
 Shows your handle and user info if logged in.
@@ -111,7 +111,7 @@ Shows your handle and user info if logged in.
 
 **A:** Use logout command:
 ```bash
-at-bot logout
+atproto logout
 ```
 
 This clears your session and any saved credentials.
@@ -122,73 +122,73 @@ This clears your session and any saved credentials.
 
 **A:** Create a post with:
 ```bash
-at-bot post "Your message here"
+atproto post "Your message here"
 ```
 
 With line breaks:
 ```bash
-at-bot post "Line 1
+atproto post "Line 1
 Line 2
 Line 3"
 ```
 
 With media (when implemented):
 ```bash
-at-bot post-with-image "Message" image.jpg
+atproto post-with-image "Message" image.jpg
 ```
 
 ### Q: How do I read my feed?
 
 **A:** View your timeline:
 ```bash
-at-bot feed          # Show last 10 posts
-at-bot feed 20       # Show last 20 posts
+atproto feed          # Show last 10 posts
+atproto feed 20       # Show last 20 posts
 ```
 
 ### Q: How do I follow someone?
 
 **A:** Use the follow command:
 ```bash
-at-bot follow username.bsky.social
+atproto follow username.bsky.social
 ```
 
 Or unfollow:
 ```bash
-at-bot unfollow username.bsky.social
+atproto unfollow username.bsky.social
 ```
 
 ### Q: How do I search for posts?
 
 **A:** Search posts or users:
 ```bash
-at-bot search "search query"
+atproto search "search query"
 ```
 
 ### Q: How do I reply to a post?
 
 **A:** Reply using the post URI:
 ```bash
-at-bot reply at://did:plc:xxx/app.bsky.feed.post/xxx "Your reply"
+atproto reply at://did:plc:xxx/app.bsky.feed.post/xxx "Your reply"
 ```
 
 You can get the URI from post listings.
 
 ### Q: How do I save my credentials for automation?
 
-**A:** AT-bot can optionally save encrypted credentials:
+**A:** atproto can optionally save encrypted credentials:
 ```bash
-at-bot login
+atproto login
 # When prompted: "Save credentials securely? (y/n): y"
 ```
 
 Then future logins auto-load credentials:
 ```bash
-at-bot login  # Uses saved credentials automatically
+atproto login  # Uses saved credentials automatically
 ```
 
 To clear saved credentials:
 ```bash
-at-bot clear-credentials
+atproto clear-credentials
 ```
 
 **Security Note**: Credentials are encrypted with AES-256-CBC. Still use in trusted environments only.
@@ -199,17 +199,17 @@ at-bot clear-credentials
 ```bash
 export BLUESKY_HANDLE="user.bsky.social"
 export BLUESKY_PASSWORD="app-password-here"
-at-bot login
-at-bot post "Automated post!"
+atproto login
+atproto post "Automated post!"
 ```
 
 Perfect for scripts and CI/CD pipelines.
 
 ## Troubleshooting
 
-### Q: I get "command not found: at-bot"
+### Q: I get "command not found: atproto"
 
-**A:** AT-bot isn't in your PATH. Either:
+**A:** atproto isn't in your PATH. Either:
 
 1. Reinstall to system PATH:
    ```bash
@@ -224,7 +224,7 @@ Perfect for scripts and CI/CD pipelines.
 
 3. Or use full path:
    ```bash
-   /usr/local/bin/at-bot login
+   /usr/local/bin/atproto login
    ```
 
 ### Q: Login fails with "Invalid credentials"
@@ -239,7 +239,7 @@ Perfect for scripts and CI/CD pipelines.
 
 Debug with:
 ```bash
-DEBUG=1 at-bot login
+DEBUG=1 atproto login
 ```
 
 ### Q: Post fails with "Rate limited"
@@ -252,9 +252,9 @@ DEBUG=1 at-bot login
 
 **A:** Your session token expired. Simply log in again:
 ```bash
-at-bot login
+atproto login
 # Or use refresh if available:
-at-bot refresh
+atproto refresh
 ```
 
 ### Q: Commands hang or timeout
@@ -265,7 +265,7 @@ at-bot refresh
 2. **Retry**: Run command again
 3. **Custom timeout** (when available):
    ```bash
-   ATP_TIMEOUT=30 at-bot feed
+   ATP_TIMEOUT=30 atproto feed
    ```
 
 ### Q: Permission denied when installing
@@ -282,7 +282,7 @@ PREFIX=$HOME/.local ./install.sh
 
 ### Q: Where are my credentials stored?
 
-**A:** In `~/.config/at-bot/`:
+**A:** In `~/.config/atproto/`:
 - `session.json` - Current session token (encrypted)
 - `credentials.json` - Saved credentials (encrypted)
 
@@ -292,8 +292,8 @@ Permissions set to 600 (user read/write only).
 
 **A:** Set DEBUG environment variable:
 ```bash
-DEBUG=1 at-bot login
-DEBUG=1 at-bot post "Test"
+DEBUG=1 atproto login
+DEBUG=1 atproto post "Test"
 ```
 
 Shows detailed debug output for troubleshooting.
@@ -302,15 +302,15 @@ Shows detailed debug output for troubleshooting.
 
 **A:** Try these steps:
 
-1. **Check installation**: `at-bot --help`
-2. **Check login**: `at-bot whoami`
-3. **Enable debugging**: `DEBUG=1 at-bot <command>`
-4. **Check logs**: Look in `~/.config/at-bot/logs/` (if available)
+1. **Check installation**: `atproto --help`
+2. **Check login**: `atproto whoami`
+3. **Enable debugging**: `DEBUG=1 atproto <command>`
+4. **Check logs**: Look in `~/.config/atproto/logs/` (if available)
 5. **Report issue**: Open GitHub issue with debug output
 
 ## Security & Privacy
 
-### Q: Is AT-bot safe to use?
+### Q: Is atproto safe to use?
 
 **A:** Yes, with precautions:
 
@@ -325,7 +325,7 @@ Shows detailed debug output for troubleshooting.
 - Don't share session/credential files
 - Review code before using in automation
 - Use in trusted environments only
-- Keep AT-bot updated
+- Keep atproto updated
 
 ### Q: Is my password stored?
 
@@ -335,16 +335,16 @@ Shows detailed debug output for troubleshooting.
 
 Passwords are only used to obtain session tokens during login.
 
-### Q: Can I audit what AT-bot does?
+### Q: Can I audit what atproto does?
 
 **A:** Yes! The entire codebase is open source:
 - Read `lib/atproto.sh` to see all API calls
-- Review `bin/at-bot` for CLI implementation
+- Review `bin/atproto` for CLI implementation
 - Enable DEBUG mode to see actual API requests
 
 ### Q: Is my data private?
 
-**A:** AT-bot itself:
+**A:** atproto itself:
 - Doesn't collect analytics
 - Doesn't phone home
 - Doesn't store your posts locally (except in command output)
@@ -356,17 +356,17 @@ However:
 
 ### Q: How do I delete my data?
 
-**A:** Remove local AT-bot data:
+**A:** Remove local atproto data:
 
 ```bash
 # Remove session and credentials
-rm ~/.config/at-bot/session.json
-rm ~/.config/at-bot/credentials.json
+rm ~/.config/atproto/session.json
+rm ~/.config/atproto/credentials.json
 
-# Or completely remove AT-bot
-at-bot logout
+# Or completely remove atproto
+atproto logout
 uninstall.sh
-rm -rf ~/.config/at-bot
+rm -rf ~/.config/atproto
 ```
 
 Bluesky stores your posts independently—delete from Bluesky directly.
@@ -378,7 +378,7 @@ Bluesky stores your posts independently—delete from Bluesky directly.
 ```bash
 .env
 .env.local
-~/.config/at-bot/
+~/.config/atproto/
 credentials.json
 session.json
 ```
@@ -391,7 +391,7 @@ export BLUESKY_PASSWORD="..."
 
 ## Advanced Usage
 
-### Q: Can I use AT-bot in scripts?
+### Q: Can I use atproto in scripts?
 
 **A:** Yes! Use environment variables:
 
@@ -399,21 +399,21 @@ export BLUESKY_PASSWORD="..."
 #!/bin/bash
 export BLUESKY_HANDLE="bot.bsky.social"
 export BLUESKY_PASSWORD="$APP_PASSWORD"
-at-bot login
-at-bot post "Automated daily post $(date)"
+atproto login
+atproto post "Automated daily post $(date)"
 ```
 
 Or non-interactive with error handling:
 ```bash
-if at-bot login; then
-    at-bot post "Success!"
+if atproto login; then
+    atproto post "Success!"
 else
     echo "Login failed" >&2
     exit 1
 fi
 ```
 
-### Q: How do I use AT-bot with GitHub Actions?
+### Q: How do I use atproto with GitHub Actions?
 
 **A:** Set up secrets and use in workflow:
 
@@ -429,21 +429,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install AT-bot
+      - name: Install atproto
         run: |
-          git clone https://github.com/p3nGu1nZz/AT-bot.git
-          cd AT-bot
+          git clone https://github.com/p3nGu1nZz/atproto.git
+          cd atproto
           ./install.sh
       - name: Post to Bluesky
         env:
           BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
           BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PASSWORD }}
         run: |
-          at-bot login
-          at-bot post "🚀 New deployment!"
+          atproto login
+          atproto post "🚀 New deployment!"
 ```
 
-### Q: Can I use AT-bot with cron for scheduled posts?
+### Q: Can I use atproto with cron for scheduled posts?
 
 **A:** Yes! Create a script:
 
@@ -455,8 +455,8 @@ source ~/.profile
 export BLUESKY_HANDLE="bot.bsky.social"
 export BLUESKY_PASSWORD="$(cat ~/.bluesky_password)"
 
-at-bot login
-at-bot post "Daily post: $(date)"
+atproto login
+atproto post "Daily post: $(date)"
 ```
 
 Then add to crontab:
@@ -472,9 +472,9 @@ crontab -e
 ```json
 {
   "mcpServers": {
-    "at-bot": {
-      "command": "at-bot-mcp-server",
-      "args": ["--config", "~/.config/at-bot/mcp.json"]
+    "atproto": {
+      "command": "atproto-mcp-server",
+      "args": ["--config", "~/.config/atproto/mcp.json"]
     }
   }
 }
@@ -488,32 +488,32 @@ Then use in AI agents and tools.
 
 ```bash
 export ATP_PDS="https://custom.pds.example.com"
-at-bot login
+atproto login
 ```
 
 Or use environment permanently in shell config.
 
 ### Q: What if I need to use a different shell?
 
-**A:** AT-bot is bash-based, but you can call it from other shells:
+**A:** atproto is bash-based, but you can call it from other shells:
 
 ```zsh
 #!/bin/zsh
-at-bot login
-at-bot post "Posted from zsh!"
+atproto login
+atproto post "Posted from zsh!"
 ```
 
 ```fish
 #!/usr/bin/fish
-at-bot login
-at-bot post "Posted from fish!"
+atproto login
+atproto post "Posted from fish!"
 ```
 
 Just ensure bash and dependencies are installed.
 
 ## Contributing
 
-### Q: How do I contribute to AT-bot?
+### Q: How do I contribute to atproto?
 
 **A:** See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guide:
 
@@ -555,8 +555,8 @@ Just ensure bash and dependencies are installed.
 
 - Check [README.md](../README.md) for overview
 - Read [STYLE.md](../STYLE.md) for technical details
-- Open a [GitHub Issue](https://github.com/p3nGu1nZz/AT-bot/issues)
-- Start a [GitHub Discussion](https://github.com/p3nGu1nZz/AT-bot/discussions)
+- Open a [GitHub Issue](https://github.com/p3nGu1nZz/atproto/issues)
+- Start a [GitHub Discussion](https://github.com/p3nGu1nZz/atproto/discussions)
 - See [CONTRIBUTING.md](CONTRIBUTING.md) for development
 
 *Last updated: October 28, 2025*

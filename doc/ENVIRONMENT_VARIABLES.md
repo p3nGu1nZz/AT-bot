@@ -1,6 +1,6 @@
-# AT-bot Environment Variables Reference
+# atproto Environment Variables Reference
 
-Complete reference for all environment variables supported by AT-bot.
+Complete reference for all environment variables supported by atproto.
 
 ## Table of Contents
 
@@ -22,7 +22,7 @@ Automatically uses this handle when logging in instead of prompting.
 
 ```bash
 export BLUESKY_HANDLE="user.bsky.social"
-at-bot login  # Uses saved credentials or prompts for password only
+atproto login  # Uses saved credentials or prompts for password only
 ```
 
 **Use Cases:**
@@ -42,7 +42,7 @@ Provides password non-interactively. Use with **extreme caution**.
 
 ```bash
 export BLUESKY_PASSWORD="abcd-efgh-ijkl-mnop"
-at-bot login  # Non-interactive login
+atproto login  # Non-interactive login
 ```
 
 **Security Note**: 
@@ -53,27 +53,27 @@ at-bot login  # Non-interactive login
 **Best Practice**:
 ```bash
 # Temporary for one command
-BLUESKY_PASSWORD="$(cat ~/.bluesky_app_password)" at-bot login
+BLUESKY_PASSWORD="$(cat ~/.bluesky_app_password)" atproto login
 
 # Or use saved credentials (encrypted)
-at-bot login  # After first interactive login with save prompt
+atproto login  # After first interactive login with save prompt
 ```
 
 ### BLUESKY_SESSION_FILE
 
 **Type**: Path  
-**Default**: `~/.config/at-bot/session.json`  
+**Default**: `~/.config/atproto/session.json`  
 **Purpose**: Custom location for session storage
 
 Store sessions in different locations for multiple accounts.
 
 ```bash
-export BLUESKY_SESSION_FILE=~/.config/at-bot/work-session.json
-at-bot login  # Saves to custom location
+export BLUESKY_SESSION_FILE=~/.config/atproto/work-session.json
+atproto login  # Saves to custom location
 
 # Switch between sessions
-export BLUESKY_SESSION_FILE=~/.config/at-bot/personal-session.json
-at-bot whoami  # Shows personal account
+export BLUESKY_SESSION_FILE=~/.config/atproto/personal-session.json
+atproto whoami  # Shows personal account
 ```
 
 ## Configuration
@@ -82,18 +82,18 @@ at-bot whoami  # Shows personal account
 
 **Type**: Path  
 **Default**: `~/.config`  
-**Purpose**: Base directory for AT-bot configuration
+**Purpose**: Base directory for atproto configuration
 
 Follows XDG Base Directory specification.
 
 ```bash
 export XDG_CONFIG_HOME="$HOME/.myconfig"
-at-bot login  # Uses ~/.myconfig/at-bot/session.json
+atproto login  # Uses ~/.myconfig/atproto/session.json
 ```
 
 **Directory Structure**:
 ```
-$XDG_CONFIG_HOME/at-bot/
+$XDG_CONFIG_HOME/atproto/
 ├── session.json        # Current session (encrypted)
 ├── credentials.json    # Saved credentials (encrypted)
 └── mcp.json           # MCP server configuration
@@ -109,7 +109,7 @@ Customize installation location.
 
 ```bash
 PREFIX=$HOME/.local ./install.sh
-# Installs to ~/.local/bin/at-bot and ~/.local/lib/at-bot/
+# Installs to ~/.local/bin/atproto and ~/.local/lib/atproto/
 ```
 
 **Common Values**:
@@ -128,10 +128,10 @@ PREFIX=$HOME/.local ./install.sh
 Shows internal debugging information for troubleshooting.
 
 ```bash
-DEBUG=1 at-bot login
+DEBUG=1 atproto login
 # Shows: function calls, API requests, credentials (encrypted)
 
-DEBUG=1 at-bot post "test"
+DEBUG=1 atproto post "test"
 # Shows: session validation, API details, response parsing
 ```
 
@@ -153,7 +153,7 @@ DEBUG=1 at-bot post "test"
 Even more detailed than DEBUG - shows HTTP details.
 
 ```bash
-DEBUG_API=1 at-bot post "test"
+DEBUG_API=1 atproto post "test"
 # Shows: raw HTTP requests, full response bodies, headers
 ```
 
@@ -168,7 +168,7 @@ DEBUG_API=1 at-bot post "test"
 More detailed but less technical than DEBUG.
 
 ```bash
-VERBOSE=1 at-bot feed
+VERBOSE=1 atproto feed
 # Shows: processing details, operation progress
 ```
 
@@ -185,12 +185,12 @@ Use custom PDS or development instances.
 ```bash
 # Use custom server
 export ATP_PDS="https://custom.pds.example.com"
-at-bot login
-at-bot post "Posted to custom server"
+atproto login
+atproto post "Posted to custom server"
 
 # Use test instance
 export ATP_PDS="https://staging.bsky.social"
-at-bot login  # Use test credentials
+atproto login  # Use test credentials
 ```
 
 **Common Values**:
@@ -209,11 +209,11 @@ Set timeout for API requests.
 ```bash
 # Longer timeout for slow connections
 export ATP_TIMEOUT=60
-at-bot feed
+atproto feed
 
 # Shorter timeout for quick fail
 export ATP_TIMEOUT=5
-at-bot whoami
+atproto whoami
 ```
 
 **Useful For**:
@@ -232,11 +232,11 @@ Retry failed API calls.
 ```bash
 # More retries for unreliable connections
 export ATP_RETRY=5
-at-bot post "Important"
+atproto post "Important"
 
 # No retries for quick feedback
 export ATP_RETRY=0
-at-bot whoami
+atproto whoami
 ```
 
 **Retry Behavior**:
@@ -256,7 +256,7 @@ Rarely needs to be set, but available for special cases.
 
 ```bash
 export SHELL=/bin/bash
-at-bot login
+atproto login
 ```
 
 ### HOME
@@ -278,11 +278,11 @@ export HOME=/tmp/testuser
 **Default**: System PATH  
 **Purpose**: Executable search path
 
-Ensure `at-bot` is in PATH:
+Ensure `atproto` is in PATH:
 
 ```bash
 export PATH="/usr/local/bin:$PATH"
-at-bot login
+atproto login
 ```
 
 ### LANG / LC_ALL
@@ -296,11 +296,11 @@ Affects output formatting and character handling.
 ```bash
 # Force UTF-8
 export LANG=en_US.UTF-8
-at-bot feed
+atproto feed
 
 # Different locale
 export LANG=fr_FR.UTF-8
-at-bot whoami
+atproto whoami
 ```
 
 ## Common Combinations
@@ -312,7 +312,7 @@ at-bot whoami
 export BLUESKY_HANDLE="bot.bsky.social"
 export BLUESKY_PASSWORD="$(cat /secure/location/password)"
 export DEBUG=0
-at-bot login
+atproto login
 ```
 
 ### Development Environment
@@ -322,8 +322,8 @@ at-bot login
 export DEBUG=1
 export ATP_PDS="https://staging.bsky.social"
 export ATP_TIMEOUT=60
-export BLUESKY_SESSION_FILE=~/.config/at-bot/dev-session.json
-at-bot login
+export BLUESKY_SESSION_FILE=~/.config/atproto/dev-session.json
+atproto login
 ```
 
 ### CI/CD Pipeline
@@ -335,8 +335,8 @@ export BLUESKY_HANDLE="${BLUESKY_HANDLE}"
 export BLUESKY_PASSWORD="${BLUESKY_PASSWORD}"
 export ATP_TIMEOUT=30
 export ATP_RETRY=3
-at-bot login
-at-bot post "CI/CD automated post"
+atproto login
+atproto post "CI/CD automated post"
 ```
 
 ### Multiple Accounts
@@ -345,21 +345,21 @@ at-bot post "CI/CD automated post"
 #!/bin/bash
 
 # Account 1
-export BLUESKY_SESSION_FILE=~/.config/at-bot/account1.json
+export BLUESKY_SESSION_FILE=~/.config/atproto/account1.json
 export BLUESKY_HANDLE="account1.bsky.social"
-at-bot login
+atproto login
 
 # Account 2
-export BLUESKY_SESSION_FILE=~/.config/at-bot/account2.json
+export BLUESKY_SESSION_FILE=~/.config/atproto/account2.json
 export BLUESKY_HANDLE="account2.bsky.social"
-at-bot login
+atproto login
 
 # Switch and operate
-export BLUESKY_SESSION_FILE=~/.config/at-bot/account1.json
-at-bot post "From account 1"
+export BLUESKY_SESSION_FILE=~/.config/atproto/account1.json
+atproto post "From account 1"
 
-export BLUESKY_SESSION_FILE=~/.config/at-bot/account2.json
-at-bot post "From account 2"
+export BLUESKY_SESSION_FILE=~/.config/atproto/account2.json
+atproto post "From account 2"
 ```
 
 ### Secure Automation
@@ -374,8 +374,8 @@ eval $(decrypt ~/.atbot.enc)
 
 # Minimal debug (no credentials shown)
 export DEBUG=0
-at-bot login
-at-bot post "Secure post"
+atproto login
+atproto post "Secure post"
 ```
 
 ## Variable Precedence
@@ -384,13 +384,13 @@ When multiple sources provide the same value:
 
 1. **Command-line environment** (highest priority)
    ```bash
-   BLUESKY_HANDLE="override" at-bot login
+   BLUESKY_HANDLE="override" atproto login
    ```
 
 2. **Exported environment variables**
    ```bash
    export BLUESKY_HANDLE="exported"
-   at-bot login
+   atproto login
    ```
 
 3. **Shell configuration files** (~/.bashrc, ~/.zshrc)
@@ -401,7 +401,7 @@ When multiple sources provide the same value:
 
 4. **Saved credentials**
    ```bash
-   # In ~/.config/at-bot/credentials.json
+   # In ~/.config/atproto/credentials.json
    ```
 
 5. **Interactive prompts** (lowest priority)
@@ -424,7 +424,7 @@ When multiple sources provide the same value:
 
 - ❌ Store `BLUESKY_PASSWORD` in shell config
 - ❌ Commit credentials to git
-- ❌ Use main Bluesky password with AT-bot
+- ❌ Use main Bluesky password with atproto
 - ❌ Share debug logs containing credentials
 - ❌ Store credentials in plain text
 - ❌ Pass credentials through command-line history
@@ -441,7 +441,7 @@ env | grep BLUESKY_
 bash -c 'echo $BLUESKY_HANDLE'
 
 # Check precedence
-at-bot whoami  # Uses current session/credentials
+atproto whoami  # Uses current session/credentials
 ```
 
 ### Credentials Not Loading
@@ -451,21 +451,21 @@ at-bot whoami  # Uses current session/credentials
 ls -la $BLUESKY_SESSION_FILE
 
 # Check config directory
-ls -la $XDG_CONFIG_HOME/at-bot/
+ls -la $XDG_CONFIG_HOME/atproto/
 
 # Try explicit path
-export BLUESKY_SESSION_FILE=~/.config/at-bot/session.json
-at-bot whoami
+export BLUESKY_SESSION_FILE=~/.config/atproto/session.json
+atproto whoami
 ```
 
 ### Debug Output Too Verbose
 
 ```bash
 # Use VERBOSE instead of DEBUG
-DEBUG=0 VERBOSE=1 at-bot login
+DEBUG=0 VERBOSE=1 atproto login
 
 # Or redirect to file
-DEBUG=1 at-bot login > debug.log 2>&1
+DEBUG=1 atproto login > debug.log 2>&1
 ```
 
 ---

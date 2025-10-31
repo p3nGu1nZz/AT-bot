@@ -1,4 +1,4 @@
-# AT-bot Project Review and Strategic Plan
+# atproto Project Review and Strategic Plan
 **Date**: October 28, 2025  
 **Status**: Phase 1 Core Features Complete ✅  
 **Next Phase**: Phase 2 - Core Features + MCP Integration  
@@ -7,7 +7,7 @@
 
 ## Executive Summary
 
-AT-bot is a **POSIX-compliant CLI tool for Bluesky/AT Protocol automation** with a growing MCP (Model Context Protocol) server for AI agent integration. The project has successfully completed Phase 1 with core authentication, social features, and MCP infrastructure in place.
+atproto is a **POSIX-compliant CLI tool for Bluesky/AT Protocol automation** with a growing MCP (Model Context Protocol) server for AI agent integration. The project has successfully completed Phase 1 with core authentication, social features, and MCP infrastructure in place.
 
 **Current Status**: 
 - ✅ Phase 1 Complete (v0.1.0 - v0.3.0)
@@ -22,7 +22,7 @@ AT-bot is a **POSIX-compliant CLI tool for Bluesky/AT Protocol automation** with
 
 ### Core Components
 
-**1. CLI Tool (`bin/at-bot`)**
+**1. CLI Tool (`bin/atproto`)**
 - Main entry point for user interactions
 - Commands: login, logout, whoami, post, feed, follow, etc.
 - Session management with AES-256-CBC encryption
@@ -54,7 +54,7 @@ AT-bot is a **POSIX-compliant CLI tool for Bluesky/AT Protocol automation** with
   - Profile (4 tools)
   - Feed (1 tool)
 - Stdio communication with MCP protocol
-- Shell executor for AT-bot CLI integration
+- Shell executor for atproto CLI integration
 
 **5. Testing & Quality**
 - 10 CLI test suites (86+ tests)
@@ -102,7 +102,7 @@ AT-bot is a **POSIX-compliant CLI tool for Bluesky/AT Protocol automation** with
 - ✅ Stdio communication ready
 - ✅ Tool discovery and execution
 - ✅ Error handling and response formatting
-- ✅ Shell executor for AT-bot CLI integration
+- ✅ Shell executor for atproto CLI integration
 
 **Developer Experience**
 - ✅ Shell completions (bash/zsh)
@@ -146,7 +146,7 @@ AT-bot is a **POSIX-compliant CLI tool for Bluesky/AT Protocol automation** with
 **Work**:
 - [ ] Add `--format json` flag to all commands
 - [ ] Implement JSON output in lib/atproto.sh functions
-- [ ] Update bin/at-bot to handle format flag
+- [ ] Update bin/atproto to handle format flag
 - [ ] Add examples to documentation
 - [ ] Write tests for JSON output
 - [ ] Document output schemas
@@ -171,9 +171,9 @@ AT-bot is a **POSIX-compliant CLI tool for Bluesky/AT Protocol automation** with
 #### 4. **Homebrew Formula** ⏳
 **Status**: Planned, not started  
 **Work**:
-- [ ] Create homebrew-at-bot tap
+- [ ] Create homebrew-atproto tap
 - [ ] Write formula.rb with version/checksums
-- [ ] Test installation: `brew install p3nGu1nZz/at-bot/at-bot`
+- [ ] Test installation: `brew install p3nGu1nZz/atproto/atproto`
 - [ ] Document tap installation
 - [ ] Set up auto-update mechanism
 
@@ -204,7 +204,7 @@ AT-bot is a **POSIX-compliant CLI tool for Bluesky/AT Protocol automation** with
 **Estimated Effort**: 8-10 hours
 
 #### 7. **Advanced Configuration**
-- [ ] Enhanced configuration file support (~/.config/at-bot/config.json)
+- [ ] Enhanced configuration file support (~/.config/atproto/config.json)
 - [ ] Environment variable interpolation
 - [ ] Profile management (work/personal accounts)
 - [ ] Preset commands for common workflows
@@ -253,7 +253,7 @@ Recent commits:
 
 ### File Structure Summary
 ```
-AT-bot/
+atproto/
 ├── bin/               # CLI executable
 ├── lib/               # Core libraries (1,850+ lines)
 ├── mcp-server/        # MCP server (TypeScript)
@@ -293,7 +293,7 @@ Total: 86+ tests, 100% pass rate
 
 ### Code Statistics
 - **Core library**: ~1,850 lines (lib/atproto.sh)
-- **CLI tool**: ~359 lines (bin/at-bot)
+- **CLI tool**: ~359 lines (bin/atproto)
 - **Supporting libraries**: ~600 lines
 - **MCP server**: ~1,200 lines (TypeScript)
 - **Test coverage**: 86+ tests across 10 suites
@@ -336,7 +336,7 @@ git push origin main
 ```
 
 **3. Test MCP Server with Claude** (1 hour)
-- Configure MCP client to use at-bot-mcp-server
+- Configure MCP client to use atproto-mcp-server
 - Test tool discovery
 - Execute sample tools
 - Verify output formats
@@ -428,7 +428,7 @@ To complete Phase 2, we need:
 
 ## Conclusion
 
-AT-bot is in an excellent position to move from Phase 1 to Phase 2. The core functionality is solid, MCP infrastructure is in place, and the codebase is well-organized and documented.
+atproto is in an excellent position to move from Phase 1 to Phase 2. The core functionality is solid, MCP infrastructure is in place, and the codebase is well-organized and documented.
 
 **The immediate priority is MCP server deployment**, which will unlock AI agent integration and significantly expand the project's reach.
 

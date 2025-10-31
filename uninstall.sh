@@ -1,19 +1,19 @@
 #!/bin/bash
-# Uninstallation script for AT-bot
+# Uninstallation script for atproto
 
 set -e
 
 # Default installation prefix
 PREFIX="${PREFIX:-/usr/local}"
 BINDIR="$PREFIX/bin"
-LIBDIR="$PREFIX/lib/at-bot"
-DOCDIR="$PREFIX/share/doc/at-bot"
+LIBDIR="$PREFIX/lib/atproto"
+DOCDIR="$PREFIX/share/doc/atproto"
 
 # Colors
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-echo "AT-bot Uninstallation Script"
+echo "atproto Uninstallation Script"
 echo "============================="
 echo ""
 echo "Removing from: $PREFIX"
@@ -27,22 +27,22 @@ if [ ! -w "$PREFIX" ]; then
 fi
 
 # Check if installed
-if [ ! -f "$BINDIR/at-bot" ]; then
-    echo -e "${YELLOW}Warning: AT-bot doesn't appear to be installed at $PREFIX${NC}"
+if [ ! -f "$BINDIR/atproto" ]; then
+    echo -e "${YELLOW}Warning: atproto doesn't appear to be installed at $PREFIX${NC}"
     echo ""
-    echo "Checked for: $BINDIR/at-bot"
+    echo "Checked for: $BINDIR/atproto"
     exit 1
 fi
 
 # Remove files
 echo "Removing files..."
-$SUDO rm -f "$BINDIR/at-bot"
+$SUDO rm -f "$BINDIR/atproto"
 $SUDO rm -rf "$LIBDIR"
 $SUDO rm -rf "$DOCDIR"
 
 echo ""
-echo "AT-bot uninstalled successfully."
+echo "atproto uninstalled successfully."
 echo ""
-echo "Note: Your configuration in ~/.config/at-bot was not removed."
+echo "Note: Your configuration in ~/.config/atproto was not removed."
 echo "To remove it manually, run:"
-echo "  rm -rf ~/.config/at-bot"
+echo "  rm -rf ~/.config/atproto"

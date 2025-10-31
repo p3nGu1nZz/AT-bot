@@ -1,5 +1,5 @@
 #!/bin/bash
-# AT-bot Documentation Compiler
+# atproto Documentation Compiler
 # Purpose: Compile all markdown documentation into a single, formatted PDF
 # Dependencies: pandoc (markdown->HTML), wkhtmltopdf (HTML->PDF), yq (YAML parsing)
 # 
@@ -20,8 +20,8 @@ CONFIG_FILE="$PROJECT_ROOT/docs.config.yaml"
 
 # Output configuration
 OUTPUT_DIR="$PROJECT_ROOT/dist/docs"
-COMPILED_MD="$OUTPUT_DIR/AT-bot_Complete_Documentation.md"
-COMPILED_PDF="$OUTPUT_DIR/AT-bot_Complete_Documentation.pdf"
+COMPILED_MD="$OUTPUT_DIR/atproto_Complete_Documentation.md"
+COMPILED_PDF="$OUTPUT_DIR/atproto_Complete_Documentation.pdf"
 TOC_SOURCE="$PROJECT_ROOT/doc/TOC.md"
 CSS_FILE="$OUTPUT_DIR/documentation.css"
 
@@ -215,6 +215,7 @@ declare -a DOC_ORDER=(
     "doc/TESTING.md"
     "doc/TESTING_GUIDE.md"
     "doc/PACKAGING.md"
+    "doc/VSCODE_EXTENSION.md"
     
     # MCP Server Documentation
     "mcp-server/README.md"
@@ -249,7 +250,7 @@ generate_css() {
     info "Generating CSS stylesheet..."
     
     cat > "$CSS_FILE" << 'EOF'
-/* AT-bot Documentation Stylesheet */
+/* atproto Documentation Stylesheet */
 
 :root {
     --primary-color: #0066cc;
@@ -266,7 +267,7 @@ generate_css() {
     size: A4;
     
     @top-right {
-        content: "AT-bot Documentation";
+        content: "atproto Documentation";
         font-size: 9pt;
         color: #666;
     }
@@ -543,8 +544,8 @@ EOF
 generate_cover_page() {
     info "Generating cover page..."
     
-    local title="${CONFIG_TITLE:-AT Protocol Bot}"
-    local author="${CONFIG_AUTHOR:-AT-bot Development Team}"
+    local title="${CONFIG_TITLE:-atproto Documentation}"
+    local author="${CONFIG_AUTHOR:-atproto Development Team}"
     local version="${CONFIG_VERSION:-0.1.0}"
     local repository="${CONFIG_REPOSITORY:-https://github.com/p3nGu1nZz/atproto}"
     local license="${CONFIG_LICENSE:-CC0 1.0 Universal}"
@@ -698,7 +699,7 @@ compile_markdown() {
 # Create HTML template with CSS styling for PDF conversion
 create_html_template() {
     local template_file="$1"
-    local title="${CONFIG_TITLE:-AT-bot Documentation}"
+    local title="${CONFIG_TITLE:-atproto Documentation}"
     
     cat > "$template_file" << EOF
 <!DOCTYPE html>
@@ -982,7 +983,7 @@ convert_to_pdf() {
     local header_template="$build_dir/header.html"
     local footer_template="$build_dir/footer.html"
     local html_intermediate="$build_dir/documentation.html"
-    local pdf_file="$build_dir/AT-bot_Complete_Documentation.pdf"
+    local pdf_file="$build_dir/atproto_Complete_Documentation.pdf"
     
     # Convert to absolute paths for wkhtmltopdf compatibility
     local abs_html_intermediate="$(cd "$(dirname "$html_intermediate")" && pwd)/$(basename "$html_intermediate")"
@@ -1076,7 +1077,7 @@ convert_to_pdf() {
 main() {
     echo ""
     echo -e "${CYAN}════════════════════════════════════════════════════════${NC}"
-    echo -e "${CYAN}  AT-bot Documentation Compiler${NC}"
+    echo -e "${CYAN}  atproto Documentation Compiler${NC}"
     echo -e "${CYAN}════════════════════════════════════════════════════════${NC}"
     echo ""
     

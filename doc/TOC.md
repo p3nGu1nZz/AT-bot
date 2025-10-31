@@ -1,4 +1,4 @@
-# AT-bot Documentation Table of Contents
+# atproto Documentation Table of Contents
 
 **Last Generated:** 2025-10-28 10:14:59  
 **Version:** 0.1.0
@@ -99,7 +99,7 @@ Core implementation files (for reference):
 - [lib/atproto.sh](../lib/atproto.sh) - AT Protocol library (850+ lines)
 - [lib/config.sh](../lib/config.sh) - Configuration management
 - [lib/cli-utils.sh](../lib/cli-utils.sh) - CLI utilities
-- [bin/at-bot](../bin/at-bot) - Main CLI entry point
+- [bin/atproto](../bin/atproto) - Main CLI entry point
 - [Makefile](../Makefile) - Build system
 
 ---
@@ -128,7 +128,7 @@ Model Context Protocol (MCP) server implementation:
 ## File Organization
 
 ```
-AT-bot/
+atproto/
 ├── doc/                          # Documentation hub (YOU ARE HERE)
 │   ├── API.md                   # API Reference (Appendix)
 │   ├── ARCHITECTURE.md          # Architecture documentation
@@ -155,8 +155,8 @@ AT-bot/
 │   ├── config.sh                # Configuration
 │   └── cli-utils.sh             # CLI utilities
 ├── bin/                           # Executables
-│   ├── at-bot                   # Main CLI
-│   └── at-bot-docs              # Documentation viewer
+│   ├── atproto                   # Main CLI
+│   └── atproto-docs              # Documentation viewer
 ├── mcp-server/                    # MCP server implementation
 │   ├── src/                     # TypeScript source
 │   ├── docs/                    # MCP documentation
@@ -184,7 +184,7 @@ The documentation is built automatically from markdown files using:
 make docs
 
 # Or directly:
-./bin/at-bot-docs
+./bin/atproto-docs
 ```
 
 ---
@@ -237,15 +237,15 @@ make docs
 ## Contribution & Updates
 
 - **Contributing:** See [CONTRIBUTING.md](../CONTRIBUTING.md) or main [PLAN.md](../PLAN.md)
-- **Reporting Issues:** https://github.com/p3nGu1nZz/AT-bot/issues
-- **Discussions:** https://github.com/p3nGu1nZz/AT-bot/discussions
+- **Reporting Issues:** https://github.com/p3nGu1nZz/atproto/issues
+- **Discussions:** https://github.com/p3nGu1nZz/atproto/discussions
 
 ---
 
 ## Quick Links
 
-- **GitHub Repository:** https://github.com/p3nGu1nZz/AT-bot
-- **Issue Tracker:** https://github.com/p3nGu1nZz/AT-bot/issues
+- **GitHub Repository:** https://github.com/p3nGu1nZz/atproto
+- **Issue Tracker:** https://github.com/p3nGu1nZz/atproto/issues
 - **AT Protocol Docs:** https://atproto.com/
 - **Bluesky:** https://bsky.app/
 

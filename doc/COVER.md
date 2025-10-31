@@ -1,8 +1,8 @@
-# AT-bot Complete Documentation
+# atproto Complete Documentation
 
 \pagebreak
 
-![AT-bot Logo](_images/figure-0.png)
+![atproto Logo](_images/figure-0.png)
 
 ---
 
@@ -14,7 +14,7 @@
 
 ### Build Powerful Automation with Confidence
 
-AT-bot is a POSIX-compliant command-line interface and MCP server for seamless interaction with Bluesky and the AT Protocol ecosystem. Whether you're automating personal workflows, building community tools, or deploying enterprise solutions, AT-bot provides the simplicity and security you need.
+atproto is a POSIX-compliant command-line interface and MCP server for seamless interaction with Bluesky and the AT Protocol ecosystem. Whether you're automating personal workflows, building community tools, or deploying enterprise solutions, atproto provides the simplicity and security you need.
 
 ---
 
@@ -22,7 +22,7 @@ AT-bot is a POSIX-compliant command-line interface and MCP server for seamless i
 **Released**: October 28, 2025  
 **Status**: Phase 1 - Foundation Complete
 
-**GitHub**: https://github.com/p3nGu1nZz/AT-bot  
+**GitHub**: https://github.com/p3nGu1nZz/atproto  
 **License**: CC0 Universal Open Source
 
 ---
@@ -31,9 +31,9 @@ AT-bot is a POSIX-compliant command-line interface and MCP server for seamless i
 
 # Preamble
 
-## Welcome to AT-bot
+## Welcome to atproto
 
-This comprehensive documentation covers **AT-bot v0.1.0** and serves as the complete reference for users, developers, system administrators, and AI agents integrating with Bluesky and the AT Protocol.
+This comprehensive documentation covers **atproto v0.1.0** and serves as the complete reference for users, developers, system administrators, and AI agents integrating with Bluesky and the AT Protocol.
 
 ### Document Structure
 
@@ -105,7 +105,7 @@ Before getting started, verify you have:
 
 ### Credential Handling
 
-**What AT-bot Does:**
+**What atproto Does:**
 ✅ Encrypts credentials using **AES-256-CBC**  
 ✅ Stores encrypted data with **600 file permissions** (owner read/write only)  
 ✅ **Never stores plaintext passwords**  
@@ -114,8 +114,8 @@ Before getting started, verify you have:
 
 **What You Should Do:**
 ✅ Create **app passwords** in Bluesky Settings → Privacy & Security  
-✅ Use **app passwords with AT-bot** (never main password)  
-✅ **Protect your credentials file** (~/.config/at-bot/)  
+✅ Use **app passwords with atproto** (never main password)  
+✅ **Protect your credentials file** (~/.config/atproto/)  
 ✅ Never **commit credentials to version control**  
 ✅ **Rotate app passwords** periodically  
 
@@ -132,7 +132,7 @@ Consider using dedicated secret management:
 - **HashiCorp Vault** - Enterprise secret management
 - **AWS Secrets Manager** - Cloud-based secrets
 - **Azure Key Vault** - Microsoft cloud solution
-- **System Keyring** - Platform-specific (planned for AT-bot)
+- **System Keyring** - Platform-specific (planned for atproto)
 
 ### Security Review
 
@@ -149,16 +149,16 @@ For detailed security analysis, see:
 
 **DISCLAIMER**: This software is provided **"AS IS"** without warranty of any kind, express or implied.
 
-The AT-bot project, its contributors, and maintainers are **NOT LIABLE** for:
+The atproto project, its contributors, and maintainers are **NOT LIABLE** for:
 - Data loss, corruption, or inaccessibility
 - Unauthorized account access or compromise
 - Loss of credentials or sensitive information
-- Damages or losses arising from use of AT-bot
+- Damages or losses arising from use of atproto
 - Third-party service disruptions or changes
 
 **Use at Your Own Risk**: While security best practices are followed:
 - Test thoroughly before production use
-- Keep AT-bot updated for security patches
+- Keep atproto updated for security patches
 - Monitor your account activity regularly
 - Report security issues responsibly
 
@@ -172,14 +172,14 @@ The AT-bot project, its contributors, and maintainers are **NOT LIABLE** for:
 
 ### Liability
 
-The AT-bot project assumes **no liability** for:
+The atproto project assumes **no liability** for:
 - Credential exposure or account compromise
 - Data loss or corruption
 - Service interruptions
 - Third-party actions
 - Any consequential, indirect, or special damages
 
-By using AT-bot, you accept these terms and assume all risks.
+By using atproto, you accept these terms and assume all risks.
 
 ---
 
@@ -189,8 +189,8 @@ By using AT-bot, you accept these terms and assume all risks.
 
 ```bash
 # Clone repository
-git clone https://github.com/p3nGu1nZz/AT-bot.git
-cd AT-bot
+git clone https://github.com/p3nGu1nZz/atproto.git
+cd atproto
 
 # Install system-wide
 make install
@@ -199,7 +199,7 @@ make install
 PREFIX=$HOME/.local make install
 
 # Verify installation
-at-bot help
+atproto help
 ```
 
 ### Basic Workflow (< 5 minutes)
@@ -208,20 +208,20 @@ at-bot help
 # 1. Create app password in Bluesky Settings
 #    Settings → Privacy & Security → App Passwords → Generate
 
-# 2. Login to AT-bot
-at-bot login
+# 2. Login to atproto
+atproto login
 
 # 3. Verify authentication
-at-bot whoami
+atproto whoami
 
 # 4. Create your first post
-at-bot post "Hello from AT-bot! 🤖"
+atproto post "Hello from atproto! 🤖"
 
 # 5. Read your feed
-at-bot feed --limit 5
+atproto feed --limit 5
 
 # 6. Logout when done
-at-bot logout
+atproto logout
 ```
 
 ### Automation Example
@@ -232,9 +232,9 @@ export BLUESKY_HANDLE="your.handle.bsky.social"
 export BLUESKY_PASSWORD="your-app-password"
 
 # Script can now run without prompts
-at-bot login
-at-bot post "Automated post at $(date)"
-at-bot logout
+atproto login
+atproto post "Automated post at $(date)"
+atproto logout
 ```
 
 ---
@@ -266,7 +266,7 @@ at-bot logout
 **🔍 Troubleshooting**
 → Check [DEBUG_MODE.md](DEBUG_MODE.md)  
 → Search [QUICKREF.md](QUICKREF.md) troubleshooting section  
-→ Review [GitHub Issues](https://github.com/p3nGu1nZz/AT-bot/issues)  
+→ Review [GitHub Issues](https://github.com/p3nGu1nZz/atproto/issues)  
 
 ---
 
@@ -280,9 +280,9 @@ at-bot logout
 | **[API.md](../doc/API.md)** | Complete command and function reference |
 | **[SECURITY.md](../SECURITY.md)** | Security guidelines and best practices |
 | **[CONFIGURATION.md](CONFIGURATION.md)** | Configuration options and environment variables |
-| **[GitHub Repository](https://github.com/p3nGu1nZz/AT-bot)** | Source code and issue tracking |
-| **[GitHub Issues](https://github.com/p3nGu1nZz/AT-bot/issues)** | Report bugs and request features |
-| **[GitHub Discussions](https://github.com/p3nGu1nZz/AT-bot/discussions)** | Ask questions and share ideas |
+| **[GitHub Repository](https://github.com/p3nGu1nZz/atproto)** | Source code and issue tracking |
+| **[GitHub Issues](https://github.com/p3nGu1nZz/atproto/issues)** | Report bugs and request features |
+| **[GitHub Discussions](https://github.com/p3nGu1nZz/atproto/discussions)** | Ask questions and share ideas |
 
 ---
 
@@ -319,7 +319,7 @@ See [PLAN.md](../PLAN.md) for full roadmap.
 
 ### License
 
-AT-bot is released under the **MIT License** - see [LICENSE](../LICENSE) for details.
+atproto is released under the **MIT License** - see [LICENSE](../LICENSE) for details.
 
 You are free to:
 ✅ Use for any purpose  
@@ -337,7 +337,7 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for:
 - Testing requirements
 - Pull request process
 
-Report security issues via [GitHub Security Advisory](https://github.com/p3nGu1nZz/AT-bot/security/advisories).
+Report security issues via [GitHub Security Advisory](https://github.com/p3nGu1nZz/atproto/security/advisories).
 
 ---
 
@@ -350,7 +350,7 @@ Report security issues via [GitHub Security Advisory](https://github.com/p3nGu1n
 3. Follow the recommended reading order
 4. Don't hesitate to ask questions or report issues
 
-**Let's build something amazing with AT-bot! 🚀**
+**Let's build something amazing with atproto! 🚀**
 
 ---
 
@@ -358,7 +358,7 @@ Report security issues via [GitHub Security Advisory](https://github.com/p3nGu1n
 
 ### About This Document
 
-This comprehensive documentation covers AT-bot **version 0.1.0** and provides complete guidance for users, developers, and system administrators working with the AT Protocol and Bluesky ecosystem.
+This comprehensive documentation covers atproto **version 0.1.0** and provides complete guidance for users, developers, and system administrators working with the AT Protocol and Bluesky ecosystem.
 
 ### Document Structure
 
@@ -380,9 +380,9 @@ make install PREFIX=/custom/path
 
 **First Command:**
 ```bash
-at-bot login              # Authenticate with Bluesky
-at-bot whoami             # Verify authentication
-at-bot post "Hello!"      # Create your first post
+atproto login              # Authenticate with Bluesky
+atproto whoami             # Verify authentication
+atproto post "Hello!"      # Create your first post
 ```
 
 **Running Tests:**
@@ -406,7 +406,7 @@ make test-e2e             # End-to-end integration tests
 
 **Credential Security**
 
-AT-bot handles credentials securely:
+atproto handles credentials securely:
 - Passwords are **never stored** in plaintext
 - Credentials are **encrypted** using AES-256-CBC
 - Session tokens stored with **600 permission** (owner only)
@@ -437,10 +437,10 @@ AT-bot handles credentials securely:
 
 ### File Organization
 
-The AT-bot project is organized for clarity and maintainability:
+The atproto project is organized for clarity and maintainability:
 
 ```
-AT-bot/
+atproto/
 ├── bin/                 # Executable scripts
 ├── lib/                 # Core library functions
 ├── scripts/             # Build and utility scripts
@@ -481,7 +481,7 @@ AT-bot/
 
 ### Contributing
 
-AT-bot is open source and welcomes contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
+atproto is open source and welcomes contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 - How to report issues
 - Code of conduct
 - Contribution guidelines
@@ -489,7 +489,7 @@ AT-bot is open source and welcomes contributions! See [CONTRIBUTING.md](CONTRIBU
 
 ### License
 
-AT-bot is licensed under the **MIT License**. See [LICENSE](LICENSE) for details.
+atproto is licensed under the **MIT License**. See [LICENSE](LICENSE) for details.
 
 ---
 
@@ -500,13 +500,13 @@ This documentation uses the following conventions:
 **Code Blocks**
 ```bash
 # Commands shown like this should be run in a terminal
-at-bot help
+atproto help
 ```
 
 **File Paths**
-- Absolute paths: `/usr/local/bin/at-bot`
+- Absolute paths: `/usr/local/bin/atproto`
 - Relative paths: `lib/atproto.sh`
-- Configuration: `~/.config/at-bot/`
+- Configuration: `~/.config/atproto/`
 
 **Important Notes**
 > **Note:** This style indicates additional information
@@ -523,8 +523,8 @@ at-bot help
 
 ```bash
 make help              # Show all available commands
-make install           # Install AT-bot
-make uninstall         # Remove AT-bot
+make install           # Install atproto
+make uninstall         # Remove atproto
 make test-unit         # Run 11 automated tests
 make test-manual       # Run interactive tests
 make test-e2e          # Run integration tests
@@ -535,14 +535,14 @@ make clean             # Clean temporary files
 ### Quick Reference: Main Commands
 
 ```bash
-at-bot login           # Authenticate with Bluesky
-at-bot logout          # Clear session
-at-bot whoami          # Show current user
-at-bot post "text"     # Create a post
-at-bot feed            # Read your feed
-at-bot follow @user    # Follow a user
-at-bot profile show    # View your profile
-at-bot help            # Show command help
+atproto login           # Authenticate with Bluesky
+atproto logout          # Clear session
+atproto whoami          # Show current user
+atproto post "text"     # Create a post
+atproto feed            # Read your feed
+atproto follow @user    # Follow a user
+atproto profile show    # View your profile
+atproto help            # Show command help
 ```
 
 ---

@@ -6,7 +6,7 @@
 
 ## Overview
 
-Successfully implemented a comprehensive unit test runner for AT-bot that automates test execution across all 12 unit tests with sophisticated reporting, CI/CD integration, and flexible configuration options.
+Successfully implemented a comprehensive unit test runner for atproto that automates test execution across all 12 unit tests with sophisticated reporting, CI/CD integration, and flexible configuration options.
 
 ## Objectives Completed
 
@@ -495,7 +495,7 @@ test-unit:
 
 ## Summary
 
-Successfully implemented a professional-grade unit test runner for AT-bot featuring:
+Successfully implemented a professional-grade unit test runner for atproto featuring:
 
 **Core Features**:
 - ✅ Automated test execution (12 tests, ~5 seconds)
@@ -531,7 +531,7 @@ Successfully implemented a professional-grade unit test runner for AT-bot featur
 - ✅ Professional CLI interface
 - ✅ CI/CD ready
 
-The test runner is now a core part of AT-bot's development workflow, enabling fast, reliable automated testing for all future development.
+The test runner is now a core part of atproto's development workflow, enabling fast, reliable automated testing for all future development.
 
 ---
 

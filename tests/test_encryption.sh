@@ -1,5 +1,5 @@
 #!/bin/bash
-# Comprehensive encryption tests for AT-bot
+# Comprehensive encryption tests for atproto
 # Tests both lib/crypt.sh module and integration with lib/atproto.sh
 
 set -e
@@ -9,7 +9,7 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 LIB_DIR="$PROJECT_ROOT/lib"
 
 # Test directory
-TEST_CRYPT_DIR="/tmp/at-bot-crypt-test-$$"
+TEST_CRYPT_DIR="/tmp/atproto-crypt-test-$$"
 export CRYPT_DIR="$TEST_CRYPT_DIR"
 export XDG_CONFIG_HOME="$(dirname "$TEST_CRYPT_DIR")"
 
@@ -45,7 +45,7 @@ fail_test() {
 source "$PROJECT_ROOT/lib/atproto.sh"
 
 echo "================================"
-echo "AT-bot Encryption Test Suite"
+echo "atproto Encryption Test Suite"
 echo "================================"
 echo ""
 

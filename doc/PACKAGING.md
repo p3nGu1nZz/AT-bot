@@ -1,6 +1,6 @@
 # Packaging and Distribution Guide
 
-This document describes how AT-bot can be packaged and distributed for various platforms.
+This document describes how atproto can be packaged and distributed for various platforms.
 
 ## Current Distribution Methods
 
@@ -9,8 +9,8 @@ This document describes how AT-bot can be packaged and distributed for various p
 The simplest method for end users:
 
 ```bash
-git clone https://github.com/p3nGu1nZz/AT-bot.git
-cd AT-bot
+git clone https://github.com/p3nGu1nZz/atproto.git
+cd atproto
 ./install.sh
 ```
 
@@ -19,8 +19,8 @@ cd AT-bot
 For custom installations:
 
 ```bash
-git clone https://github.com/p3nGu1nZz/AT-bot.git
-cd AT-bot
+git clone https://github.com/p3nGu1nZz/atproto.git
+cd atproto
 make install PREFIX=/your/custom/path
 ```
 
@@ -32,7 +32,7 @@ To create a Debian package in the future:
 
 1. Create a `debian/` directory with control files
 2. Use `dpkg-deb` to build the package
-3. Users can install with: `sudo dpkg -i at-bot_0.1.0_all.deb`
+3. Users can install with: `sudo dpkg -i atproto_0.1.0_all.deb`
 
 ### Homebrew (macOS/Linux)
 
@@ -41,13 +41,13 @@ Create a Homebrew formula:
 ```ruby
 class AtBot < Formula
   desc "Simple CLI tool for Bluesky AT Protocol automation"
-  homepage "https://github.com/p3nGu1nZz/AT-bot"
-  url "https://github.com/p3nGu1nZz/AT-bot/archive/v0.1.0.tar.gz"
+  homepage "https://github.com/p3nGu1nZz/atproto"
+  url "https://github.com/p3nGu1nZz/atproto/archive/v0.1.0.tar.gz"
   sha256 "..."
 
   def install
-    bin.install "bin/at-bot"
-    lib.install "lib/atproto.sh" => "at-bot/atproto.sh"
+    bin.install "bin/atproto"
+    lib.install "lib/atproto.sh" => "atproto/atproto.sh"
     doc.install "README.md", "LICENSE"
   end
 end
@@ -69,14 +69,14 @@ Create a Docker image for containerized usage:
 FROM ubuntu:latest
 RUN apt-get update && apt-get install -y curl bash
 COPY bin/ /usr/local/bin/
-COPY lib/ /usr/local/lib/at-bot/
-RUN chmod +x /usr/local/bin/at-bot
-ENTRYPOINT ["/usr/local/bin/at-bot"]
+COPY lib/ /usr/local/lib/atproto/
+RUN chmod +x /usr/local/bin/atproto
+ENTRYPOINT ["/usr/local/bin/atproto"]
 ```
 
 ## Release Process
 
-1. Update version in `bin/at-bot`
+1. Update version in `bin/atproto`
 2. Update CHANGELOG.md
 3. Tag release: `git tag -a v0.1.0 -m "Release v0.1.0"`
 4. Push tag: `git push origin v0.1.0`
@@ -88,13 +88,13 @@ ENTRYPOINT ["/usr/local/bin/at-bot"]
 After installation, users should verify:
 
 ```bash
-at-bot --version
-at-bot help
+atproto --version
+atproto help
 ```
 
 ## Dependencies
 
-AT-bot requires:
+atproto requires:
 - Bash 4.0+
 - curl
 - grep

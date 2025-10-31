@@ -1,0 +1,102 @@
+{
+  "name": "atproto",
+  "displayName": "atproto: AT Protocol & Bluesky",
+  "description": "AT Protocol/Bluesky integration for AI agents via MCP",
+  "version": "0.1.0",
+  "publisher": "p3ngu1nzz",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "AI",
+    "Chat",
+    "Other"
+  ],
+  "keywords": [
+    "atproto",
+    "at protocol",
+    "bluesky",
+    "mcp",
+    "model context protocol",
+    "ai",
+    "copilot",
+    "social media"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "mcpServerDefinitionProviders": [
+      {
+        "id": "atproto.mcp-server",
+        "label": "atproto (AT Protocol)"
+      }
+    ],
+    "commands": [
+      {
+        "command": "atproto.login",
+        "title": "Login to Bluesky",
+        "category": "atproto"
+      },
+      {
+        "command": "atproto.logout",
+        "title": "Logout",
+        "category": "atproto"
+      },
+      {
+        "command": "atproto.post",
+        "title": "Create Post",
+        "category": "atproto"
+      },
+      {
+        "command": "atproto.installCli",
+        "title": "Install CLI Tool",
+        "category": "atproto"
+      }
+    ],
+    "configuration": {
+      "title": "atproto",
+      "properties": {
+        "atproto.pdsEndpoint": {
+          "type": "string",
+          "default": "https://bsky.social",
+          "description": "AT Protocol PDS endpoint"
+        },
+        "atproto.autoLogin": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically login on startup"
+        },
+        "atproto.debugMode": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable debug logging"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "20.x",
+    "@types/vscode": "^1.96.0",
+    "@typescript-eslint/eslint-plugin": "^6.4.0",
+    "@typescript-eslint/parser": "^6.4.0",
+    "eslint": "^8.47.0",
+    "typescript": "^5.1.6",
+    "@vscode/vsce": "^2.22.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/p3nGu1nZz/atproto.git"
+  },
+  "license": "MIT"
+}

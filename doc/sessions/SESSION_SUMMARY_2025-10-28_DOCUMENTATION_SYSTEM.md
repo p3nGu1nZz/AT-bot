@@ -5,7 +5,7 @@
 
 ## Overview
 
-Successfully implemented a comprehensive documentation system for AT-bot featuring:
+Successfully implemented a comprehensive documentation system for atproto featuring:
 - **API Reference**: 3700+ line comprehensive documentation
 - **Procedural TOC Generation**: Automatic table of contents from 92 documentation files
 - **YAML Configuration**: Declarative build system with proper PDF ordering
@@ -30,13 +30,13 @@ Successfully implemented a comprehensive documentation system for AT-bot featuri
 
 - **CLI Commands Documentation** (800+ lines)
   - 35+ user-facing commands with usage examples
-  - Authentication: `at-bot login`, `at-bot logout`, `at-bot whoami`, `at-bot refresh`
-  - Content: `at-bot post`, `at-bot reply`, `at-bot like`, `at-bot repost`
-  - Feed: `at-bot feed`, `at-bot search`
-  - Profile: `at-bot profile`, `at-bot profile-edit`
-  - Social: `at-bot follow`, `at-bot unfollow`, `at-bot followers`, `at-bot following`
-  - Configuration: `at-bot config list`, `at-bot config get`, `at-bot config set`
-  - Utilities: `at-bot clear-credentials`, `at-bot help`, `at-bot version`
+  - Authentication: `atproto login`, `atproto logout`, `atproto whoami`, `atproto refresh`
+  - Content: `atproto post`, `atproto reply`, `atproto like`, `atproto repost`
+  - Feed: `atproto feed`, `atproto search`
+  - Profile: `atproto profile`, `atproto profile-edit`
+  - Social: `atproto follow`, `atproto unfollow`, `atproto followers`, `atproto following`
+  - Configuration: `atproto config list`, `atproto config get`, `atproto config set`
+  - Utilities: `atproto clear-credentials`, `atproto help`, `atproto version`
 
 - **MCP Tools Documentation** (600+ lines)
   - 31 MCP tools for AI agent integration
@@ -151,8 +151,8 @@ Successfully implemented a comprehensive documentation system for AT-bot featuri
 **Build Output**:
 ```
 Files Generated:
-  📝 Markdown: dist/docs/AT-bot_Complete_Documentation.md (306KB)
-  📄 PDF: dist/docs/AT-bot_Complete_Documentation.pdf (1.1MB, 196 pages)
+  📝 Markdown: dist/docs/atproto_Complete_Documentation.md (306KB)
+  📄 PDF: dist/docs/atproto_Complete_Documentation.pdf (1.1MB, 196 pages)
   🎨 CSS: dist/docs/documentation.css (5.0KB)
 
 PDF Statistics:
@@ -215,8 +215,8 @@ Processing Steps:
    └── Final A4 196-page PDF
 
 Output:
-├── AT-bot_Complete_Documentation.md (306KB compiled markdown)
-├── AT-bot_Complete_Documentation.pdf (1.1MB professional PDF)
+├── atproto_Complete_Documentation.md (306KB compiled markdown)
+├── atproto_Complete_Documentation.pdf (1.1MB professional PDF)
 └── documentation.css (5KB styling)
 ```
 

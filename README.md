@@ -1,13 +1,14 @@
-# AT-bot
+# atproto - AT Protocol CLI & VS Code Extension
 
-A simple but powerful CLI tool and MCP server for Bluesky/AT Protocol automation, designed for both traditional users and AI agents.
+A simple but powerful CLI tool, MCP server, and VS Code extension for Bluesky/AT Protocol automation, designed for both traditional users and AI agents.
 
 ## Overview
 
-AT-bot provides two interfaces for interacting with Bluesky:
+atproto provides three interfaces for interacting with Bluesky:
 
 1. **CLI Interface** - Traditional command-line tool for users and scripts
 2. **MCP Server Interface** - Model Context Protocol server for AI agents and automation
+3. **VS Code Extension** - Native VS Code integration with zero-configuration MCP server
 
 It provides simple authentication and session management, making it easy to automate Bluesky workflows from the command line or integrate with AI agents.
 
@@ -64,12 +65,12 @@ make install PREFIX=/custom/path
 ### Login to Bluesky
 
 ```bash
-at-bot login
+atproto login
 ```
 
 You'll be prompted for your Bluesky handle and app password. Your session will be securely stored.
 
-**Optional:** AT-bot will ask if you want to save your credentials for testing/automation. If you choose yes:
+**Optional:** atproto will ask if you want to save your credentials for testing/automation. If you choose yes:
 - Credentials are **encrypted** using AES-256-CBC
 - Encryption key is stored securely with 600 permissions
 - On next login, credentials are automatically decrypted
@@ -80,7 +81,7 @@ You'll be prompted for your Bluesky handle and app password. Your session will b
 ### Check Current User
 
 ```bash
-at-bot whoami
+atproto whoami
 ```
 
 Displays information about the currently authenticated user.
@@ -88,7 +89,7 @@ Displays information about the currently authenticated user.
 ### Create a Post
 
 ```bash
-at-bot post "Hello Bluesky! 🚀"
+atproto post "Hello Bluesky! 🚀"
 ```
 
 Creates a new post on your Bluesky feed.
@@ -97,36 +98,36 @@ Creates a new post on your Bluesky feed.
 
 ```bash
 # Read default (10 posts)
-at-bot feed
+atproto feed
 
 # Read specific number of posts
-at-bot feed 20
+atproto feed 20
 ```
 
 ### Follow/Unfollow Users
 
 ```bash
 # Follow a user
-at-bot follow user.bsky.social
+atproto follow user.bsky.social
 
 # Unfollow a user
-at-bot unfollow user.bsky.social
+atproto unfollow user.bsky.social
 ```
 
 ### Search for Posts
 
 ```bash
 # Search with default limit (10 results)
-at-bot search "bluesky"
+atproto search "bluesky"
 
 # Search with custom limit
-at-bot search "AT Protocol" 25
+atproto search "AT Protocol" 25
 ```
 
 ### Clear Saved Credentials
 
 ```bash
-at-bot clear-credentials
+atproto clear-credentials
 ```
 
 Removes any saved credentials (if you opted to save them during login).
@@ -134,7 +135,7 @@ Removes any saved credentials (if you opted to save them during login).
 ### Logout
 
 ```bash
-at-bot logout
+atproto logout
 ```
 
 Clears your session and logs you out.
@@ -142,9 +143,9 @@ Clears your session and logs you out.
 ### Help
 
 ```bash
-at-bot help
+atproto help
 # or
-at-bot --help
+atproto --help
 ```
 
 Displays usage information and available commands.
@@ -156,28 +157,28 @@ You can optionally set credentials via environment variables for non-interactive
 ```bash
 export BLUESKY_HANDLE="your-handle.bsky.social"
 export BLUESKY_PASSWORD="your-app-password"
-at-bot login
+atproto login
 ```
 
 **Security Note:** Only use environment variables in secure, trusted environments.
 
 ## Configuration
 
-AT-bot includes a powerful configuration system for managing user preferences:
+atproto includes a powerful configuration system for managing user preferences:
 
 ```bash
 # View current configuration
-at-bot config list
+atproto config list
 
 # Set configuration values
-at-bot config set feed_limit 50
-at-bot config set output_format json
+atproto config set feed_limit 50
+atproto config set output_format json
 
 # Get specific values
-at-bot config get pds_endpoint
+atproto config get pds_endpoint
 
 # Reset to defaults
-at-bot config reset
+atproto config reset
 ```
 
 ### Configuration Options
@@ -189,34 +190,34 @@ at-bot config reset
 - **search_limit** - Default search results (default: 10)
 - **debug** - Enable debug mode: true or false (default: false)
 
-Configuration is stored in `~/.config/at-bot/config.json` and can be overridden with environment variables (e.g., `ATP_PDS`, `ATP_FEED_LIMIT`).
+Configuration is stored in `~/.config/atproto/config.json` and can be overridden with environment variables (e.g., `ATP_PDS`, `ATP_FEED_LIMIT`).
 
 **For complete configuration documentation, see [doc/CONFIGURATION.md](doc/CONFIGURATION.md)**
 
 ### Session Storage
 
-Session data is stored in `~/.config/at-bot/session.json`. This file contains your access tokens and should be kept secure (it's automatically set to mode 600).
+Session data is stored in `~/.config/atproto/session.json`. This file contains your access tokens and should be kept secure (it's automatically set to mode 600).
 
 ## Automation & JSON Output
 
-AT-bot supports JSON output for easy automation and scripting:
+atproto supports JSON output for easy automation and scripting:
 
 ```bash
 # Enable JSON output via config
-at-bot config set output_format json
+atproto config set output_format json
 
 # Or use environment variable (no config change)
-ATP_OUTPUT_FORMAT=json at-bot whoami
+ATP_OUTPUT_FORMAT=json atproto whoami
 # Output: {"handle":"user.bsky.social","did":"did:plc:...","status":"authenticated"}
 
 # Parse with jq for automation
-ATP_OUTPUT_FORMAT=json at-bot whoami | jq -r '.handle'
+ATP_OUTPUT_FORMAT=json atproto whoami | jq -r '.handle'
 
 # Create post and get URI
-ATP_OUTPUT_FORMAT=json at-bot post "Hello!" | jq -r '.uri'
+ATP_OUTPUT_FORMAT=json atproto post "Hello!" | jq -r '.uri'
 
 # Get feed data for processing
-ATP_OUTPUT_FORMAT=json at-bot feed 50 | jq '.feed[].post.record.text'
+ATP_OUTPUT_FORMAT=json atproto feed 50 | jq '.feed[].post.record.text'
 ```
 
 ### Automation Examples
@@ -226,8 +227,8 @@ ATP_OUTPUT_FORMAT=json at-bot feed 50 | jq '.feed[].post.record.text'
 # GitHub Actions, GitLab CI, etc.
 export ATP_OUTPUT_FORMAT=json
 export ATP_COLOR_OUTPUT=never
-at-bot login
-RESULT=$(at-bot post "Build #${BUILD_NUMBER} successful ✅")
+atproto login
+RESULT=$(atproto post "Build #${BUILD_NUMBER} successful ✅")
 echo "Posted: $(echo $RESULT | jq -r '.uri')"
 ```
 
@@ -236,8 +237,8 @@ echo "Posted: $(echo $RESULT | jq -r '.uri')"
 #!/bin/bash
 # daily-update.sh
 export ATP_OUTPUT_FORMAT=json
-at-bot login
-at-bot post "📊 Daily Stats: $(generate_stats)" | jq -r '.uri' >> posted_uris.log
+atproto login
+atproto post "📊 Daily Stats: $(generate_stats)" | jq -r '.uri' >> posted_uris.log
 ```
 
 **For more automation patterns, see [AGENTS.md](AGENTS.md)**
@@ -268,9 +269,9 @@ For more testing options and details, see **[TESTING.md](doc/TESTING.md)**.
 ### Project Structure
 
 ```
-AT-bot/
+atproto/
 ├── bin/          # Executable scripts
-│   └── at-bot    # Main CLI tool
+│   └── atproto    # Main CLI tool
 ├── lib/          # Library functions
 │   └── atproto.sh # AT Protocol implementation
 ├── scripts/      # Build and utility scripts
@@ -291,9 +292,9 @@ AT-bot/
 ### Using the installer
 
 ```bash
-sudo rm -f /usr/local/bin/at-bot
-sudo rm -rf /usr/local/lib/at-bot
-sudo rm -rf /usr/local/share/doc/at-bot
+sudo rm -f /usr/local/bin/atproto
+sudo rm -rf /usr/local/lib/atproto
+sudo rm -rf /usr/local/share/doc/atproto
 ```
 
 ### Using Make
@@ -311,7 +312,7 @@ make uninstall
 
 ## Security
 
-AT-bot takes security seriously:
+atproto takes security seriously:
 
 - **Passwords are encrypted, not stored in plaintext**
   - Optional `--save` flag encrypts credentials with **AES-256-CBC** encryption
@@ -329,8 +330,8 @@ AT-bot takes security seriously:
   - Avoids storing credentials on disk entirely
   
 - **Clear commands** to remove stored data
-  - `at-bot clear-credentials` removes encrypted credentials and key
-  - `at-bot logout` removes session tokens
+  - `atproto clear-credentials` removes encrypted credentials and key
+  - `atproto logout` removes session tokens
   
 - **All API communication** uses HTTPS
 - **App-specific passwords** recommended for additional security
@@ -374,7 +375,7 @@ This creates:
 - **HTML** - Web-friendly version with styling
 - **Markdown** - Combined source document
 
-The generated "AT-bot Complete Documentation" PDF is perfect for:
+The generated "atproto Complete Documentation" PDF is perfect for:
 - Onboarding new contributors
 - Offline reference
 - Project presentations
@@ -407,9 +408,9 @@ See the [LICENSE](LICENSE) file for details.
 ### Command not found
 
 - Make sure the installation directory is in your PATH
-- Try running with the full path: `/usr/local/bin/at-bot`
+- Try running with the full path: `/usr/local/bin/atproto`
 
 ### Permission denied
 
-- Ensure the script has execute permissions: `chmod +x /usr/local/bin/at-bot`
+- Ensure the script has execute permissions: `chmod +x /usr/local/bin/atproto`
 - Check that the lib directory is readable

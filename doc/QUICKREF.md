@@ -1,25 +1,25 @@
-# AT-bot Quick Reference - Encryption & Security
+# atproto Quick Reference - Encryption & Security
 
 ## Quick Commands
 
 ```bash
 # Login with encrypted credential storage
-at-bot login --save
+atproto login --save
 
 # Login with debug mode (shows plaintext)
-DEBUG=1 at-bot login --save
+DEBUG=1 atproto login --save
 
 # Login without saving credentials
-at-bot login
+atproto login
 
 # Check current session
-at-bot whoami
+atproto whoami
 
 # Clear encrypted credentials
-at-bot clear-credentials
+atproto clear-credentials
 
 # Logout (clears session)
-at-bot logout
+atproto logout
 ```
 
 ## Encryption Quick Facts
@@ -31,13 +31,13 @@ at-bot logout
 | **Key Derivation** | PBKDF2 |
 | **Salt** | Random per operation |
 | **Implementation** | OpenSSL 3.x |
-| **Key Location** | `~/.config/at-bot/.key` |
-| **Credentials** | `~/.config/at-bot/credentials.json` |
+| **Key Location** | `~/.config/atproto/.key` |
+| **Credentials** | `~/.config/atproto/credentials.json` |
 
 ## File Locations
 
 ```
-~/.config/at-bot/
+~/.config/atproto/
 ├── session.json        # Session tokens (600 permissions)
 ├── credentials.json    # Encrypted credentials (600 permissions)
 └── .key               # Encryption key (600 permissions)
@@ -60,7 +60,7 @@ echo "my-password" > password.txt
 ### 🟢 Current (Development)
 ```bash
 # AES-256-CBC encryption
-at-bot login --save
+atproto login --save
 ```
 
 ### 🟢 Recommended (Production)
@@ -68,13 +68,13 @@ at-bot login --save
 # Environment variables
 export BLUESKY_HANDLE="bot.bsky.social"
 export BLUESKY_PASSWORD="app-password"
-at-bot login
+atproto login
 ```
 
 ### 🔵 Future (Enterprise)
 ```bash
 # System keyring (planned)
-at-bot login --keyring
+atproto login --keyring
 ```
 
 ## Testing
@@ -87,7 +87,7 @@ make test
 ./tests/test_encryption.sh
 
 # Test with debug mode
-DEBUG=1 at-bot login
+DEBUG=1 atproto login
 ```
 
 ## Troubleshooting
@@ -109,17 +109,17 @@ brew install openssl
 ### "Permission denied"
 ```bash
 # Fix file permissions
-chmod 600 ~/.config/at-bot/credentials.json
-chmod 600 ~/.config/at-bot/.key
-chmod 600 ~/.config/at-bot/session.json
+chmod 600 ~/.config/atproto/credentials.json
+chmod 600 ~/.config/atproto/.key
+chmod 600 ~/.config/atproto/session.json
 ```
 
 ### "Decryption failed"
 ```bash
 # Remove corrupted files and re-login
-at-bot clear-credentials
-at-bot logout
-at-bot login --save
+atproto clear-credentials
+atproto logout
+atproto login --save
 ```
 
 ## Environment Variables
@@ -128,15 +128,15 @@ at-bot login --save
 # Non-interactive login
 export BLUESKY_HANDLE="user.bsky.social"
 export BLUESKY_PASSWORD="app-password"
-at-bot login
+atproto login
 
 # Debug mode
 export DEBUG=1
-at-bot login
+atproto login
 
 # Custom PDS endpoint
 export ATP_PDS="https://custom.pds.example"
-at-bot login
+atproto login
 ```
 
 ## Security Best Practices
@@ -161,9 +161,9 @@ at-bot login
 
 ```bash
 # Already in .gitignore:
-.config/at-bot/session.json
-.config/at-bot/credentials.json
-.config/at-bot/.key
+.config/atproto/session.json
+.config/atproto/credentials.json
+.config/atproto/.key
 
 # Double-check before committing
 git status
@@ -175,44 +175,44 @@ git status
 
 ```bash
 # Old format still works (shows warning)
-at-bot login
+atproto login
 
 # To upgrade to new encryption:
-at-bot clear-credentials  # Remove old format
-at-bot login --save       # Save with new encryption
+atproto clear-credentials  # Remove old format
+atproto login --save       # Save with new encryption
 ```
 
 ### From Encrypted to Environment Variables
 
 ```bash
 # 1. Get your credentials from encrypted storage
-DEBUG=1 at-bot whoami  # Shows your handle
+DEBUG=1 atproto whoami  # Shows your handle
 
 # 2. Set environment variables
 export BLUESKY_HANDLE="your-handle.bsky.social"
 export BLUESKY_PASSWORD="your-app-password"
 
 # 3. Clear encrypted storage
-at-bot clear-credentials
+atproto clear-credentials
 
 # 4. Login with env vars
-at-bot login
+atproto login
 ```
 
 ## Development Workflow
 
 ```bash
 # 1. Login once with credential save
-at-bot login --save
+atproto login --save
 
 # 2. Develop and test freely
-at-bot post "Test post 1"
-at-bot post "Test post 2"
-at-bot feed
+atproto post "Test post 1"
+atproto post "Test post 2"
+atproto feed
 
 # 3. Clear when done
-at-bot clear-credentials
-at-bot logout
+atproto clear-credentials
+atproto logout
 ```
 
 ## Production Deployment
@@ -223,8 +223,8 @@ export BLUESKY_HANDLE="bot.bsky.social"
 export BLUESKY_PASSWORD="app-password"
 
 # In your deployment script
-at-bot login
-at-bot post "Deployment successful!"
+atproto login
+atproto post "Deployment successful!"
 
 # Don't use --save in production
 ```
@@ -246,5 +246,5 @@ at-bot post "Deployment successful!"
 ---
 
 **Quick Reference Version:** 1.0  
-**AT-bot Version:** 0.1.0  
+**atproto Version:** 0.1.0  
 **Last Updated:** October 28, 2025

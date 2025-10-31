@@ -1,10 +1,10 @@
-# Makefile for AT-bot installation
-# Simple installation script for AT-bot CLI tool
+# Makefile for atproto installation
+# Simple installation script for atproto CLI tool
 
 PREFIX ?= /usr/local
 BINDIR = $(PREFIX)/bin
-LIBDIR = $(PREFIX)/lib/at-bot
-DOCDIR = $(PREFIX)/share/doc/at-bot
+LIBDIR = $(PREFIX)/lib/atproto
+DOCDIR = $(PREFIX)/share/doc/atproto
 MANDIR = $(PREFIX)/share/man/man1
 
 .PHONY: all install uninstall test test-unit test-manual test-e2e clean docs help
@@ -12,10 +12,10 @@ MANDIR = $(PREFIX)/share/man/man1
 all: help
 
 help:
-	@echo "AT-bot - Makefile targets:"
+	@echo "atproto - Makefile targets:"
 	@echo ""
-	@echo "  make install      Install AT-bot (interactive, optionally includes MCP)"
-	@echo "  make uninstall    Remove AT-bot from $(PREFIX)"
+	@echo "  make install      Install atproto (interactive, optionally includes MCP)"
+	@echo "  make uninstall    Remove atproto from $(PREFIX)"
 	@echo "  make test         Run all tests (unit + e2e)"
 	@echo "  make test-unit    Run unit test suite (12 tests, ~5 seconds)"
 	@echo "  make test-manual  Run interactive manual test suite"
@@ -31,19 +31,19 @@ help:
 	@echo ""
 	@echo "Test options (via scripts/test-unit.sh):"
 	@echo "  make test-unit               # Run all unit tests"
-	@echo "  AT_BOT_TEST_VERBOSE=1 make test-unit  # Verbose output"
-	@echo "  AT_BOT_TEST_TIMEOUT=30 make test-unit # Custom timeout"
+	@echo "  ATPROTO_TEST_VERBOSE=1 make test-unit  # Verbose output"
+	@echo "  ATPROTO_TEST_TIMEOUT=30 make test-unit # Custom timeout"
 
 install:
 	@bash install.sh
 
 uninstall:
-	@echo "Uninstalling AT-bot..."
-	rm -f $(BINDIR)/at-bot
+	@echo "Uninstalling atproto..."
+	rm -f $(BINDIR)/atproto
 	# MCP server is now integrated into main atproto binary
 	rm -rf $(LIBDIR)
 	rm -rf $(DOCDIR)
-	@echo "AT-bot uninstalled successfully."
+	@echo "atproto uninstalled successfully."
 
 test:
 	@echo "Running all tests..."

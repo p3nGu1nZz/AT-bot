@@ -1,16 +1,16 @@
-# AT-bot Debug Mode Quick Reference
+# atproto Debug Mode Quick Reference
 
 ## Enable Debug Mode
 
 ```bash
-DEBUG=1 at-bot [command]
+DEBUG=1 atproto [command]
 ```
 
 ## What Debug Mode Shows
 
 ### During Login
 ```bash
-DEBUG=1 at-bot login
+DEBUG=1 atproto login
 ```
 
 **Output includes:**
@@ -22,7 +22,7 @@ DEBUG=1 at-bot login
 
 ### When Saving Credentials
 ```bash
-DEBUG=1 at-bot login
+DEBUG=1 atproto login
 # ... enter credentials ...
 # Choose 'y' to save
 ```
@@ -35,7 +35,7 @@ DEBUG=1 at-bot login
 
 ### When Loading Saved Credentials
 ```bash
-DEBUG=1 at-bot login
+DEBUG=1 atproto login
 # If credentials already saved
 ```
 
@@ -50,25 +50,25 @@ DEBUG=1 at-bot login
 ### 1. Verify Credentials are Saved Correctly
 ```bash
 # First login and save
-at-bot login
+atproto login
 # ... enter credentials, choose 'y' to save ...
 
 # Verify they load correctly
-DEBUG=1 at-bot logout
-DEBUG=1 at-bot login
+DEBUG=1 atproto logout
+DEBUG=1 atproto login
 # Should see: "Using saved credentials for ..."
 # Debug output shows the loaded password
 ```
 
 ### 2. Troubleshoot Login Issues
 ```bash
-DEBUG=1 at-bot login
+DEBUG=1 atproto login
 # See exactly what's being sent to the API
 ```
 
 ### 3. Verify Password Encoding
 ```bash
-DEBUG=1 at-bot login
+DEBUG=1 atproto login
 # See the AES-256-CBC encryption process
 ```
 
@@ -90,20 +90,20 @@ Simply don't set DEBUG=1:
 
 ```bash
 # Normal mode (no debug output)
-at-bot login
+atproto login
 ```
 
 Or explicitly disable:
 
 ```bash
-DEBUG=0 at-bot login
+DEBUG=0 atproto login
 ```
 
 ## Example Debug Session
 
 ```bash
 # Terminal session showing debug output
-$ DEBUG=1 at-bot login
+$ DEBUG=1 atproto login
 [DEBUG] No credentials file found
 Bluesky handle (e.g., user.bsky.social): myhandle.bsky.social
 [DEBUG] Handle entered: myhandle.bsky.social
@@ -118,7 +118,7 @@ Authenticating...
 [DEBUG] Password (plaintext): abcd-efgh-ijkl-mnop
 [DEBUG] Password encrypted with AES-256-CBC
 [DEBUG] Encrypted data: U2FsdGVkX1/jBQdTc9arcQQz3rF0dULp...
-✓ Credentials saved with AES-256-CBC encryption to /home/user/.config/at-bot/credentials.json
+✓ Credentials saved with AES-256-CBC encryption to /home/user/.config/atproto/credentials.json
 ✓ Successfully logged in as: myhandle.bsky.social
 ```
 
@@ -132,16 +132,16 @@ Authenticating...
 3. **Or use a temporary session:**
    ```bash
    bash --norc --noprofile
-   DEBUG=1 at-bot login
+   DEBUG=1 atproto login
    exit
    ```
 
 ## Related Commands
 
-- `at-bot help` - Show all commands
-- `at-bot clear-credentials` - Remove saved credentials
-- `cat ~/.config/at-bot/credentials.json` - View saved credentials file
-- `DEBUG=1 at-bot whoami` - Debug current session
+- `atproto help` - Show all commands
+- `atproto clear-credentials` - Remove saved credentials
+- `cat ~/.config/atproto/credentials.json` - View saved credentials file
+- `DEBUG=1 atproto whoami` - Debug current session
 
 ---
 

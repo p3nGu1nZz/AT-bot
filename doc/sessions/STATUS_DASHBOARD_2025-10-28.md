@@ -1,4 +1,4 @@
-# 🚀 AT-bot Project Status Dashboard
+# 🚀 atproto Project Status Dashboard
 **Last Updated**: October 28, 2025  
 **Current Phase**: Phase 1 ✅ → Phase 2 🚀  
 
@@ -88,7 +88,7 @@
 
 4. MACOS PACKAGING (Homebrew)
    Status: ⏳ Planned, not started
-   Work:   Create homebrew-at-bot tap
+   Work:   Create homebrew-atproto tap
    Time:   3-4 hours
    Impact: HIGH (macOS user adoption)
 
@@ -140,9 +140,9 @@ npm start  # Verify it runs
 ### Session 2: JSON Output Format 🎯 SHOULD DO
 ```bash
 # Add --format json flag support
-at-bot whoami --format json
-at-bot post "hello" --format json
-at-bot feed --format json
+atproto whoami --format json
+atproto post "hello" --format json
+atproto feed --format json
 ```
 **Effort**: 6-8 hours | **Blocker**: YES for v0.4.0
 
@@ -150,7 +150,7 @@ at-bot feed --format json
 ```bash
 # Create .deb package
 dpkg-buildpackage
-# Expected: at-bot_0.4.0_all.deb
+# Expected: atproto_0.4.0_all.deb
 ```
 **Effort**: 4-6 hours | **Blocker**: NO (v0.5.0 ok)
 
@@ -162,7 +162,7 @@ dpkg-buildpackage
 ```
 lib/atproto.sh         1,850 lines  ████████████████████  Core lib
 mcp-server/src/        1,200 lines  ███████████░░░░░░░░░  MCP
-bin/at-bot               359 lines  ██░░░░░░░░░░░░░░░░░  CLI
+bin/atproto               359 lines  ██░░░░░░░░░░░░░░░░░  CLI
 lib/crypt.sh             280 lines  ██░░░░░░░░░░░░░░░░░  Encryption
 lib/cli-utils.sh         150 lines  █░░░░░░░░░░░░░░░░░░  Utils
 Tests                    600 lines  ███░░░░░░░░░░░░░░░░  Testing
@@ -284,29 +284,29 @@ DAY 7: Release
 
 ### Current Working Commands
 ```bash
-at-bot login                 # Login to Bluesky
-at-bot logout                # Logout
-at-bot whoami                # Get current user
-at-bot post "text"           # Create post
-at-bot feed [limit]          # Read timeline
-at-bot follow <handle>       # Follow user
-at-bot unfollow <handle>     # Unfollow user
-at-bot followers <handle>    # List followers
-at-bot following <handle>    # List following
-at-bot block <handle>        # Block user
-at-bot unblock <handle>      # Unblock user
-at-bot search <query>        # Search posts
-at-bot profile <handle>      # Get profile
-at-bot help                  # Show help
+atproto login                 # Login to Bluesky
+atproto logout                # Logout
+atproto whoami                # Get current user
+atproto post "text"           # Create post
+atproto feed [limit]          # Read timeline
+atproto follow <handle>       # Follow user
+atproto unfollow <handle>     # Unfollow user
+atproto followers <handle>    # List followers
+atproto following <handle>    # List following
+atproto block <handle>        # Block user
+atproto unblock <handle>      # Unblock user
+atproto search <query>        # Search posts
+atproto profile <handle>      # Get profile
+atproto help                  # Show help
 ```
 
 ### Planned Commands (v0.4.0+)
 ```bash
-at-bot whoami --format json              # JSON output
-at-bot batch-post @file.txt              # Batch operations
-at-bot schedule @schedule.json           # Scheduled posts
-at-bot config set key value              # Config management
-at-bot cache status                      # Cache info
+atproto whoami --format json              # JSON output
+atproto batch-post @file.txt              # Batch operations
+atproto schedule @schedule.json           # Scheduled posts
+atproto config set key value              # Config management
+atproto cache status                      # Cache info
 ```
 
 ---
@@ -329,10 +329,10 @@ make test
 cd mcp-server && npm run build
 
 # View help
-at-bot help
+atproto help
 
 # View specific command help
-at-bot help post
+atproto help post
 
 # Manual testing
 ./tests/manual_test.sh

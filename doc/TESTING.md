@@ -1,6 +1,6 @@
-# AT-bot Testing Guide
+# atproto Testing Guide
 
-This guide explains the complete testing approach for AT-bot, including automated unit tests, interactive manual testing, and end-to-end integration tests.
+This guide explains the complete testing approach for atproto, including automated unit tests, interactive manual testing, and end-to-end integration tests.
 
 ## Quick Start
 
@@ -240,20 +240,20 @@ For comprehensive AT Protocol integration testing.
 
 ### Secure Credential Storage
 
-AT-bot supports **optional** secure credential storage for testing and automation purposes.
+atproto supports **optional** secure credential storage for testing and automation purposes.
 
 #### How It Works
 
-When you login, AT-bot will ask:
+When you login, atproto will ask:
 
 ```
 Save credentials securely for testing/automation? (y/n):
 ```
 
 If you choose **yes**:
-- Your credentials are saved to `~/.config/at-bot/credentials.json`
+- Your credentials are saved to `~/.config/atproto/credentials.json`
 - Password is **encrypted** using AES-256-CBC encryption
-- Encryption key is stored in `~/.config/at-bot/.key` with 600 permissions
+- Encryption key is stored in `~/.config/atproto/.key` with 600 permissions
 - Both files are readable only by you (mode 600)
 - On next login, credentials are automatically decrypted and loaded
 
@@ -283,12 +283,12 @@ If you have credentials saved with the old base64 encoding:
 #### Clearing Saved Credentials
 
 ```bash
-at-bot clear-credentials
+atproto clear-credentials
 ```
 
 Or manually delete:
 ```bash
-rm ~/.config/at-bot/credentials.json
+rm ~/.config/atproto/credentials.json
 ```
 
 ## Testing Features
@@ -297,13 +297,13 @@ rm ~/.config/at-bot/credentials.json
 
 ```bash
 # Interactive login (will prompt for credentials)
-at-bot login
+atproto login
 
 # Check current user
-at-bot whoami
+atproto whoami
 
 # Logout
-at-bot logout
+atproto logout
 ```
 
 ### 2. Debug Mode (Show Plaintext Passwords)
@@ -312,7 +312,7 @@ For debugging authentication issues, you can enable debug mode:
 
 ```bash
 # Enable debug output (shows plaintext passwords)
-DEBUG=1 at-bot login
+DEBUG=1 atproto login
 ```
 
 **Debug mode will show:**
@@ -328,20 +328,20 @@ DEBUG=1 at-bot login
 
 ```bash
 # Create a simple post
-at-bot post "Hello from AT-bot! 🤖"
+atproto post "Hello from atproto! 🤖"
 
 # Create a post with special characters (use quotes)
-at-bot post "Testing #ATProtocol with @handle.bsky.social"
+atproto post "Testing #ATProtocol with @handle.bsky.social"
 ```
 
 ### 4. Reading Your Feed
 
 ```bash
 # Read default (10 posts)
-at-bot feed
+atproto feed
 
 # Read specific number of posts
-at-bot feed 20
+atproto feed 20
 ```
 
 ## Automated Testing
@@ -354,9 +354,9 @@ For CI/CD or automated testing without interactive prompts:
 export BLUESKY_HANDLE="your.handle.bsky.social"
 export BLUESKY_PASSWORD="your-app-password"
 
-at-bot login
-at-bot post "Automated test post"
-at-bot feed
+atproto login
+atproto post "Automated test post"
+atproto feed
 ```
 
 ### Using Saved Credentials
@@ -365,10 +365,10 @@ If you've saved credentials:
 
 ```bash
 # Credentials are automatically loaded
-at-bot login
+atproto login
 
 # Or use environment variable to skip saving prompt
-BLUESKY_HANDLE="your.handle" at-bot login
+BLUESKY_HANDLE="your.handle" atproto login
 ```
 
 ## Test Suite
@@ -390,7 +390,7 @@ This runs:
 
 1. **Use saved credentials** for quick iteration:
    ```bash
-   at-bot login  # Save when prompted
+   atproto login  # Save when prompted
    # Now you can test repeatedly without re-entering password
    ```
 
@@ -401,7 +401,7 @@ This runs:
 
 3. **Clear credentials** when done:
    ```bash
-   at-bot clear-credentials
+   atproto clear-credentials
    ```
 
 ### For Production Use
@@ -426,7 +426,7 @@ For security, always use Bluesky app passwords instead of your main password:
 2. Navigate to Privacy and Security
 3. Select "App Passwords"
 4. Create a new app password
-5. Use this password with AT-bot
+5. Use this password with atproto
 
 ## Troubleshooting
 
@@ -436,7 +436,7 @@ If saved credentials aren't loading:
 
 ```bash
 # Check if file exists and has correct permissions
-ls -la ~/.config/at-bot/credentials.json
+ls -la ~/.config/atproto/credentials.json
 
 # Should show: -rw------- (600)
 ```
@@ -447,8 +447,8 @@ If your session expires:
 
 ```bash
 # Logout and login again
-at-bot logout
-at-bot login
+atproto logout
+atproto login
 ```
 
 ### Clear Everything
@@ -456,8 +456,8 @@ at-bot login
 To start fresh:
 
 ```bash
-rm -rf ~/.config/at-bot/
-at-bot login
+rm -rf ~/.config/atproto/
+atproto login
 ```
 
 ## Security Notes
@@ -477,7 +477,7 @@ at-bot login
 **Development/Testing:**
 - ✓ Save credentials on personal, secure machines
 - ✓ Use app passwords, not main account passwords
-- ✓ Clear credentials when done: `at-bot clear-credentials`
+- ✓ Clear credentials when done: `atproto clear-credentials`
 
 **Production:**
 - ✓ Use environment variables for credentials
@@ -494,7 +494,7 @@ at-bot login
 | System Keyring | Better | Desktop applications |
 | Secret Management Service | Best | Production deployments |
 
-### What AT-bot Does
+### What atproto Does
 
 ✓ **Encrypts** passwords with AES-256-CBC  
 ✓ **Never stores** plaintext passwords  
@@ -505,8 +505,8 @@ at-bot login
 
 ## File Locations
 
-- **Session**: `~/.config/at-bot/session.json` (access tokens)
-- **Credentials**: `~/.config/at-bot/credentials.json` (saved login, optional)
+- **Session**: `~/.config/atproto/session.json` (access tokens)
+- **Credentials**: `~/.config/atproto/credentials.json` (saved login, optional)
 
 Both files are automatically created with `600` permissions (owner read/write only).
 
@@ -514,6 +514,6 @@ Both files are automatically created with `600` permissions (owner read/write on
 
 **Need Help?**
 
-- Run `at-bot help` for command reference
+- Run `atproto help` for command reference
 - Check [README.md](../README.md) for general documentation
 - Review [SECURITY.md](../doc/SECURITY.md) for security guidelines

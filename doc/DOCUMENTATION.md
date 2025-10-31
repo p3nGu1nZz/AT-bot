@@ -1,6 +1,6 @@
 # Documentation Compilation Guide
 
-This guide explains how to use AT-bot's documentation compilation system to generate a comprehensive, professionally formatted PDF containing all project documentation.
+This guide explains how to use atproto's documentation compilation system to generate a comprehensive, professionally formatted PDF containing all project documentation.
 
 ## Overview
 
@@ -23,7 +23,7 @@ make docs
 
 ### Method 2: Direct Script Execution
 ```bash
-./bin/at-bot-docs
+./bin/atproto-docs
 ```
 
 ### Method 3: Library Function
@@ -36,17 +36,17 @@ main
 
 Three comprehensive documentation files are created in `dist/docs/`:
 
-1. **AT-bot_Complete_Documentation.md** (361KB+)
+1. **atproto_Complete_Documentation.md** (361KB+)
    - All markdown files compiled into one
    - Logical document ordering
    - No duplicates
 
-2. **AT-bot_Complete_Documentation.html**
+2. **atproto_Complete_Documentation.html**
    - Styled HTML with custom CSS
    - Clickable table of contents
    - Syntax-highlighted code blocks
 
-3. **AT-bot_Complete_Documentation.pdf**
+3. **atproto_Complete_Documentation.pdf**
    - Professional PDF format
    - Auto-generated table of contents
    - Perfect for sharing and offline use
@@ -85,9 +85,9 @@ Visit [Pandoc Installation Guide](https://pandoc.org/installing.html)
 
 The compilation process generates three files in `dist/docs/`:
 
-1. **AT-bot_Complete_Documentation.md** - Combined markdown source
-2. **AT-bot_Complete_Documentation.html** - Styled HTML version
-3. **AT-bot_Complete_Documentation.pdf** - Final PDF output (recommended for sharing)
+1. **atproto_Complete_Documentation.md** - Combined markdown source
+2. **atproto_Complete_Documentation.html** - Styled HTML version
+3. **atproto_Complete_Documentation.pdf** - Final PDF output (recommended for sharing)
 
 Additionally created:
 - **cover.md** - Generated cover page
@@ -244,7 +244,7 @@ Set a custom output location:
 
 ```bash
 export OUTPUT_DIR="/path/to/custom/output"
-./bin/at-bot-docs
+./bin/atproto-docs
 ```
 
 ### Processing Specific Files
@@ -340,10 +340,10 @@ git pull origin main
 make docs
 
 # Review the output
-open dist/docs/AT-bot_Complete_Documentation.pdf
+open dist/docs/atproto_Complete_Documentation.pdf
 
 # Commit if satisfied
-git add dist/docs/AT-bot_Complete_Documentation.pdf
+git add dist/docs/atproto_Complete_Documentation.pdf
 git commit -m "docs: update complete documentation for v0.x.0 release"
 ```
 
@@ -365,16 +365,16 @@ Add to your pipeline:
 ## File Structure
 
 ```
-AT-bot/
+atproto/
 ├── lib/
 │   └── doc.sh              # Core compilation script
 ├── bin/
-│   └── at-bot-docs         # Convenient wrapper
+│   └── atproto-docs         # Convenient wrapper
 ├── dist/
 │   └── docs/               # Generated output
-│       ├── AT-bot_Complete_Documentation.md
-│       ├── AT-bot_Complete_Documentation.html
-│       ├── AT-bot_Complete_Documentation.pdf
+│       ├── atproto_Complete_Documentation.md
+│       ├── atproto_Complete_Documentation.html
+│       ├── atproto_Complete_Documentation.pdf
 │       ├── documentation.css
 │       └── cover.md
 └── doc/

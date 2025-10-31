@@ -1,10 +1,10 @@
-# AT-bot Configuration Guide
+# atproto Configuration Guide
 
-This guide explains how to use AT-bot's configuration system to customize your experience.
+This guide explains how to use atproto's configuration system to customize your experience.
 
 ## Overview
 
-AT-bot uses a JSON configuration file to store user preferences. The configuration system supports:
+atproto uses a JSON configuration file to store user preferences. The configuration system supports:
 
 - **Default values** for all commands
 - **Environment variable overrides** for automation
@@ -13,7 +13,7 @@ AT-bot uses a JSON configuration file to store user preferences. The configurati
 
 ## Configuration File
 
-**Location**: `~/.config/at-bot/config.json`
+**Location**: `~/.config/atproto/config.json`
 
 **Default Content**:
 ```json
@@ -41,8 +41,8 @@ AT-bot uses a JSON configuration file to store user preferences. The configurati
 
 **Examples**:
 ```bash
-at-bot config set pds_endpoint https://bsky.social
-at-bot config set pds_endpoint https://my-custom-pds.example.com
+atproto config set pds_endpoint https://bsky.social
+atproto config set pds_endpoint https://my-custom-pds.example.com
 ```
 
 ### `output_format`
@@ -56,8 +56,8 @@ at-bot config set pds_endpoint https://my-custom-pds.example.com
 
 **Examples**:
 ```bash
-at-bot config set output_format text   # Human-readable
-at-bot config set output_format json   # Machine-readable
+atproto config set output_format text   # Human-readable
+atproto config set output_format json   # Machine-readable
 ```
 
 ### `color_output`
@@ -72,9 +72,9 @@ at-bot config set output_format json   # Machine-readable
 
 **Examples**:
 ```bash
-at-bot config set color_output auto    # Detect automatically
-at-bot config set color_output always  # Force colors
-at-bot config set color_output never   # Plain text only
+atproto config set color_output auto    # Detect automatically
+atproto config set color_output always  # Force colors
+atproto config set color_output never   # Plain text only
 ```
 
 ### `feed_limit`
@@ -84,9 +84,9 @@ at-bot config set color_output never   # Plain text only
 
 **Examples**:
 ```bash
-at-bot config set feed_limit 10   # Quick check
-at-bot config set feed_limit 50   # Deep dive
-at-bot config set feed_limit 100  # Maximum
+atproto config set feed_limit 10   # Quick check
+atproto config set feed_limit 50   # Deep dive
+atproto config set feed_limit 100  # Maximum
 ```
 
 ### `search_limit`
@@ -96,8 +96,8 @@ at-bot config set feed_limit 100  # Maximum
 
 **Examples**:
 ```bash
-at-bot config set search_limit 5    # Quick search
-at-bot config set search_limit 25   # Detailed search
+atproto config set search_limit 5    # Quick search
+atproto config set search_limit 25   # Detailed search
 ```
 
 ### `debug`
@@ -107,8 +107,8 @@ at-bot config set search_limit 25   # Detailed search
 
 **Examples**:
 ```bash
-at-bot config set debug true    # Enable debug output
-at-bot config set debug false   # Disable debug output
+atproto config set debug true    # Enable debug output
+atproto config set debug false   # Disable debug output
 ```
 
 ## CLI Commands
@@ -117,7 +117,7 @@ at-bot config set debug false   # Disable debug output
 Show all current configuration values:
 
 ```bash
-at-bot config list
+atproto config list
 ```
 
 **Output**:
@@ -132,22 +132,22 @@ Feed Limit:      20
 Search Limit:    10
 Debug Mode:      false
 
-Config file: /home/user/.config/at-bot/config.json
+Config file: /home/user/.config/atproto/config.json
 ```
 
 ### Get Configuration Value
 Retrieve a specific configuration value:
 
 ```bash
-at-bot config get <key>
+atproto config get <key>
 ```
 
 **Examples**:
 ```bash
-at-bot config get feed_limit
+atproto config get feed_limit
 # Output: 20
 
-at-bot config get pds_endpoint
+atproto config get pds_endpoint
 # Output: https://bsky.social
 ```
 
@@ -155,15 +155,15 @@ at-bot config get pds_endpoint
 Update a configuration value:
 
 ```bash
-at-bot config set <key> <value>
+atproto config set <key> <value>
 ```
 
 **Examples**:
 ```bash
-at-bot config set feed_limit 50
+atproto config set feed_limit 50
 # Output: Configuration updated: feed_limit = 50
 
-at-bot config set color_output never
+atproto config set color_output never
 # Output: Configuration updated: color_output = never
 ```
 
@@ -171,12 +171,12 @@ at-bot config set color_output never
 Reset all configuration to default values:
 
 ```bash
-at-bot config reset
+atproto config reset
 ```
 
 **Output**:
 ```
-Backup created: /home/user/.config/at-bot/config.json.backup
+Backup created: /home/user/.config/atproto/config.json.backup
 Configuration reset to defaults
 
 Current Configuration:
@@ -190,7 +190,7 @@ Current Configuration:
 Check if your configuration file is valid:
 
 ```bash
-at-bot config validate
+atproto config validate
 ```
 
 **Output** (if valid):
@@ -200,7 +200,7 @@ Configuration is valid
 
 **Output** (if invalid):
 ```
-Configuration has errors. Run 'at-bot config reset' to fix.
+Configuration has errors. Run 'atproto config reset' to fix.
 ```
 
 ## Environment Variable Overrides
@@ -233,10 +233,10 @@ Configuration values can be overridden by environment variables without modifyin
 **Temporary Override**:
 ```bash
 # Use custom PDS for single command
-ATP_PDS="https://test.bsky.social" at-bot whoami
+ATP_PDS="https://test.bsky.social" atproto whoami
 
 # Your config file is unchanged
-at-bot config get pds_endpoint
+atproto config get pds_endpoint
 # Output: https://bsky.social
 ```
 
@@ -247,8 +247,8 @@ export ATP_FEED_LIMIT=100
 export DEBUG=1
 
 # All commands use these values
-at-bot feed  # Shows 100 posts
-at-bot search "bluesky"  # Debug output enabled
+atproto feed  # Shows 100 posts
+atproto search "bluesky"  # Debug output enabled
 ```
 
 **Automation Script**:
@@ -261,8 +261,8 @@ export ATP_OUTPUT_FORMAT="json"
 export ATP_COLOR_OUTPUT="never"
 
 # Commands use overridden values
-at-bot whoami | jq '.did'
-at-bot feed | jq '.feed[0].post.record.text'
+atproto whoami | jq '.did'
+atproto feed | jq '.feed[0].post.record.text'
 ```
 
 ## Use Cases & Workflows
@@ -272,15 +272,15 @@ at-bot feed | jq '.feed[0].post.record.text'
 **Quick Setup**:
 ```bash
 # Install and configure
-at-bot login
-at-bot config set feed_limit 30
-at-bot config set search_limit 15
+atproto login
+atproto config set feed_limit 30
+atproto config set search_limit 15
 ```
 
 **Daily Usage**:
 ```bash
-at-bot feed          # Uses configured limit (30)
-at-bot search "tech" # Uses configured limit (15)
+atproto feed          # Uses configured limit (30)
+atproto search "tech" # Uses configured limit (15)
 ```
 
 ### For Developers
@@ -288,8 +288,8 @@ at-bot search "tech" # Uses configured limit (15)
 **Development Setup**:
 ```bash
 # Point to local PDS
-at-bot config set pds_endpoint http://localhost:2583
-at-bot config set debug true
+atproto config set pds_endpoint http://localhost:2583
+atproto config set debug true
 ```
 
 **Testing**:
@@ -298,7 +298,7 @@ at-bot config set debug true
 DEBUG=1 make test
 
 # Test against production without changing config
-ATP_PDS="https://bsky.social" at-bot whoami
+ATP_PDS="https://bsky.social" atproto whoami
 ```
 
 ### For Automation/Bots
@@ -306,8 +306,8 @@ ATP_PDS="https://bsky.social" at-bot whoami
 **Bot Configuration**:
 ```bash
 # Machine-readable output for parsing
-at-bot config set output_format json
-at-bot config set color_output never
+atproto config set output_format json
+atproto config set color_output never
 ```
 
 **CI/CD Pipeline**:
@@ -330,8 +330,8 @@ jobs:
           BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
           BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PASSWORD }}
         run: |
-          at-bot login
-          at-bot post "🎉 New release: ${{ github.event.release.tag_name }}"
+          atproto login
+          atproto post "🎉 New release: ${{ github.event.release.tag_name }}"
 ```
 
 ### For System Administrators
@@ -353,7 +353,7 @@ export ATP_FEED_LIMIT=100
 export DEBUG=0
 
 while true; do
-    at-bot feed | jq '.feed[].post.record.text' | grep -i "incident"
+    atproto feed | jq '.feed[].post.record.text' | grep -i "incident"
     sleep 300
 done
 ```
@@ -367,7 +367,7 @@ done
 **Solution**:
 ```bash
 # Initialize config manually
-at-bot config list  # This creates default config
+atproto config list  # This creates default config
 ```
 
 ### Invalid Configuration
@@ -377,10 +377,10 @@ at-bot config list  # This creates default config
 **Solution**:
 ```bash
 # Validate configuration
-at-bot config validate
+atproto config validate
 
 # If invalid, reset to defaults
-at-bot config reset
+atproto config reset
 ```
 
 ### Environment Variables Not Working
@@ -404,11 +404,11 @@ echo $ATP_PDS
 **Solution**:
 ```bash
 # Check permissions
-ls -la ~/.config/at-bot/
+ls -la ~/.config/atproto/
 
 # Fix permissions
-chmod 644 ~/.config/at-bot/config.json
-chmod 755 ~/.config/at-bot/
+chmod 644 ~/.config/atproto/config.json
+chmod 755 ~/.config/atproto/
 ```
 
 ## Best Practices
@@ -440,9 +440,9 @@ Override the default config location:
 
 ```bash
 # Use custom config directory
-export XDG_CONFIG_HOME=/opt/at-bot/config
-at-bot config list
-# Config file: /opt/at-bot/config/at-bot/config.json
+export XDG_CONFIG_HOME=/opt/atproto/config
+atproto config list
+# Config file: /opt/atproto/config/atproto/config.json
 ```
 
 ### Backup and Restore
@@ -450,18 +450,18 @@ at-bot config list
 **Backup**:
 ```bash
 # Manual backup
-cp ~/.config/at-bot/config.json ~/at-bot-config-backup.json
+cp ~/.config/atproto/config.json ~/atproto-config-backup.json
 
 # Or use reset (creates automatic backup)
-at-bot config reset
-# Backup created: /home/user/.config/at-bot/config.json.backup
+atproto config reset
+# Backup created: /home/user/.config/atproto/config.json.backup
 ```
 
 **Restore**:
 ```bash
 # Restore from backup
-cp ~/at-bot-config-backup.json ~/.config/at-bot/config.json
-at-bot config validate
+cp ~/atproto-config-backup.json ~/.config/atproto/config.json
+atproto config validate
 ```
 
 ### Multiple Configurations
@@ -471,18 +471,18 @@ Use different configs for different purposes:
 ```bash
 # Personal account config
 export XDG_CONFIG_HOME=~/.config/personal
-at-bot login
-at-bot config set feed_limit 50
+atproto login
+atproto config set feed_limit 50
 
 # Work account config
 export XDG_CONFIG_HOME=~/.config/work
-at-bot login
-at-bot config set feed_limit 20
+atproto login
+atproto config set feed_limit 20
 
 # Bot account config
 export XDG_CONFIG_HOME=~/.config/bot
-at-bot login
-at-bot config set output_format json
+atproto login
+atproto config set output_format json
 ```
 
 ### Exporting Configuration
@@ -491,7 +491,7 @@ Export config as environment variables (for scripts):
 
 ```bash
 # In your script
-eval "$(at-bot config export)"  # Sets ATP_* environment variables
+eval "$(atproto config export)"  # Sets ATP_* environment variables
 echo $ATP_PDS
 echo $ATP_FEED_LIMIT
 ```
@@ -553,11 +553,11 @@ For developers and advanced users, the full JSON schema:
 
 ## See Also
 
-- [QUICKSTART.md](QUICKSTART.md) - Getting started with AT-bot
+- [QUICKSTART.md](QUICKSTART.md) - Getting started with atproto
 - [SECURITY.md](SECURITY.md) - Security best practices
 - [AGENTS.md](AGENTS.md) - Automation and agent workflows
 - [README.md](README.md) - Main documentation
 
 ---
 
-*For issues or questions about configuration, please open an issue on [GitHub](https://github.com/p3nGu1nZz/AT-bot/issues).*
+*For issues or questions about configuration, please open an issue on [GitHub](https://github.com/p3nGu1nZz/atproto/issues).*

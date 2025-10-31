@@ -1,8 +1,8 @@
-# Agents and Automation for AT-bot
+# Agents and Automation for atproto
 
-This document outlines how AI agents and automated systems can enhance the AT-bot project through MCP (Model Context Protocol) integration, enabling sophisticated agentic workflows and collaborative development patterns.
+This document outlines how AI agents and automated systems can enhance the atproto project through MCP (Model Context Protocol) integration, enabling sophisticated agentic workflows and collaborative development patterns.
 
-**Core Concept**: AT-bot exposes AT Protocol/Bluesky capabilities through both a CLI interface and an MCP server, allowing agents to seamlessly interact with Bluesky without parsing shell output or managing sessions manually.
+**Core Concept**: atproto exposes AT Protocol/Bluesky capabilities through both a CLI interface and an MCP server, allowing agents to seamlessly interact with Bluesky without parsing shell output or managing sessions manually.
 
 **📌 Quick Links:**
 - [PLAN.md](PLAN.md) - Strategic roadmap with MCP integration timeline
@@ -12,7 +12,7 @@ This document outlines how AI agents and automated systems can enhance the AT-bo
 
 ## Overview
 
-AT-bot serves as a foundational infrastructure layer for AT Protocol interactions. The project provides two primary interfaces:
+atproto serves as a foundational infrastructure layer for AT Protocol interactions. The project provides two primary interfaces:
 
 1. **CLI Interface** (`atproto`): Direct command-line access for users and scripts
 2. **MCP Server Interface** (`atproto mcp-server`): Standardized JSON-RPC interface for AI agents
@@ -25,7 +25,7 @@ This document explores opportunities for integrating intelligent agents through 
 
 **Social Media Automation Agent**
 - **Purpose**: Automate posting schedules, content curation, and engagement
-- **Implementation**: Shell scripts + AT-bot for authentication + AI for content generation
+- **Implementation**: Shell scripts + atproto for authentication + AI for content generation
 - **Use Cases**:
   - Scheduled posting of project updates
   - Automated responses to common questions
@@ -33,7 +33,7 @@ This document explores opportunities for integrating intelligent agents through 
 
 **Code Documentation Agent**
 - **Purpose**: Automatically generate and update project documentation
-- **Implementation**: Git hooks + AT-bot + documentation AI
+- **Implementation**: Git hooks + atproto + documentation AI
 - **Use Cases**:
   - Auto-update README based on code changes
   - Generate API documentation
@@ -43,7 +43,7 @@ This document explores opportunities for integrating intelligent agents through 
 
 **Testing and Quality Assurance Agent**
 - **Purpose**: Continuous integration with social reporting
-- **Implementation**: CI/CD pipeline + AT-bot + testing frameworks
+- **Implementation**: CI/CD pipeline + atproto + testing frameworks
 - **Use Cases**:
   - Post test results to Bluesky
   - Alert about security vulnerabilities
@@ -51,7 +51,7 @@ This document explores opportunities for integrating intelligent agents through 
 
 **Release Management Agent**
 - **Purpose**: Automate release processes and announcements
-- **Implementation**: GitHub Actions + AT-bot + version management
+- **Implementation**: GitHub Actions + atproto + version management
 - **Use Cases**:
   - Announce new releases on Bluesky
   - Generate changelog summaries
@@ -61,7 +61,7 @@ This document explores opportunities for integrating intelligent agents through 
 
 **Support Bot Agent**
 - **Purpose**: Provide automated support and guidance
-- **Implementation**: Webhook listener + AT-bot + knowledge base
+- **Implementation**: Webhook listener + atproto + knowledge base
 - **Use Cases**:
   - Answer common installation questions
   - Direct users to relevant documentation
@@ -69,7 +69,7 @@ This document explores opportunities for integrating intelligent agents through 
 
 **Analytics and Insights Agent**
 - **Purpose**: Monitor project metrics and community engagement
-- **Implementation**: Data collection + AT-bot + analytics AI
+- **Implementation**: Data collection + atproto + analytics AI
 - **Use Cases**:
   - Track adoption metrics
   - Identify trending topics
@@ -84,10 +84,10 @@ This document explores opportunities for integrating intelligent agents through 
 #!/bin/bash
 # deploy-success-hook.sh
 
-source /usr/local/lib/at-bot/atproto.sh
+source /usr/local/lib/atproto/atproto.sh
 
 if deployment_successful; then
-    post_content="✅ AT-bot v$(get_version) deployed successfully! 
+    post_content="✅ atproto v$(get_version) deployed successfully! 
     
 Features:
 - Enhanced AT Protocol support
@@ -96,7 +96,7 @@ Features:
 
 #ATProtocol #OpenSource #CLI"
     
-    at-bot post "$post_content"
+    atproto post "$post_content"
 fi
 ```
 
@@ -112,7 +112,7 @@ COMMITS=$(git rev-list --count HEAD ^HEAD~7)
 ISSUES_CLOSED=$(gh issue list --state closed --search "closed:>=7days" --json number | jq length)
 NEW_CONTRIBUTORS=$(git shortlog -sn HEAD~7..HEAD | wc -l)
 
-STATUS="📊 Weekly AT-bot Update:
+STATUS="📊 Weekly atproto Update:
 • $COMMITS commits this week
 • $ISSUES_CLOSED issues resolved
 • $NEW_CONTRIBUTORS contributors active
@@ -121,7 +121,7 @@ Thank you to our amazing community! 🙏
 
 #WeeklyUpdate #OpenSource"
 
-at-bot post "$STATUS"
+atproto post "$STATUS"
 ```
 
 ### 3. Collaborative Development Patterns
@@ -142,7 +142,7 @@ at-bot post "$STATUS"
 
 ### What is MCP (Model Context Protocol)?
 
-MCP is an open protocol for connecting AI models and agents to data and tools. It uses JSON-RPC 2.0 over stdio, making it language-agnostic and lightweight. AT-bot's MCP server exposes Bluesky/AT Protocol capabilities as standardized tools.
+MCP is an open protocol for connecting AI models and agents to data and tools. It uses JSON-RPC 2.0 over stdio, making it language-agnostic and lightweight. atproto's MCP server exposes Bluesky/AT Protocol capabilities as standardized tools.
 
 **Key Benefits:**
 - **Standardized Interface**: Agents use the same protocol regardless of underlying implementation
@@ -151,9 +151,9 @@ MCP is an open protocol for connecting AI models and agents to data and tools. I
 - **Secure**: Authentication and permission management built-in
 - **Extensible**: New tools can be added without modifying the protocol
 
-### MCP Tools for AT-bot
+### MCP Tools for atproto
 
-The AT-bot MCP server exposes tools organized by category:
+The atproto MCP server exposes tools organized by category:
 
 **Authentication Tools**
 - `auth_login` - Authenticate user
@@ -191,10 +191,10 @@ The AT-bot MCP server exposes tools organized by category:
 ```json
 {
   "mcpServers": {
-    "at-bot": {
+    "atproto": {
       "command": "atproto",
       "args": ["mcp-server"],
-      "args": ["--config", "~/.config/at-bot/mcp.json"],
+      "args": ["--config", "~/.config/atproto/mcp.json"],
       "env": {
         "ATP_PDS": "https://bsky.social"
       }
@@ -237,20 +237,20 @@ For seamless agent integration, commands should support:
 # Environment variables for credentials (development/testing only)
 BLUESKY_HANDLE="bot.bsky.social"
 BLUESKY_PASSWORD="$APP_PASSWORD"
-at-bot login
+atproto login
 
 # Commands with exit codes for automation
-at-bot whoami && echo "Logged in successfully" || echo "Login failed"
+atproto whoami && echo "Logged in successfully" || echo "Login failed"
 ```
 
 **Structured Output**
 ```bash
 # Machine-readable JSON output (future enhancement)
-at-bot whoami --format json
+atproto whoami --format json
 # Output: {"handle":"user.bsky.social","did":"did:plc:...","status":"authenticated"}
 
 # Exit codes for scripting
-at-bot check-session
+atproto check-session
 # Returns: 0 if logged in, 1 if not, 2 if session expired
 ```
 
@@ -258,17 +258,17 @@ at-bot check-session
 ```bash
 # Chain multiple commands
 message=$(generate_daily_report)
-at-bot post "$message" && \
-  at-bot follow "@user.bsky.social" && \
+atproto post "$message" && \
+  atproto follow "@user.bsky.social" && \
   log_success || log_failure
 ```
 
 **Batch/Bulk Operations** (Future)
 ```bash
 # Read from files
-at-bot batch-post @daily-posts.txt
-at-bot batch-follow @followers-list.txt
-at-bot schedule @weekly-schedule.json
+atproto batch-post @daily-posts.txt
+atproto batch-follow @followers-list.txt
+atproto schedule @weekly-schedule.json
 ```
 
 See [.github/copilot-instructions.md](.github/copilot-instructions.md) for implementation details.
@@ -299,8 +299,8 @@ See [.github/copilot-instructions.md](.github/copilot-instructions.md) for imple
 
 ```bash
 # Create agent environment
-mkdir -p ~/.config/at-bot/agents
-cd ~/.config/at-bot/agents
+mkdir -p ~/.config/atproto/agents
+cd ~/.config/atproto/agents
 
 # Create agent configuration
 cat > config.json << EOF
@@ -315,10 +315,10 @@ EOF
 # Create agent script
 cat > status_agent.sh << 'EOF'
 #!/bin/bash
-source /usr/local/lib/at-bot/atproto.sh
+source /usr/local/lib/atproto/atproto.sh
 
 # Your agent logic here
-at-bot post "Daily status: All systems operational! 🤖"
+atproto post "Daily status: All systems operational! 🤖"
 EOF
 
 chmod +x status_agent.sh
@@ -373,7 +373,7 @@ chmod +x status_agent.sh
 
 ## Contributing to Agent Development
 
-We welcome contributions to the AT-bot agent ecosystem:
+We welcome contributions to the atproto agent ecosystem:
 
 1. **Agent Scripts**: Share useful automation scripts
 2. **Integration Patterns**: Document successful integration approaches

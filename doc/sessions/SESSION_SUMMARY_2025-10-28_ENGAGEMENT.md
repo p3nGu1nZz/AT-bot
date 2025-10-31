@@ -5,7 +5,7 @@
 
 ## 🎯 Session Overview
 
-This session focused on implementing **engagement features** and **session management** improvements to make AT-bot a fully-functional social media CLI tool. We added threading support through replies, content engagement through likes and reposts, and automatic session refresh for reliability.
+This session focused on implementing **engagement features** and **session management** improvements to make atproto a fully-functional social media CLI tool. We added threading support through replies, content engagement through likes and reposts, and automatic session refresh for reliability.
 
 ## ✅ Features Implemented
 
@@ -20,7 +20,7 @@ This session focused on implementing **engagement features** and **session manag
 - `refresh_session()` - Uses AT Protocol's refreshJwt
 - `validate_session()` - Checks session validity
 - `get_access_token()` - Enhanced with auto-refresh
-- CLI command: `at-bot refresh`
+- CLI command: `atproto refresh`
 
 ### 2. **Reply Functionality** ✅
 **Threading Support**
@@ -33,7 +33,7 @@ This session focused on implementing **engagement features** and **session manag
 - Enhanced `atproto_post()` with reply parameter
 - Automatic parent post fetching
 - Root post determination for threads
-- CLI command: `at-bot reply <uri> <text>`
+- CLI command: `atproto reply <uri> <text>`
 
 ### 3. **Like Functionality** ✅
 **Content Engagement**
@@ -45,7 +45,7 @@ This session focused on implementing **engagement features** and **session manag
 **Implementation:**
 - `atproto_like()` function
 - Post details fetching for CID
-- CLI command: `at-bot like <uri>`
+- CLI command: `atproto like <uri>`
 
 ### 4. **Repost Functionality** ✅
 **Content Amplification**
@@ -57,7 +57,7 @@ This session focused on implementing **engagement features** and **session manag
 **Implementation:**
 - `atproto_repost()` function
 - CID-based post referencing
-- CLI command: `at-bot repost <uri>`
+- CLI command: `atproto repost <uri>`
 
 ---
 
@@ -173,49 +173,49 @@ atproto_like/repost() {
 ### Workflow 1: Content Creation & Engagement
 ```bash
 # Login
-at-bot login
+atproto login
 
 # Create original post
-at-bot post "Excited about AT Protocol! 🚀"
+atproto post "Excited about AT Protocol! 🚀"
 # Output: URI: at://did:plc:.../app.bsky.feed.post/abc123
 
 # Someone replies - you can engage
-at-bot like at://did:plc:.../app.bsky.feed.post/xyz789
-at-bot repost at://did:plc:.../app.bsky.feed.post/xyz789
-at-bot reply at://did:plc:.../app.bsky.feed.post/xyz789 "Thanks for sharing!"
+atproto like at://did:plc:.../app.bsky.feed.post/xyz789
+atproto repost at://did:plc:.../app.bsky.feed.post/xyz789
+atproto reply at://did:plc:.../app.bsky.feed.post/xyz789 "Thanks for sharing!"
 ```
 
 ### Workflow 2: Long-Running Session
 ```bash
 # Login in the morning
-at-bot login
+atproto login
 
 # Work all day - session automatically refreshes
-at-bot post "Morning update"
+atproto post "Morning update"
 # ... 2 hours later ...
-at-bot post "Afternoon progress"  # Token auto-refreshed!
+atproto post "Afternoon progress"  # Token auto-refreshed!
 # ... 4 hours later ...
-at-bot post "Evening wrap-up"     # Another auto-refresh!
+atproto post "Evening wrap-up"     # Another auto-refresh!
 
 # Manual refresh if needed
-at-bot refresh
+atproto refresh
 ```
 
 ### Workflow 3: Complete Social Interaction
 ```bash
 # Discover content
-at-bot search "bluesky" 20
+atproto search "bluesky" 20
 
 # Engage with interesting post
 POST_URI="at://did:plc:.../app.bsky.feed.post/123"
-at-bot like $POST_URI
-at-bot reply $POST_URI "Great insight!"
+atproto like $POST_URI
+atproto reply $POST_URI "Great insight!"
 
 # Follow the author
-at-bot follow user.bsky.social
+atproto follow user.bsky.social
 
 # Share with your network
-at-bot repost $POST_URI
+atproto repost $POST_URI
 ```
 
 ---
@@ -228,7 +228,7 @@ at-bot repost $POST_URI
 $ make test
 
 ================================
-AT-bot Test Suite
+atproto Test Suite
 ================================
 
 ✓ test_cli_basic      # CLI interface validation
@@ -337,7 +337,7 @@ atproto_post "$text" "$reply_uri" # Reply
 | Component | Before | After | Growth |
 |-----------|--------|-------|--------|
 | lib/atproto.sh | ~900 | 1,230 | +37% |
-| bin/at-bot | ~150 | ~180 | +20% |
+| bin/atproto | ~150 | ~180 | +20% |
 | Total Features | 11 | 15 | +36% |
 
 ### Function Distribution
@@ -514,7 +514,7 @@ Utilities:          5+ functions
 
 ### Before This Session
 ```bash
-at-bot commands:
+atproto commands:
   login, logout, whoami, post, feed,
   follow, unfollow, search
 
@@ -526,7 +526,7 @@ Session management: Manual login only
 
 ### After This Session
 ```bash
-at-bot commands:
+atproto commands:
   login, logout, refresh, whoami,
   post, reply, like, repost,
   feed, follow, unfollow, search
@@ -544,37 +544,37 @@ Session management: Auto-refresh ✅
 ### Scenario 1: Developer Sharing Progress
 ```bash
 # Daily standup automation
-at-bot post "Daily Update:
+atproto post "Daily Update:
 ✅ Implemented session refresh
 ✅ Added reply functionality
 ✅ Created like/repost features
-🚀 AT-bot is getting powerful!"
+🚀 atproto is getting powerful!"
 
 # Engage with team feedback
-at-bot reply at://... "Thanks for the suggestion!"
+atproto reply at://... "Thanks for the suggestion!"
 ```
 
 ### Scenario 2: Content Curator
 ```bash
 # Find interesting content
-at-bot search "AT Protocol development" 20
+atproto search "AT Protocol development" 20
 
 # Curate and amplify
-at-bot like at://...
-at-bot repost at://...
-at-bot reply at://... "Great resource for newcomers!"
+atproto like at://...
+atproto repost at://...
+atproto reply at://... "Great resource for newcomers!"
 ```
 
 ### Scenario 3: Community Manager
 ```bash
 # Morning routine
-at-bot login
-at-bot feed 50  # Review overnight activity
+atproto login
+atproto feed 50  # Review overnight activity
 
 # Engage with community
-at-bot like at://...  # Appreciate contributions
-at-bot reply at://... "Welcome to the community!"
-at-bot follow new.user.bsky.social
+atproto like at://...  # Appreciate contributions
+atproto reply at://... "Welcome to the community!"
+atproto follow new.user.bsky.social
 
 # Session stays valid all day - no re-login needed!
 ```

@@ -1,6 +1,6 @@
-# AT-bot Usage Examples
+# atproto Usage Examples
 
-Practical examples and code snippets for common AT-bot use cases.
+Practical examples and code snippets for common atproto use cases.
 
 ## Table of Contents
 
@@ -18,58 +18,58 @@ Practical examples and code snippets for common AT-bot use cases.
 
 ```bash
 # Interactive login
-at-bot login
+atproto login
 
 # Check who you're logged in as
-at-bot whoami
+atproto whoami
 
 # Logout
-at-bot logout
+atproto logout
 ```
 
 ### Create a Simple Post
 
 ```bash
 # Single line post
-at-bot post "Hello, Bluesky! 👋"
+atproto post "Hello, Bluesky! 👋"
 
 # Multi-line post
-at-bot post "First line
+atproto post "First line
 Second line
 Third line"
 
 # Post with variables
 message="Posted at $(date)"
-at-bot post "$message"
+atproto post "$message"
 ```
 
 ### Read Your Feed
 
 ```bash
 # Show last 10 posts (default)
-at-bot feed
+atproto feed
 
 # Show last 20 posts
-at-bot feed 20
+atproto feed 20
 
 # Show last 50 posts
-at-bot feed 50
+atproto feed 50
 ```
 
 ### Search and Follow
 
 ```bash
 # Search for posts
-at-bot search "AT Protocol"
+atproto search "AT Protocol"
 
 # Search for specific user
-at-bot search "@user.bsky.social"
+atproto search "@user.bsky.social"
 
 # Follow a user
-at-bot follow user.bsky.social
+atproto follow user.bsky.social
 
 # Unfollow a user
-at-bot unfollow user.bsky.social
+atproto unfollow user.bsky.social
 ```
 
 ## Automation Scripts
@@ -87,7 +87,7 @@ BLUESKY_HANDLE="${BLUESKY_HANDLE:-automation.bot}"
 export BLUESKY_HANDLE
 
 # Login
-at-bot login
+atproto login
 
 # Gather information
 UPTIME=$(uptime | awk -F'up' '{print $2}' | cut -d',' -f1)
@@ -106,7 +106,7 @@ Status: ✅ All systems operational
 #DailyReport #Automation #Monitoring"
 
 # Post to Bluesky
-at-bot post "$MESSAGE"
+atproto post "$MESSAGE"
 
 echo "Status posted successfully!"
 ```
@@ -135,8 +135,8 @@ crontab -e
 set -e
 
 # Configuration
-REPO_NAME="AT-bot"
-REPO_URL="https://github.com/p3nGu1nZz/AT-bot"
+REPO_NAME="atproto"
+REPO_URL="https://github.com/p3nGu1nZz/atproto"
 
 # Get recent commits
 COMMITS=$(git log -5 --oneline)
@@ -159,8 +159,8 @@ Interested? Check us out: $REPO_URL
 #OpenSource #GitHub #Development"
 
 # Post update
-at-bot login
-at-bot post "$MESSAGE"
+atproto login
+atproto post "$MESSAGE"
 ```
 
 ### Weekly Digest
@@ -200,8 +200,8 @@ MESSAGE="📰 Weekly Digest - Week $WEEK_NUMBER, $YEAR
 
 #WeeklyDigest #Development"
 
-at-bot login
-at-bot post "$MESSAGE"
+atproto login
+atproto post "$MESSAGE"
 ```
 
 ## CI/CD Integration
@@ -223,10 +223,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Install AT-bot
+      - name: Install atproto
         run: |
-          git clone https://github.com/p3nGu1nZz/AT-bot.git
-          cd AT-bot
+          git clone https://github.com/p3nGu1nZz/atproto.git
+          cd atproto
           ./install.sh
 
       - name: Post release announcement
@@ -237,7 +237,7 @@ jobs:
           VERSION="${{ github.event.release.tag_name }}"
           BODY="${{ github.event.release.body }}"
           
-          at-bot login
+          atproto login
           
           MESSAGE="🎉 Release: $VERSION
 
@@ -247,7 +247,7 @@ $BODY
 
 #Release #NewVersion"
           
-          at-bot post "$MESSAGE"
+          atproto post "$MESSAGE"
 ```
 
 ### Test Results Reporter
@@ -272,10 +272,10 @@ jobs:
         run: |
           make test > test-results.txt 2>&1 || true
 
-      - name: Install AT-bot
+      - name: Install atproto
         run: |
-          git clone https://github.com/p3nGu1nZz/AT-bot.git
-          cd AT-bot
+          git clone https://github.com/p3nGu1nZz/atproto.git
+          cd atproto
           ./install.sh
 
       - name: Post test results
@@ -295,7 +295,7 @@ jobs:
             EMOJI="🚨"
           fi
           
-          at-bot login
+          atproto login
           
           MESSAGE="$EMOJI Test Run Results
           
@@ -306,7 +306,7 @@ Status: $STATUS
 Branch: ${{ github.ref }}
 Commit: ${{ github.sha }}"
           
-          at-bot post "$MESSAGE"
+          atproto post "$MESSAGE"
 ```
 
 ## Social Media Workflows
@@ -322,12 +322,12 @@ set -e
 # Load posts from JSON file
 CALENDAR_FILE="posts.json"
 
-at-bot login
+atproto login
 
 # Process each post in calendar
 jq -r '.[] | select(.date == "'$(date +%Y-%m-%d)'") | .content' "$CALENDAR_FILE" | while read -r post; do
     echo "Posting: $post"
-    at-bot post "$post"
+    atproto post "$post"
     sleep 5  # Wait between posts
 done
 ```
@@ -358,10 +358,10 @@ Example `posts.json`:
 
 set -e
 
-at-bot login
+atproto login
 
 # Get recent notifications
-MENTIONS=$(at-bot feed | grep "@your.handle")
+MENTIONS=$(atproto feed | grep "@your.handle")
 
 while IFS= read -r mention; do
     # Extract post URI
@@ -370,7 +370,7 @@ while IFS= read -r mention; do
     if [ -n "$URI" ]; then
         REPLY="Thanks for the mention! 👋"
         echo "Replying to: $URI"
-        # at-bot reply "$URI" "$REPLY"  # When implemented
+        # atproto reply "$URI" "$REPLY"  # When implemented
     fi
 done <<< "$MENTIONS"
 ```
@@ -383,18 +383,18 @@ done <<< "$MENTIONS"
 
 set -e
 
-at-bot login
+atproto login
 
 # Get followers list
-FOLLOWERS=$(at-bot followers | jq -r '.[].handle')
+FOLLOWERS=$(atproto followers | jq -r '.[].handle')
 
 # Get following list
-FOLLOWING=$(at-bot following | jq -r '.[].handle')
+FOLLOWING=$(atproto following | jq -r '.[].handle')
 
 while read -r follower; do
     if ! echo "$FOLLOWING" | grep -q "$follower"; then
         echo "Following back: $follower"
-        at-bot follow "$follower"
+        atproto follow "$follower"
         sleep 2  # Rate limiting
     fi
 done <<< "$FOLLOWERS"
@@ -421,8 +421,8 @@ QUOTES=(
 RANDOM_INDEX=$((RANDOM % ${#QUOTES[@]}))
 QUOTE="${QUOTES[$RANDOM_INDEX]}"
 
-at-bot login
-at-bot post "📖 Quote of the Day
+atproto login
+atproto post "📖 Quote of the Day
 
 \"$QUOTE\"
 
@@ -437,7 +437,7 @@ at-bot post "📖 Quote of the Day
 
 set -e
 
-at-bot login
+atproto login
 
 # Fetch news from RSS feed (requires rss parser)
 ARTICLES=$(curl -s "https://news.ycombinator.com/rss" | \
@@ -455,7 +455,7 @@ done <<< "$ARTICLES"
 MESSAGE="$MESSAGE
 #News #TopStories #Aggregation"
 
-at-bot post "$MESSAGE"
+atproto post "$MESSAGE"
 ```
 
 ## Data Operations
@@ -468,10 +468,10 @@ at-bot post "$MESSAGE"
 
 set -e
 
-at-bot login
+atproto login
 
 # Get feed (limit to 100)
-FEED=$(at-bot feed 100)
+FEED=$(atproto feed 100)
 
 # Save to file with timestamp
 FILENAME="feed-$(date +%Y%m%d-%H%M%S).json"
@@ -491,10 +491,10 @@ set -e
 BACKUP_DIR="./backups"
 mkdir -p "$BACKUP_DIR"
 
-at-bot login
+atproto login
 
 # Get recent posts
-POSTS=$(at-bot feed 50)
+POSTS=$(atproto feed 50)
 
 # Save with metadata
 BACKUP_FILE="$BACKUP_DIR/posts-$(date +%Y%m%d-%H%M%S).json"
@@ -528,7 +528,7 @@ post_with_retry() {
     while [ $attempt -le $MAX_RETRIES ]; do
         echo "Attempt $attempt..."
         
-        if at-bot post "$message"; then
+        if atproto post "$message"; then
             echo "✅ Post successful"
             return 0
         fi
@@ -546,7 +546,7 @@ post_with_retry() {
 }
 
 # Usage
-at-bot login
+atproto login
 post_with_retry "Important announcement with retry logic"
 ```
 
@@ -577,11 +577,11 @@ post_from_account() {
         return 1
     fi
     
-    export BLUESKY_SESSION_FILE=~/.config/at-bot/"${account_key}-session.json"
+    export BLUESKY_SESSION_FILE=~/.config/atproto/"${account_key}-session.json"
     
     echo "Posting from: $handle"
-    at-bot login
-    at-bot post "$message"
+    atproto login
+    atproto post "$message"
 }
 
 # Usage
@@ -608,8 +608,8 @@ run_at_time() {
         
         if [ "$current_time" = "$target_time" ]; then
             echo "Executing scheduled operation: $target_time"
-            at-bot login
-            at-bot post "$message"
+            atproto login
+            atproto post "$message"
             break
         fi
         
@@ -626,13 +626,13 @@ Or use system scheduler (cron):
 # Edit crontab: crontab -e
 
 # Post at 9 AM every day
-0 9 * * * /path/to/at-bot login && /path/to/at-bot post "Morning!"
+0 9 * * * /path/to/atproto login && /path/to/atproto post "Morning!"
 
 # Post every 6 hours
-0 */6 * * * /path/to/at-bot login && /path/to/at-bot post "Check-in!"
+0 */6 * * * /path/to/atproto login && /path/to/atproto post "Check-in!"
 
 # Post every Monday at 8 AM
-0 8 * * 1 /path/to/at-bot login && /path/to/at-bot post "Monday motivation!"
+0 8 * * 1 /path/to/atproto login && /path/to/atproto post "Monday motivation!"
 ```
 
 ### Monitoring and Alerts
@@ -664,8 +664,8 @@ Time: $(date '+%Y-%m-%d %H:%M:%S')
 
 #Monitoring #Alert"
     
-    at-bot login
-    at-bot post "$message"
+    atproto login
+    atproto post "$message"
 }
 
 # Usage examples

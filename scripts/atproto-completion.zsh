@@ -1,6 +1,6 @@
-#compdef at-bot
-# AT-bot zsh completion script
-# Install with: cp scripts/at-bot-completion.zsh /usr/share/zsh/site-functions/_at-bot
+#compdef atproto
+# atproto zsh completion script
+# Install with: cp scripts/atproto-completion.zsh /usr/share/zsh/site-functions/_atproto
 # Or add to ~/.zshrc: fpath+=/path/to/scripts && autoload -Uz compinit && compinit
 
 local -a commands

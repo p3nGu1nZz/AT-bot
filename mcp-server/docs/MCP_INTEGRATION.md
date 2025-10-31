@@ -1,6 +1,6 @@
 # MCP Integration Strategy
 
-This document outlines how AT-bot's MCP server will integrate into the broader MCP ecosystem, particularly with Claude Copilot and other AI agents.
+This document outlines how atproto's MCP server will integrate into the broader MCP ecosystem, particularly with Claude Copilot and other AI agents.
 
 ## What is MCP?
 
@@ -14,11 +14,11 @@ This document outlines how AT-bot's MCP server will integrate into the broader M
 - **Secure**: Built-in authentication and permission management
 - **Extensible**: New tools can be added without protocol changes
 
-## AT-bot MCP Server Overview
+## atproto MCP Server Overview
 
 ### Core Concept
 
-AT-bot exposes Bluesky/AT Protocol capabilities as MCP tools, allowing AI agents to:
+atproto exposes Bluesky/AT Protocol capabilities as MCP tools, allowing AI agents to:
 - Authenticate with Bluesky
 - Create and manage posts
 - Read feeds and timelines
@@ -38,7 +38,7 @@ All through standardized MCP tool calls instead of shell command parsing.
              │ (JSON-RPC 2.0 / stdio)
              ▼
 ┌─────────────────────────────────────┐
-│   AT-bot MCP Server                 │
+│   atproto MCP Server                 │
 │  (Tool Discovery & Execution)       │
 └────────────┬────────────────────────┘
              │
@@ -62,8 +62,8 @@ All through standardized MCP tool calls instead of shell command parsing.
    ```json
    {
      "mcpServers": {
-       "at-bot": {
-         "command": "at-bot-mcp-server",
+       "atproto": {
+         "command": "atproto-mcp-server",
          "args": [],
          "env": {
            "ATP_PDS": "https://bsky.social"
@@ -78,7 +78,7 @@ All through standardized MCP tool calls instead of shell command parsing.
    User: "Post a message to Bluesky about our latest release"
    
    Claude:
-   - Discovers available tools from at-bot MCP server
+   - Discovers available tools from atproto MCP server
    - Sees: post_create tool available
    - Generates post content
    - Calls: post_create {text: "Check out our latest release..."}
@@ -201,11 +201,11 @@ Agent: "Monitor discussions about AT Protocol"
 ### Authentication Flow
 
 ```
-1. User sets up at-bot with:
+1. User sets up atproto with:
    - Bluesky handle
    - App password (NOT main password)
    
-2. Session token stored locally (~/.config/at-bot/session.json)
+2. Session token stored locally (~/.config/atproto/session.json)
    - Permissions: 600 (owner only)
    
 3. Agent gets access via:
@@ -236,14 +236,14 @@ Each tool will have configurable permissions:
 ### For Developers
 
 ```bash
-# Install AT-bot with MCP server support
-at-bot install --with-mcp
+# Install atproto with MCP server support
+atproto install --with-mcp
 
 # Start MCP server manually for testing
-at-bot-mcp-server --debug
+atproto-mcp-server --debug
 
 # Configure for Copilot
-at-bot configure-mcp --copilot
+atproto configure-mcp --copilot
 ```
 
 ### For AI Assistants
@@ -253,7 +253,7 @@ at-bot configure-mcp --copilot
 import mcp_client
 
 client = mcp_client.MCPClient()
-tools = client.discover_tools("at-bot")
+tools = client.discover_tools("atproto")
 
 # Use tools directly
 result = tools["post_create"]({
@@ -285,14 +285,14 @@ result = tools["post_create"]({
 
 ### For Users
 
-1. Install AT-bot with MCP support
+1. Install atproto with MCP support
 2. Generate Bluesky app password
 3. Configure MCP in your AI assistant
 4. Start using Bluesky in your agent interactions
 
 ### For Developers
 
-1. Clone AT-bot repository
+1. Clone atproto repository
 2. Review ARCHITECTURE.md for design details
 3. Implement MCP server wrapper
 4. Define tool schemas
@@ -301,7 +301,7 @@ result = tools["post_create"]({
 
 ### For AI Agent Builders
 
-1. Add AT-bot MCP server to your project
+1. Add atproto MCP server to your project
 2. Discover available tools
 3. Build agent workflows using Bluesky capabilities
 4. Test and deploy

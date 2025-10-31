@@ -1,12 +1,12 @@
 #!/bin/bash
-# AT-bot Automated End-to-End Integration Tests
+# atproto Automated End-to-End Integration Tests
 # This script runs comprehensive sequential API tests with optional credential saving
 # Designed for both local testing and CI/CD automation
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-AT_BOT="$PROJECT_ROOT/bin/at-bot"
-CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/at-bot"
+AT_BOT="$PROJECT_ROOT/bin/atproto"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/atproto"
 SESSION_FILE="$CONFIG_DIR/session.json"
 CREDS_FILE="$CONFIG_DIR/.test_credentials"
 
@@ -30,7 +30,7 @@ SKIPPED_TESTS=0
 # Utility functions
 print_header() {
     echo ""
-    echo -e "${WHITE}AT-bot Automated Integration Tests${NC}"
+    echo -e "${WHITE}atproto Automated Integration Tests${NC}"
     echo -e "${BLUE}$(printf '═%.0s' {1..60})${NC}"
     echo ""
 }
@@ -232,9 +232,9 @@ test_diagnostics() {
     
     print_test "Binary verification"
     if [ -f "$AT_BOT" ] && [ -x "$AT_BOT" ]; then
-        print_check_success "AT-bot binary is executable at $AT_BOT"
+        print_check_success "atproto binary is executable at $AT_BOT"
     else
-        print_check_failure "AT-bot binary not found or not executable"
+        print_check_failure "atproto binary not found or not executable"
     fi
     
     print_test "Dependencies check"
@@ -316,7 +316,7 @@ while [ $# -gt 0 ]; do
         -h|--help)
             echo "Usage: $0 [OPTIONS]"
             echo ""
-            echo "Automated end-to-end integration tests for AT-bot"
+            echo "Automated end-to-end integration tests for atproto"
             echo ""
             echo "Options:"
             echo "  -v, --verbose     Show verbose output"

@@ -131,6 +131,41 @@ show_version() {
 
 # Launch MCP server mode
 launch_mcp_server() {
+    # Handle help request
+    if [ "$1" = "--help" ] || [ "$1" = "-h" ] || [ "$1" = "help" ]; then
+        echo "atproto MCP Server"
+        echo ""
+        echo "Launches Model Context Protocol server for AI agent integration."
+        echo "The server communicates via JSON-RPC 2.0 over stdio."
+        echo ""
+        echo "Usage:"
+        echo "  atproto mcp-server    Start MCP server (stdio mode)"
+        echo ""
+        echo "Environment Variables:"
+        echo "  ATP_PDS              AT Protocol server endpoint (default: https://bsky.social)"
+        echo "  MCP_LOG_LEVEL        Logging level: debug, info, warn, error (default: info)"
+        echo ""
+        echo "The MCP server provides 29 tools for AT Protocol operations:"
+        echo "  • Authentication: auth_login, auth_logout, auth_whoami, auth_is_authenticated"
+        echo "  • Content: post_create, post_reply, post_like, post_repost, post_delete"
+        echo "  • Feeds: feed_read, feed_search, feed_timeline, feed_notifications"
+        echo "  • Profile: profile_get, profile_follow, profile_unfollow, profile_block"
+        echo "  • Search: search_posts, search_users, search_feeds"
+        echo "  • Social: follow_user, unfollow_user, block_user, unblock_user, get_followers"
+        echo ""
+        echo "Example VS Code configuration (.vscode/settings.json):"
+        echo '{'
+        echo '  "github.copilot.chat.mcp.enabled": true,'
+        echo '  "github.copilot.chat.mcp.servers": {'
+        echo '    "atproto": {'
+        echo '      "command": "atproto",'
+        echo '      "args": ["mcp-server"]'
+        echo '    }'
+        echo '  }'
+        echo '}'
+        return 0
+    fi
+
     local project_root
     project_root="$(dirname "$SCRIPT_DIR")"
     local mcp_server="$project_root/mcp-server/dist/index.js"

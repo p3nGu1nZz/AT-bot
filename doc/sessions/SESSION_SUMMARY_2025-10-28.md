@@ -1,8 +1,8 @@
-# AT-bot Session Summary - October 28, 2025
+# atproto Session Summary - October 28, 2025
 
 ## Session Overview
 
-This session completed a strategic transformation of the AT-bot project from a CLI-only tool to a dual-interface infrastructure platform with comprehensive MCP (Model Context Protocol) server support.
+This session completed a strategic transformation of the atproto project from a CLI-only tool to a dual-interface infrastructure platform with comprehensive MCP (Model Context Protocol) server support.
 
 ## Completed Work
 
@@ -256,7 +256,7 @@ All 18 tools documented with:
 
 ## Conclusion
 
-AT-bot has been strategically positioned as comprehensive infrastructure for AT Protocol interactions, serving both traditional CLI users and modern AI agents through MCP integration. The foundation is solid:
+atproto has been strategically positioned as comprehensive infrastructure for AT Protocol interactions, serving both traditional CLI users and modern AI agents through MCP integration. The foundation is solid:
 
 ✅ Clear vision and roadmap (PLAN.md)
 ✅ Detailed architecture (ARCHITECTURE.md)

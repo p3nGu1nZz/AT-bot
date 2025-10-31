@@ -11,7 +11,7 @@ LIB_DIR="$PROJECT_ROOT/lib"
 source "$LIB_DIR/config.sh"
 
 # Test config directory
-TEST_CONFIG_DIR="/tmp/at-bot-config-test-$$"
+TEST_CONFIG_DIR="/tmp/atproto-config-test-$$"
 CONFIG_FILE="$TEST_CONFIG_DIR/config.json"
 
 # Setup test environment
@@ -212,7 +212,7 @@ test_env_override() {
 # Main test execution
 main() {
     echo "================================"
-    echo "AT-bot Configuration Tests"
+    echo "atproto Configuration Tests"
     echo "================================"
     echo ""
     

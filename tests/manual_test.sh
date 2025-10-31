@@ -1,6 +1,6 @@
 #!/bin/bash
-# Comprehensive manual testing helper for AT-bot
-# This script provides interactive testing of all major AT-bot features
+# Comprehensive manual testing helper for atproto
+# This script provides interactive testing of all major atproto features
 # with multi-level menu navigation and authentication onboarding
 
 # Don't use set -e as it interferes with interactive menu and read commands
@@ -8,8 +8,8 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-AT_BOT="$PROJECT_ROOT/bin/at-bot"
-CONFIG_DIR="$HOME/.config/at-bot"
+AT_BOT="$PROJECT_ROOT/bin/atproto"
+CONFIG_DIR="$HOME/.config/atproto"
 SESSION_FILE="$CONFIG_DIR/session.json"
 
 # Colors
@@ -42,7 +42,7 @@ clear_screen() {
 print_header() {
     clear_screen
     echo -e "${CYAN}╔═══════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║${NC}  ${WHITE}AT-bot Comprehensive Test Suite${NC}                          ${CYAN}║${NC}"
+    echo -e "${CYAN}║${NC}  ${WHITE}atproto Comprehensive Test Suite${NC}                          ${CYAN}║${NC}"
     echo -e "${CYAN}╚═══════════════════════════════════════════════════════════╝${NC}"
 }
 
@@ -98,7 +98,7 @@ check_authentication() {
 show_auth_onboarding() {
     print_header
     echo ""
-    echo -e "${YELLOW}  👋 Welcome to AT-bot Test Suite!${NC}"
+    echo -e "${YELLOW}  👋 Welcome to atproto Test Suite!${NC}"
     echo ""
     echo -e "${WHITE}  No active session detected${NC}"
     echo -e "${DIM}  Let's get you authenticated first.${NC}"
@@ -796,7 +796,7 @@ test_verify_binary() {
     print_section "🧪 Verify Binary"
     echo ""
     
-    which_out=$(which at-bot 2>/dev/null || echo "Not in PATH")
+    which_out=$(which atproto 2>/dev/null || echo "Not in PATH")
     print_info "Binary location: $which_out"
     
     if [ -x "$AT_BOT" ]; then
@@ -980,7 +980,7 @@ main() {
             0)
                 print_header
                 echo ""
-                echo -e "${YELLOW}  Thank you for testing AT-bot!${NC}"
+                echo -e "${YELLOW}  Thank you for testing atproto!${NC}"
                 echo ""
                 echo -e "${CYAN}  Test Summary:${NC}"
                 echo -e "    ${GREEN}Passed:  $TESTS_PASSED${NC}"

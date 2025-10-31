@@ -1,5 +1,5 @@
 #!/bin/bash
-# AT-bot Documentation Build Script
+# atproto Documentation Build Script
 # Wrapper around lib/doc.sh for building documentation
 # Usage: ./scripts/build-docs.sh [--clean] [--verbose]
 
@@ -69,7 +69,7 @@ fi
 
 OUTPUT_DIR="$PROJECT_ROOT/dist/docs"
 
-echo -e "${BLUE}📚 AT-bot Documentation Build${NC}"
+echo -e "${BLUE}📚 atproto Documentation Build${NC}"
 echo "=================================="
 echo -e "Project root:  ${YELLOW}$PROJECT_ROOT${NC}"
 echo -e "Doc compiler:  ${YELLOW}$DOC_COMPILER${NC}"
@@ -95,13 +95,13 @@ echo ""
 echo -e "Output location: ${YELLOW}$OUTPUT_DIR${NC}"
 echo ""
 echo "Generated files:"
-echo "  - AT-bot_Complete_Documentation.md (markdown)"
-echo "  - AT-bot_Complete_Documentation.html (HTML)"
-echo "  - AT-bot_Complete_Documentation.pdf (PDF)"
+echo "  - atproto_Complete_Documentation.md (markdown)"
+echo "  - atproto_Complete_Documentation.html (HTML)"
+echo "  - atproto_Complete_Documentation.pdf (PDF)"
 echo "  - documentation.css (stylesheet)"
 echo ""
 echo "To view documentation:"
-echo "  - Markdown: cat $OUTPUT_DIR/AT-bot_Complete_Documentation.md"
-echo "  - HTML: open file://$OUTPUT_DIR/AT-bot_Complete_Documentation.html"
-echo "  - PDF: open $OUTPUT_DIR/AT-bot_Complete_Documentation.pdf"
+echo "  - Markdown: cat $OUTPUT_DIR/atproto_Complete_Documentation.md"
+echo "  - HTML: open file://$OUTPUT_DIR/atproto_Complete_Documentation.html"
+echo "  - PDF: open $OUTPUT_DIR/atproto_Complete_Documentation.pdf"
 echo ""

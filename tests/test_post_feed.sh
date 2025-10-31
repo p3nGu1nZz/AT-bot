@@ -5,7 +5,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-AT_BOT="$PROJECT_ROOT/bin/at-bot"
+AT_BOT="$PROJECT_ROOT/bin/atproto"
 
 # Test that post command requires text
 test_post_requires_text() {
@@ -16,7 +16,7 @@ test_post_requires_text() {
 # Test that post command requires login
 test_post_requires_login() {
     # Make sure we're logged out
-    rm -f ~/.config/at-bot/session.json 2>/dev/null || true
+    rm -f ~/.config/atproto/session.json 2>/dev/null || true
     
     output=$("$AT_BOT" post "test" 2>&1 || true)
     echo "$output" | grep -q "Not logged in"
@@ -25,7 +25,7 @@ test_post_requires_login() {
 # Test that feed command requires login
 test_feed_requires_login() {
     # Make sure we're logged out
-    rm -f ~/.config/at-bot/session.json 2>/dev/null || true
+    rm -f ~/.config/atproto/session.json 2>/dev/null || true
     
     output=$("$AT_BOT" feed 2>&1 || true)
     echo "$output" | grep -q "Not logged in"

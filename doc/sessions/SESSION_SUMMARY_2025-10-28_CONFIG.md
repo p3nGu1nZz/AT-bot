@@ -19,7 +19,7 @@ This session focused on **creative but logical** development by implementing a *
 
 **Implementation:**
 - `lib/config.sh` - New modular configuration library (~400 lines)
-- `at-bot config` commands - Full CRUD operations
+- `atproto config` commands - Full CRUD operations
 - Integration with `lib/atproto.sh` - Config-aware defaults
 - Comprehensive test suite - 8 tests covering all scenarios
 
@@ -222,7 +222,7 @@ get_config_value() {
 **Full Suite Results:**
 ```
 ================================
-AT-bot Test Suite
+atproto Test Suite
 ================================
 
 ✓ test_cli_basic     # CLI interface
@@ -249,11 +249,11 @@ All tests passed!
 
 | Command | Purpose | Example |
 |---------|---------|---------|
-| `config list` | Show all settings | `at-bot config list` |
-| `config get <key>` | Get single value | `at-bot config get feed_limit` |
-| `config set <key> <val>` | Update setting | `at-bot config set feed_limit 50` |
-| `config reset` | Restore defaults | `at-bot config reset` |
-| `config validate` | Check validity | `at-bot config validate` |
+| `config list` | Show all settings | `atproto config list` |
+| `config get <key>` | Get single value | `atproto config get feed_limit` |
+| `config set <key> <val>` | Update setting | `atproto config set feed_limit 50` |
+| `config reset` | Restore defaults | `atproto config reset` |
+| `config validate` | Check validity | `atproto config validate` |
 
 ### Configuration Options
 
@@ -278,13 +278,13 @@ All tests passed!
 **Examples:**
 ```bash
 # Invalid values rejected with clear errors
-at-bot config set feed_limit 500
+atproto config set feed_limit 500
 # Error: Invalid limit: must be between 1 and 100
 
-at-bot config set pds_endpoint "not-a-url"
+atproto config set pds_endpoint "not-a-url"
 # Error: Invalid PDS endpoint: must start with http:// or https://
 
-at-bot config set output_format xml
+atproto config set output_format xml
 # Error: Invalid output format: must be 'text' or 'json'
 ```
 
@@ -297,27 +297,27 @@ at-bot config set output_format xml
 ```bash
 # Development environment
 export XDG_CONFIG_HOME=~/.config/dev
-at-bot config set pds_endpoint http://localhost:2583
-at-bot config set debug true
+atproto config set pds_endpoint http://localhost:2583
+atproto config set debug true
 
 # Production environment
 export XDG_CONFIG_HOME=~/.config/prod
-at-bot config set pds_endpoint https://bsky.social
-at-bot config set debug false
+atproto config set pds_endpoint https://bsky.social
+atproto config set debug false
 
 # Easily switch between environments
-alias at-bot-dev="XDG_CONFIG_HOME=~/.config/dev at-bot"
-alias at-bot-prod="XDG_CONFIG_HOME=~/.config/prod at-bot"
+alias atproto-dev="XDG_CONFIG_HOME=~/.config/dev atproto"
+alias atproto-prod="XDG_CONFIG_HOME=~/.config/prod atproto"
 ```
 
 ### Use Case 2: Automation with Override
 
 ```bash
 # Config file has defaults for interactive use
-at-bot config set feed_limit 20
+atproto config set feed_limit 20
 
 # Automation script overrides temporarily
-ATP_FEED_LIMIT=100 ATP_OUTPUT_FORMAT=json at-bot feed | jq '.feed[].post.record.text'
+ATP_FEED_LIMIT=100 ATP_OUTPUT_FORMAT=json atproto feed | jq '.feed[].post.record.text'
 
 # Config file unchanged - no side effects
 ```
@@ -326,14 +326,14 @@ ATP_FEED_LIMIT=100 ATP_OUTPUT_FORMAT=json at-bot feed | jq '.feed[].post.record.
 
 ```bash
 # User starts with defaults
-at-bot login
-at-bot feed  # Gets 20 posts (default)
+atproto login
+atproto feed  # Gets 20 posts (default)
 
 # User finds optimal value
-at-bot config set feed_limit 50
+atproto config set feed_limit 50
 
 # Now all feeds use new default
-at-bot feed  # Gets 50 posts
+atproto feed  # Gets 50 posts
 ```
 
 ### Use Case 4: CI/CD Pipeline
@@ -348,8 +348,8 @@ env:
 steps:
   - name: Post update
     run: |
-      at-bot login
-      at-bot post "Build successful ✅"
+      atproto login
+      atproto post "Build successful ✅"
 ```
 
 ---
@@ -394,7 +394,7 @@ steps:
 
 **Integration Changes**:
 - lib/atproto.sh: +40 lines (config integration)
-- bin/at-bot: +40 lines (config commands)
+- bin/atproto: +40 lines (config commands)
 - Tests: +180 lines (comprehensive test suite)
 - Documentation: +300 lines (inline + CONFIGURATION.md)
 
@@ -415,7 +415,7 @@ Configuration Module (config.sh):
 Integration Functions (atproto.sh):
 └── get_config_value()       - Multi-source resolution
 
-CLI Commands (at-bot):
+CLI Commands (atproto):
 └── config [list|get|set|reset|validate]
 ```
 
@@ -448,7 +448,7 @@ CLI Commands (at-bot):
 > "Support both interactive and programmatic modes"
 
 **Achievement:**
-✅ Interactive: `at-bot config set ...`
+✅ Interactive: `atproto config set ...`
 ✅ Programmatic: Environment variable overrides
 ✅ Both work simultaneously without conflict
 
@@ -469,37 +469,37 @@ CLI Commands (at-bot):
 **1. Output Format Control**
 ```bash
 # Already in config, ready to implement
-at-bot config set output_format json
-at-bot feed  # Could output JSON
+atproto config set output_format json
+atproto feed  # Could output JSON
 ```
 
 **2. Theme Support**
 ```bash
 # Future enhancement
-at-bot config set theme dark
-at-bot config set theme light
+atproto config set theme dark
+atproto config set theme light
 ```
 
 **3. Plugin Configuration**
 ```bash
 # When plugin system arrives
-at-bot config set plugin.analytics.enabled true
-at-bot config set plugin.analytics.interval 3600
+atproto config set plugin.analytics.enabled true
+atproto config set plugin.analytics.interval 3600
 ```
 
 **4. Profile-Based Configuration**
 ```bash
 # Future feature
-at-bot config profile work --set pds_endpoint https://work.bsky.social
-at-bot config profile personal --set feed_limit 50
-at-bot config use work
+atproto config profile work --set pds_endpoint https://work.bsky.social
+atproto config profile personal --set feed_limit 50
+atproto config use work
 ```
 
 **5. Import/Export**
 ```bash
 # Future feature
-at-bot config export > myconfig.json
-at-bot config import < myconfig.json
+atproto config export > myconfig.json
+atproto config import < myconfig.json
 ```
 
 ---
@@ -528,7 +528,7 @@ at-bot config import < myconfig.json
 
 ### User Experience Improvements
 
-- ✅ Customize AT-bot to personal preferences
+- ✅ Customize atproto to personal preferences
 - ✅ Set defaults once, use everywhere
 - ✅ Easy to experiment and reset
 - ✅ Clear error messages for invalid values
@@ -600,7 +600,7 @@ set_config() {
 ### Code
 - [x] lib/config.sh - Complete configuration module
 - [x] Integration with lib/atproto.sh
-- [x] CLI commands in bin/at-bot
+- [x] CLI commands in bin/atproto
 - [x] Validation for all config values
 - [x] Environment variable overrides
 
@@ -643,10 +643,10 @@ atproto_feed() {
 }
 
 # User management
-at-bot config set feed_limit 50
+atproto config set feed_limit 50
 
 # Automation override
-ATP_FEED_LIMIT=100 at-bot feed
+ATP_FEED_LIMIT=100 atproto feed
 
 # Clear, documented, validated
 ```
@@ -751,7 +751,7 @@ This demonstrates the "force multiplier" effect immediately.
 - Production-ready quality
 
 **4. Developer Experience Focus**
-- Made AT-bot easier to customize
+- Made atproto easier to customize
 - Improved automation capabilities
 - Reduced support burden
 

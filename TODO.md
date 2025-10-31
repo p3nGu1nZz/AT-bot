@@ -1,6 +1,6 @@
-# AT-bot Project TODO
+# atproto Project TODO
 
-This document tracks pending tasks, improvements, and features for the AT-bot project. Items are organized by priority and category.
+This document tracks pending tasks, improvements, and features for the atproto project. Items are organized by priority and category.
 
 ## 🚀 Current Focus: MCP Server Activation (October 31, 2025)
 
@@ -80,7 +80,7 @@ This document tracks pending tasks, improvements, and features for the AT-bot pr
 - [ ] Implement session timeout handling
 
 ### AT Protocol Integration
-- [x] ✅ **COMPLETED** - Add post creation functionality (`at-bot post "message"`)
+- [x] ✅ **COMPLETED** - Add post creation functionality (`atproto post "message"`)
 - [x] ✅ **COMPLETED** - Implement timeline/feed reading capabilities
 - [x] ✅ **COMPLETED** - Add follow/unfollow user commands (atproto_follow, atproto_unfollow)
 - [x] ✅ **COMPLETED** - Support for image/media uploads in posts (post_with_image, post_with_gallery, upload_media)
@@ -116,7 +116,7 @@ This document tracks pending tasks, improvements, and features for the AT-bot pr
 ### Documentation & Help
 - [x] ✅ **COMPLETED** - Documentation compilation system (`lib/doc.sh`)
 - [x] ✅ **COMPLETED** - Generate combined markdown from all project docs
-- [x] ✅ **COMPLETED** - Create `make docs` and `at-bot-docs` commands
+- [x] ✅ **COMPLETED** - Create `make docs` and `atproto-docs` commands
 - [x] ✅ **COMPLETED** - Make doc.sh dynamic with auto-discovery and pattern-based exclusions
 - [x] ✅ **COMPLETED** - Exclude session documentation from compilation workflow
 - [x] ✅ **COMPLETED** - Fix pandoc HTML/PDF conversion (YAML parsing issue resolved)

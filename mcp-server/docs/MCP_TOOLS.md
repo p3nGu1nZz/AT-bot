@@ -1,6 +1,6 @@
-# AT-bot MCP Tools Reference
+# atproto MCP Tools Reference
 
-This document provides detailed specifications for all MCP tools exposed by the AT-bot MCP server. Each tool includes its schema, parameters, return values, and example usage.
+This document provides detailed specifications for all MCP tools exposed by the atproto MCP server. Each tool includes its schema, parameters, return values, and example usage.
 
 ## Authentication Tools
 
@@ -209,7 +209,7 @@ Create a new post on Bluesky.
 
 **Example Usage:**
 ```
-Agent: Call post_create with text="Hello from AT-bot MCP! 🤖"
+Agent: Call post_create with text="Hello from atproto MCP! 🤖"
 Response: {success: true, uri: "at://...", cid: "bafy..."}
 ```
 

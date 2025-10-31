@@ -1,6 +1,6 @@
-# AT-bot Testing Guide
+# atproto Testing Guide
 
-This guide explains the two complementary testing approaches available in AT-bot.
+This guide explains the two complementary testing approaches available in atproto.
 
 ## Quick Comparison
 
@@ -16,7 +16,7 @@ This guide explains the two complementary testing approaches available in AT-bot
 ## Manual Test Suite (`manual_test.sh`)
 
 ### Purpose
-Interactive, menu-driven testing interface for exploring all AT-bot features.
+Interactive, menu-driven testing interface for exploring all atproto features.
 
 ### When to Use
 - 🔍 Learning the API
@@ -34,7 +34,7 @@ bash tests/manual_test.sh
 make test-manual
 
 # Option 3: From installed location
-at-bot-manual-test  # If installed via make install
+atproto-manual-test  # If installed via make install
 ```
 
 ### Features
@@ -77,7 +77,7 @@ at-bot-manual-test  # If installed via make install
 > Enter choice: 1
 
 ✓ User information retrieved:
-  Handle: at-bot.bsky.social
+  Handle: atproto.bsky.social
   DID: did:plc:...
 
 Press Enter to continue...
@@ -124,7 +124,7 @@ bash tests/atp_test.sh --help     # Show help
 ```bash
 $ bash tests/atp_test.sh
 
-Handle (e.g., user.bsky.social): at-bot.bsky.social
+Handle (e.g., user.bsky.social): atproto.bsky.social
 App Password: ••••••••••
 
 Save credentials for next test run? (y/n): y
@@ -165,7 +165,7 @@ The E2E suite tests:
 
 ```
 ╔═══════════════════════════════════════════════════════════╗
-║  AT-bot Automated Integration Tests                   ║
+║  atproto Automated Integration Tests                   ║
 ╚═══════════════════════════════════════════════════════════╝
 
 ────────────────────────────────────────────────────────────
@@ -174,7 +174,7 @@ The E2E suite tests:
   ▶ Verify current user...
   ✓ Verify current user
         Logged in as:
-          Handle: at-bot.bsky.social
+          Handle: atproto.bsky.social
           DID: did:plc:...
 
 ────────────────────────────────────────────────────────────
@@ -207,7 +207,7 @@ The E2E suite tests:
 ### GitHub Actions Example
 
 ```yaml
-name: AT-bot Integration Tests
+name: atproto Integration Tests
 
 on: [push, pull_request]
 
@@ -217,7 +217,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Setup AT-bot
+      - name: Setup atproto
         run: make install PREFIX=$HOME/.local
       
       - name: Run unit tests
@@ -246,8 +246,8 @@ fi
 ## Credential Storage
 
 ### Locations
-- **Session Token**: `~/.config/at-bot/session.json` (mode 600)
-- **Test Credentials**: `~/.config/at-bot/.test_credentials` (mode 600)
+- **Session Token**: `~/.config/atproto/session.json` (mode 600)
+- **Test Credentials**: `~/.config/atproto/.test_credentials` (mode 600)
 
 ### Security
 - Both files stored with `chmod 600` (owner read/write only)
@@ -271,13 +271,13 @@ echo "session.json" >> .gitignore
 ✅ **Fixed** in v0.3.0 - Updated handle parsing in authentication check
 
 ### Credentials Not Being Saved
-- Check that `~/.config/at-bot/` directory exists
-- Verify write permissions: `ls -la ~/.config/at-bot/`
+- Check that `~/.config/atproto/` directory exists
+- Verify write permissions: `ls -la ~/.config/atproto/`
 - Ensure you answered "y" to the save prompt
 
 ### Authentication Fails in E2E Tests
-1. Verify credentials are correct: `at-bot login`
-2. Clear saved credentials: `rm ~/.config/at-bot/.test_credentials`
+1. Verify credentials are correct: `atproto login`
+2. Clear saved credentials: `rm ~/.config/atproto/.test_credentials`
 3. Run tests again and re-enter credentials
 
 ### Tests Pass Locally but Fail in CI/CD
@@ -322,13 +322,13 @@ bash tests/atp_test.sh --verbose
 ```
 
 ## See Also
-- `README.md` - General AT-bot documentation
+- `README.md` - General atproto documentation
 - `doc/TESTING.md` - Detailed testing procedures
 - `STYLE.md` - Code standards for tests
-- `bin/at-bot` - Main CLI entry point
+- `bin/atproto` - Main CLI entry point
 
 ---
 
 **Last Updated**: October 28, 2025  
-**AT-bot Version**: v0.3.0+  
+**atproto Version**: v0.3.0+  
 **Status**: Testing framework complete and operational

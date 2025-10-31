@@ -49,7 +49,7 @@ This approach follows the pattern of successful extensions like markitdown and A
 │                                                             │
 │  2. Bundled MCP Server (dist/)                             │
 │     ├── AT Protocol Tools (31 tools)                       │
-│     ├── Shell Executor (for atproto CLI bridge)           │
+│     ├── Shell Executor (for "atproto" CLI bridge)         │
 │     └── Session Manager                                     │
 │                                                             │
 │  3. Optional: CLI Tools                                     │
@@ -69,14 +69,14 @@ cd atproto
 # Install CLI
 sudo ./install.sh
 
-# Install MCP server
+# Build MCP server
 cd mcp-server
 npm install
 npm run build
 
-# Configure VS Code
-# Edit .vscode/settings.json manually
-# Add mcpServers configuration
+# Configure VS Code manually
+# Edit .vscode/settings.json
+# Add mcpServers configuration pointing to "atproto mcp-server"
 # Reload VS Code
 ```
 
@@ -130,7 +130,7 @@ vscode-extension/
 
 ### Phase 4: CLI Integration (Optional, 1 day)
 - [ ] Add CLI installer command
-- [ ] Download and install at-bot binary
+- [ ] Download and install atproto binary
 - [ ] Integrate terminal commands
 - [ ] Add PATH configuration helper
 
@@ -246,18 +246,12 @@ export class AtprotoMcpProvider implements vscode.McpServerDefinitionProvider {
 
     async provideMcpServerDefinitions(): Promise<vscode.McpServerDefinition[]> {
         // Path to bundled MCP server in extension
-        const serverPath = path.join(
-            this.context.extensionPath,
-            'mcp-server',
-            'dist',
-            'index.js'
-        );
-
+        // Use integrated binary approach
         return [{
             id: 'atproto',
             name: 'atproto (AT Protocol)',
-            command: 'node',
-            args: [serverPath],
+            command: 'atproto',
+            args: ['mcp-server'],
             env: {
                 ATP_PDS: vscode.workspace.getConfiguration('atproto').get('pdsEndpoint', 'https://bsky.social')
             }

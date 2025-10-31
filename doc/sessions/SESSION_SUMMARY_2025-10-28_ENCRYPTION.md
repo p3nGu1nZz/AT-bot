@@ -4,7 +4,7 @@
 
 ## Session Overview
 
-This session focused on upgrading AT-bot's credential storage security from simple base64 encoding to industry-standard **AES-256-CBC encryption** with PBKDF2 key derivation and random salts.
+This session focused on upgrading atproto's credential storage security from simple base64 encoding to industry-standard **AES-256-CBC encryption** with PBKDF2 key derivation and random salts.
 
 ## Key Achievements
 
@@ -77,7 +77,7 @@ Implementation: OpenSSL 3.x
 ### File Structure
 
 ```
-~/.config/at-bot/
+~/.config/atproto/
 ├── session.json           # Session tokens (unchanged)
 ├── credentials.json       # Encrypted credentials
 │   ├── identifier         # Plaintext username
@@ -130,7 +130,7 @@ Implementation: OpenSSL 3.x
 $ make test
 
 ================================
-AT-bot Test Suite
+atproto Test Suite
 ================================
 
 ✓ test_cli_basic
@@ -151,7 +151,7 @@ All tests passed!
 ```bash
 $ ./tests/test_encryption.sh
 
-Testing AT-bot Encryption System
+Testing atproto Encryption System
 ================================
 
 ✓ Encryption successful
@@ -167,7 +167,7 @@ All encryption tests passed! ✓
 User successfully tested login with DEBUG mode:
 
 ```bash
-$ DEBUG=1 at-bot login
+$ DEBUG=1 atproto login
 # Showed plaintext password for verification
 # Exit Code: 0 (success)
 # Credentials encrypted and saved
@@ -309,7 +309,7 @@ Or use dedicated services:
 
 ## Conclusion
 
-This session successfully upgraded AT-bot's credential storage from basic base64 encoding to **industry-standard AES-256-CBC encryption**, providing significantly better security for development and testing use cases while maintaining backward compatibility and adding comprehensive documentation.
+This session successfully upgraded atproto's credential storage from basic base64 encoding to **industry-standard AES-256-CBC encryption**, providing significantly better security for development and testing use cases while maintaining backward compatibility and adding comprehensive documentation.
 
 The encryption implementation:
 - ✅ Uses proven cryptographic standards

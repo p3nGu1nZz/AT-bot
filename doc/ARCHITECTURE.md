@@ -1,10 +1,10 @@
-# AT-bot Architecture
+# atproto Architecture
 
-This document describes the overall architecture of AT-bot, including both the CLI interface and the MCP server interface.
+This document describes the overall architecture of atproto, including both the CLI interface and the MCP server interface.
 
 ## Project Architecture Overview
 
-AT-bot is designed as a dual-interface system that serves both traditional CLI users and AI agents through the Model Context Protocol (MCP).
+atproto is designed as a dual-interface system that serves both traditional CLI users and AI agents through the Model Context Protocol (MCP).
 
 ### High-Level Architecture
 
@@ -13,7 +13,7 @@ AT-bot is designed as a dual-interface system that serves both traditional CLI u
 │              User Interfaces                          │
 ├─────────────────────┬────────────────────────────────┤
 │   CLI Users         │   MCP-based Agents            │
-│   (at-bot cmd)      │   (AI assistants, bots)       │
+│   (atproto cmd)      │   (AI assistants, bots)       │
 └─────────┬───────────┴──────────────┬─────────────────┘
           │                          │
           │ Shell / TTY              │ JSON-RPC 2.0
@@ -23,7 +23,7 @@ AT-bot is designed as a dual-interface system that serves both traditional CLI u
 ┌─────────────────────────────────────────────────────┐
 │         Unified Interface Layer                      │
 ├─────────────────────────────────────────────────────┤
-│  bin/at-bot (CLI)  |  mcp-server (MCP wrapper)      │
+│  bin/atproto (CLI)  |  mcp-server (MCP wrapper)      │
 │  Entry point       |  Tool definitions & routing    │
 └─────────────┬───────────────────┬───────────────────┘
               │                   │
@@ -51,12 +51,12 @@ AT-bot is designed as a dual-interface system that serves both traditional CLI u
 
 ### 1. User Interface Layer
 
-#### CLI Interface (`bin/at-bot`)
+#### CLI Interface (`bin/atproto`)
 - **Purpose**: Provides traditional command-line interface for users and scripts
 - **Interaction**: User runs commands directly in terminal
 - **Output**: Colored text output, user-friendly messages
 - **Protocol**: Shell commands and arguments
-- **Examples**: `at-bot login`, `at-bot post "Hello"`, `at-bot whoami`
+- **Examples**: `atproto login`, `atproto post "Hello"`, `atproto whoami`
 
 #### MCP Server Interface (`mcp-server`)
 - **Purpose**: Provides standardized JSON-RPC interface for AI agents
@@ -103,7 +103,7 @@ Direct communication with Bluesky's AT Protocol:
 
 ## Component Responsibilities
 
-### CLI (`bin/at-bot`)
+### CLI (`bin/atproto`)
 - Parse command-line arguments
 - Invoke appropriate functions from `lib/atproto.sh`
 - Format and display output for terminal
@@ -131,9 +131,9 @@ Direct communication with Bluesky's AT Protocol:
 ### Example 1: CLI Login Flow
 
 ```
-User: $ at-bot login
+User: $ atproto login
 
-bin/at-bot
+bin/atproto
   │
   ├─→ Parse arguments
   ├─→ Call: atproto_login()
@@ -147,7 +147,7 @@ bin/at-bot
   │   │   └─→ Bluesky API
   │   │
   │   ├─→ Parse response
-  │   ├─→ Save session to ~/.config/at-bot/session.json
+  │   ├─→ Save session to ~/.config/atproto/session.json
   │   └─→ Return success
   │
   └─→ Display success message
@@ -187,7 +187,7 @@ mcp-server (stdin)
 ### Example 3: Creating a Post
 
 ```
-CLI: $ at-bot post "Hello Bluesky!"
+CLI: $ atproto post "Hello Bluesky!"
 OR
 MCP: post_create {text: "Hello Bluesky!"}
 
@@ -227,8 +227,8 @@ lib/
 
 ```
 bin/
-├── at-bot               # Main CLI entry point
-├── at-bot-lib           # CLI library functions (future)
+├── atproto               # Main CLI entry point
+├── atproto-lib           # CLI library functions (future)
 └── commands/            # Command implementations (future)
     ├── login.sh
     ├── post.sh

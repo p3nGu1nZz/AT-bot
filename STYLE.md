@@ -1,6 +1,6 @@
-# AT-bot Style Guide
+# atproto Style Guide
 
-This document defines the coding standards, conventions, and best practices for the AT-bot project. Following these guidelines ensures code consistency, maintainability, and collaboration effectiveness.
+This document defines the coding standards, conventions, and best practices for the atproto project. Following these guidelines ensures code consistency, maintainability, and collaboration effectiveness.
 
 ## General Principles
 
@@ -34,7 +34,7 @@ set -e  # Exit on any error
 set -e
 
 # Constants and configuration
-CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/at-bot"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/atproto"
 SESSION_FILE="$CONFIG_DIR/session.json"
 
 # Source dependencies
@@ -202,9 +202,9 @@ token()
 ### Directory Structure
 
 ```
-AT-bot/
+atproto/
 ├── bin/              # Executable scripts
-│   └── at-bot        # Main CLI entry point
+│   └── atproto        # Main CLI entry point
 ├── lib/              # Library functions and modules
 │   ├── atproto.sh    # AT Protocol functions
 │   ├── utils.sh      # Utility functions (future)
@@ -526,7 +526,7 @@ case "$(uname -s)" in
 esac
 
 # Use appropriate config directories
-CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/at-bot"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/atproto"
 ```
 
 ## Documentation Organization Guidelines

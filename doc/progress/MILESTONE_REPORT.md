@@ -1,4 +1,4 @@
-# 🎉 AT-bot Development Milestone Report
+# 🎉 atproto Development Milestone Report
 **Date**: October 28, 2025  
 **Session**: Major Feature Expansion  
 **Achievement**: 28% Project Completion
@@ -7,7 +7,7 @@
 
 ## 🚀 Executive Summary
 
-AT-bot has successfully crossed the 25% completion milestone with significant additions to core functionality:
+atproto has successfully crossed the 25% completion milestone with significant additions to core functionality:
 - **3 major features** added: Follow, Unfollow, and Search
 - **3 new MCP tools** for agent integration
 - **Full CI/CD pipeline** established
@@ -21,14 +21,14 @@ AT-bot has successfully crossed the 25% completion milestone with significant ad
 ### Complete CLI Workflow
 ```bash
 # Full user journey supported
-at-bot login                          # ✅ Secure authentication (AES-256-CBC)
-at-bot whoami                         # ✅ Identity verification
-at-bot post "Hello Bluesky!"         # ✅ Content creation
-at-bot feed 20                        # ✅ Timeline reading
-at-bot search "AT Protocol" 15        # ✅ Content discovery
-at-bot follow user.bsky.social        # ✅ Network building
-at-bot unfollow user.bsky.social      # ✅ Connection management
-at-bot logout                         # ✅ Session cleanup
+atproto login                          # ✅ Secure authentication (AES-256-CBC)
+atproto whoami                         # ✅ Identity verification
+atproto post "Hello Bluesky!"         # ✅ Content creation
+atproto feed 20                        # ✅ Timeline reading
+atproto search "AT Protocol" 15        # ✅ Content discovery
+atproto follow user.bsky.social        # ✅ Network building
+atproto unfollow user.bsky.social      # ✅ Connection management
+atproto logout                         # ✅ Session cleanup
 ```
 
 ### MCP Tools for AI Agents
@@ -165,7 +165,7 @@ Error Handling: Comprehensive
 ### Lines of Code by Category
 ```
 Core Library (lib/atproto.sh):     ~900 lines
-CLI Interface (bin/at-bot):        ~150 lines
+CLI Interface (bin/atproto):        ~150 lines
 Tests (tests/*.sh):                ~400 lines
 MCP Server (mcp-server/src/):      ~300 lines
 Documentation (doc/*.md):          ~2500 lines
@@ -268,9 +268,9 @@ debug "Using encrypted credentials"
 ### Command Simplicity
 ```bash
 # Natural, intuitive commands
-at-bot post "My message"          # Not: at-bot create-post --text="My message"
-at-bot follow user.bsky.social    # Not: at-bot user follow --handle=user.bsky.social
-at-bot search "query"             # Not: at-bot posts search --query="query"
+atproto post "My message"          # Not: atproto create-post --text="My message"
+atproto follow user.bsky.social    # Not: atproto user follow --handle=user.bsky.social
+atproto search "query"             # Not: atproto posts search --query="query"
 ```
 
 ### Helpful Feedback
@@ -349,7 +349,7 @@ at-bot search "query"             # Not: at-bot posts search --query="query"
 - **Production-ready** for development use
 
 **Impact:**
-- AT-bot is now **usable for real workflows**
+- atproto is now **usable for real workflows**
 - **AI agents can interact** with Bluesky
 - **Community can contribute** with confidence
 - **Path to v1.0** is clear
@@ -360,23 +360,23 @@ at-bot search "query"             # Not: at-bot posts search --query="query"
 
 ### Quick Install
 ```bash
-git clone https://github.com/p3nGu1nZz/AT-bot.git
-cd AT-bot
+git clone https://github.com/p3nGu1nZz/atproto.git
+cd atproto
 sudo make install
 ```
 
 ### First Steps
 ```bash
-at-bot login              # Authenticate
-at-bot whoami             # Verify
-at-bot post "Hello!"      # Create content
-at-bot feed               # See timeline
+atproto login              # Authenticate
+atproto whoami             # Verify
+atproto post "Hello!"      # Create content
+atproto feed               # See timeline
 ```
 
 ### For Developers
 ```bash
 make test                 # Run tests
-DEBUG=1 at-bot login      # Debug mode
+DEBUG=1 atproto login      # Debug mode
 ./tests/test_follow.sh    # Test specific feature
 ```
 
@@ -399,7 +399,7 @@ DEBUG=1 at-bot login      # Debug mode
 ## 📊 Final Statistics
 
 ```
-=== AT-bot v0.1.0 ===
+=== atproto v0.1.0 ===
 
 Project Completion:      28% (11/40 tasks)
 CLI Commands:            8 commands
@@ -424,4 +424,4 @@ Dependencies:           Minimal (bash, curl, openssl)
 
 ---
 
-**🚀 AT-bot: Simple, Secure, Powerful AT Protocol CLI**
+**🚀 atproto: Simple, Secure, Powerful AT Protocol CLI**

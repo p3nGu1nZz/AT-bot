@@ -1,9 +1,9 @@
 #!/bin/bash
-# AT-bot bash completion script
-# Install with: cp scripts/at-bot-completion.bash /etc/bash_completion.d/at-bot
-# Or source manually: source scripts/at-bot-completion.bash
+# atproto bash completion script
+# Install with: cp scripts/atproto-completion.bash /etc/bash_completion.d/atproto
+# Or source manually: source scripts/atproto-completion.bash
 
-_at_bot_completion() {
+_atproto_completion() {
     local cur prev words cword
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
@@ -138,4 +138,4 @@ _at_bot_completion() {
 }
 
 # Register the completion function
-complete -o bashdefault -o default -o nospace -F _at_bot_completion at-bot
+complete -o bashdefault -o default -o nospace -F _atproto_completion atproto

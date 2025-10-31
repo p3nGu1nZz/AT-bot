@@ -1,6 +1,6 @@
-# AT-bot Quick Start Guide
+# atproto Quick Start Guide
 
-This guide will help you get started with AT-bot quickly.
+This guide will help you get started with atproto quickly.
 
 ## Prerequisites
 
@@ -15,25 +15,25 @@ This guide will help you get started with AT-bot quickly.
 1. Log in to your Bluesky account at https://bsky.app/
 2. Go to Settings → App Passwords
 3. Click "Add App Password"
-4. Give it a name (e.g., "AT-bot CLI")
+4. Give it a name (e.g., "atproto CLI")
 5. Copy the generated password
 
 **Important:** Use app passwords, not your main account password!
 
-## Step 2: Install AT-bot
+## Step 2: Install atproto
 
 Clone and install:
 
 ```bash
 git clone https://github.com/p3nGu1nZz/atproto.git
-cd AT-bot
+cd atproto
 ./install.sh
 ```
 
 ## Step 3: Login
 
 ```bash
-at-bot login
+atproto login
 ```
 
 Enter your Bluesky handle (e.g., `yourname.bsky.social`) and the app password you generated.
@@ -41,14 +41,14 @@ Enter your Bluesky handle (e.g., `yourname.bsky.social`) and the app password yo
 ## Step 4: Verify Login
 
 ```bash
-at-bot whoami
+atproto whoami
 ```
 
 You should see your handle and DID (Decentralized Identifier).
 
 ## Next Steps
 
-- Explore available commands with `at-bot help`
+- Explore available commands with `atproto help`
 - Check out the main README.md for detailed documentation
 - Look at the lib/atproto.sh file to understand the API integration
 
@@ -69,7 +69,7 @@ brew install curl
 
 Make sure the script is executable:
 ```bash
-chmod +x /usr/local/bin/at-bot
+chmod +x /usr/local/bin/atproto
 ```
 
 ### "Login failed: Invalid identifier or password"
