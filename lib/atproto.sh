@@ -172,8 +172,16 @@ json_get_field() {
     local json="$1"
     local field="$2"
     
-    # Use sed for more robust extraction
-    echo "$json" | sed -n 's/.*"'"$field"'":"\([^"]*\)".*/\1/p' | head -n1
+    # Try to extract quoted string value first (for strings)
+    local value
+    value=$(echo "$json" | grep -o '"'"$field"'":"[^"]*"' | head -n1 | sed 's/^"[^"]*":"\(.*\)"$/\1/')
+    
+    # If no quoted value found, try numeric/boolean value (not quoted in JSON)
+    if [ -z "$value" ]; then
+        value=$(echo "$json" | grep -o '"'"$field"'":[0-9]*' | head -n1 | sed 's/^"[^"]*"://')
+    fi
+    
+    echo "$value"
 }
 
 # Login to Bluesky
@@ -1240,6 +1248,29 @@ get_access_token() {
     json_get_field "$session_data" "accessJwt"
 }
 
+# Get DID from session file
+# 
+# Retrieves the user's DID from the stored session data.
+#
+# Returns:
+#   0 - Success, DID printed to stdout
+#   1 - Session file not found
+#
+# Environment:
+#   SESSION_FILE - Session file location
+#
+# Outputs:
+#   User's DID on success, nothing on failure
+get_session_did() {
+    if [ ! -f "$SESSION_FILE" ]; then
+        return 1
+    fi
+    
+    local session_data
+    session_data=$(cat "$SESSION_FILE")
+    json_get_field "$session_data" "did"
+}
+
 # Refresh session using refresh token
 # 
 # Automatically refreshes the session using the stored refresh token.
@@ -1528,12 +1559,26 @@ atproto_show_profile() {
     
     # Extract profile fields
     local handle display_name description followers following posts
+    local created_at indexed_at lists feedgens starter_packs did
+    
     handle=$(json_get_field "$profile_json" "handle")
     display_name=$(json_get_field "$profile_json" "displayName")
     description=$(json_get_field "$profile_json" "description")
+    did=$(json_get_field "$profile_json" "did")
+    
+    # Stats
     followers=$(json_get_field "$profile_json" "followersCount")
     following=$(json_get_field "$profile_json" "followsCount")
     posts=$(json_get_field "$profile_json" "postsCount")
+    
+    # Dates
+    created_at=$(json_get_field "$profile_json" "createdAt")
+    indexed_at=$(json_get_field "$profile_json" "indexedAt")
+    
+    # Associated content (extract from nested "associated" object)
+    lists=$(echo "$profile_json" | grep -o '"lists":[0-9]*' | head -n1 | cut -d':' -f2)
+    feedgens=$(echo "$profile_json" | grep -o '"feedgens":[0-9]*' | head -n1 | cut -d':' -f2)
+    starter_packs=$(echo "$profile_json" | grep -o '"starterPacks":[0-9]*' | head -n1 | cut -d':' -f2)
     
     # Display profile
     echo ""
@@ -1545,16 +1590,53 @@ atproto_show_profile() {
         echo -e "${GREEN}Name:${NC}        $display_name"
     fi
     echo -e "${GREEN}Handle:${NC}      @$handle"
+    echo -e "${GREEN}DID:${NC}         $did"
     
     if [ -n "$description" ]; then
-        echo -e "${GREEN}Bio:${NC}         $description"
+        echo ""
+        echo -e "${GREEN}Bio:${NC}"
+        # Properly handle newlines in bio (replace \n with actual newlines)
+        echo -e "$description" | sed 's/^/  /'
     fi
     
     echo ""
     echo -e "${GREEN}Stats:${NC}"
-    echo -e "  Posts:     ${BLUE}${posts:-N/A}${NC}"
-    echo -e "  Followers: ${BLUE}${followers:-N/A}${NC}"
-    echo -e "  Following: ${BLUE}${following:-N/A}${NC}"
+    echo -e "  Posts:     ${BLUE}${posts:-0}${NC}"
+    echo -e "  Followers: ${BLUE}${followers:-0}${NC}"
+    echo -e "  Following: ${BLUE}${following:-0}${NC}"
+    
+    # Show associated content if any exists
+    if [ -n "$lists" ] && [ "$lists" != "0" ] || [ -n "$feedgens" ] && [ "$feedgens" != "0" ] || [ -n "$starter_packs" ] && [ "$starter_packs" != "0" ]; then
+        echo ""
+        echo -e "${GREEN}Content:${NC}"
+        if [ -n "$lists" ] && [ "$lists" != "0" ]; then
+            echo -e "  Lists:         ${BLUE}${lists}${NC}"
+        fi
+        if [ -n "$feedgens" ] && [ "$feedgens" != "0" ]; then
+            echo -e "  Custom Feeds:  ${BLUE}${feedgens}${NC}"
+        fi
+        if [ -n "$starter_packs" ] && [ "$starter_packs" != "0" ]; then
+            echo -e "  Starter Packs: ${BLUE}${starter_packs}${NC}"
+        fi
+    fi
+    
+    # Show dates
+    if [ -n "$created_at" ] || [ -n "$indexed_at" ]; then
+        echo ""
+        echo -e "${GREEN}Activity:${NC}"
+        if [ -n "$created_at" ]; then
+            # Format: 2025-06-19T00:00:41.439Z -> June 19, 2025
+            local date_formatted
+            date_formatted=$(echo "$created_at" | sed 's/T.*//' | xargs -I {} date -d {} "+%B %d, %Y" 2>/dev/null || echo "$created_at")
+            echo -e "  Joined:        ${BLUE}${date_formatted}${NC}"
+        fi
+        if [ -n "$indexed_at" ]; then
+            local indexed_formatted
+            indexed_formatted=$(echo "$indexed_at" | sed 's/T.*//' | xargs -I {} date -d {} "+%B %d, %Y" 2>/dev/null || echo "$indexed_at")
+            echo -e "  Last Updated:  ${BLUE}${indexed_formatted}${NC}"
+        fi
+    fi
+    
     echo ""
     
     return 0

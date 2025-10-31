@@ -41,6 +41,8 @@ install:
 	install -m 644 lib/atproto.sh $(LIBDIR)/atproto.sh
 	install -m 644 lib/config.sh $(LIBDIR)/config.sh
 	install -m 644 lib/crypt.sh $(LIBDIR)/crypt.sh
+	install -m 644 lib/reporter.sh $(LIBDIR)/reporter.sh
+	install -m 644 lib/cli-utils.sh $(LIBDIR)/cli-utils.sh
 	install -m 755 lib/doc.sh $(LIBDIR)/doc.sh
 	install -m 644 README.md $(DOCDIR)/README.md
 	install -m 644 LICENSE $(DOCDIR)/LICENSE

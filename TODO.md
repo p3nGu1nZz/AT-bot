@@ -59,6 +59,9 @@ This document tracks pending tasks, improvements, and features for the AT-bot pr
 - [x] ✅ **COMPLETED** - Add reply functionality for posts (atproto_reply, threading support)
 - [x] ✅ **COMPLETED** - Implement search functionality (atproto_search for posts and users)
 - [x] ✅ **COMPLETED** - Support for blocks and mutes management (block_user, unblock_user, mute_user, unmute_user)
+- [x] ✅ **COMPLETED** - Enhanced profile display with stats, content, and activity dates (October 31, 2025)
+- [x] ✅ **COMPLETED** - Fixed JSON parsing for numeric values and nested objects (json_get_field enhancement)
+- [x] ✅ **COMPLETED** - Added get_session_did() helper function for profile operations
 - [ ] Add support for custom feeds
 - [ ] Implement pinned posts support
 - [ ] Add repost functionality with custom text
@@ -133,6 +136,7 @@ This document tracks pending tasks, improvements, and features for the AT-bot pr
 ### Installation
 - [x] ✅ **COMPLETED** - Create dependency setup script (`lib/setup.sh`) with OS detection and package manager support
 - [x] ✅ **COMPLETED** - Integrate setup script into `install.sh` for automatic dependency checking
+- [x] ✅ **COMPLETED** - Fix Makefile to install all required library files (reporter.sh, cli-utils.sh) - October 31, 2025
 - [ ] Create Debian package (.deb)
 - [ ] Add Homebrew formula for macOS
 - [ ] Create Snap package for Linux
@@ -300,7 +304,7 @@ For more details, see [CONTRIBUTING.md](doc/CONTRIBUTING.md).
 
 ---
 
-*Last updated: October 28, 2025*
+*Last updated: October 31, 2025*
 *This is a living document - items may be added, removed, or reprioritized based on community feedback and project evolution.*
 
 ## Phase 1 Completion Summary
@@ -328,7 +332,7 @@ For more details, see [CONTRIBUTING.md](doc/CONTRIBUTING.md).
 - ✅ Block/unblock users
 - ✅ Mute/unmute users
 - ✅ Media upload (images, videos)
-- ✅ Profile view and edit
+- ✅ Profile view and edit with complete stats
 - ✅ Thread support for replies
 - ✅ Error handling and validation
 - ✅ Comprehensive API integration
@@ -378,4 +382,4 @@ Phase 2 will focus on:
 - Enterprise features and scalability
 - Third-party integrations
 
-*Last updated: October 28, 2025*
+*Last updated: October 31, 2025*
