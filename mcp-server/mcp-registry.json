@@ -1,0 +1,667 @@
+{
+  "name": "@atproto/mcp-server",
+  "version": "0.1.0",
+  "description": "Model Context Protocol server for Bluesky/AT Protocol - enables AI agents to interact with the decentralized social network",
+  "homepage": "https://github.com/p3nGu1nZz/atproto",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/p3nGu1nZz/atproto.git"
+  },
+  "license": "MIT",
+  "author": "atproto Contributors",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "bluesky",
+    "at-protocol",
+    "atproto",
+    "ai-agent",
+    "automation",
+    "social-media",
+    "decentralized"
+  ],
+  "installation": {
+    "npm": "npm install -g @atproto/mcp-server",
+    "source": "git clone https://github.com/p3nGu1nZz/atproto.git && cd atproto && ./install.sh"
+  },
+  "configuration": {
+    "claude_desktop": {
+      "file": "~/Library/Application Support/Claude/claude_desktop_config.json",
+      "config": {
+        "mcpServers": {
+          "atproto": {
+            "command": "atproto-mcp-server"
+          }
+        }
+      }
+    },
+    "vscode": {
+      "file": ".vscode/settings.json",
+      "config": {
+        "mcp.servers": {
+          "atproto": {
+            "command": "atproto-mcp-server"
+          }
+        }
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "auth_login",
+      "category": "Authentication",
+      "description": "Authenticate with Bluesky using handle and app password",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "Bluesky handle (e.g., user.bsky.social)"
+          },
+          "password": {
+            "type": "string",
+            "description": "App password (recommended) or account password"
+          }
+        },
+        "required": ["handle", "password"]
+      }
+    },
+    {
+      "name": "auth_logout",
+      "category": "Authentication",
+      "description": "Clear authentication session and logout",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "auth_whoami",
+      "category": "Authentication",
+      "description": "Get information about currently authenticated user",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "auth_is_authenticated",
+      "category": "Authentication",
+      "description": "Check if user is currently authenticated",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "post_create",
+      "category": "Content",
+      "description": "Create a new post on Bluesky with automatic hashtag and mention detection",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Post content (max 300 characters). Supports #hashtags and @mentions"
+          }
+        },
+        "required": ["text"]
+      }
+    },
+    {
+      "name": "post_reply",
+      "category": "Content",
+      "description": "Reply to an existing post",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "uri": {
+            "type": "string",
+            "description": "AT-URI of the post to reply to"
+          },
+          "text": {
+            "type": "string",
+            "description": "Reply content"
+          }
+        },
+        "required": ["uri", "text"]
+      }
+    },
+    {
+      "name": "post_like",
+      "category": "Content",
+      "description": "Like a post",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "uri": {
+            "type": "string",
+            "description": "AT-URI of the post to like"
+          }
+        },
+        "required": ["uri"]
+      }
+    },
+    {
+      "name": "post_repost",
+      "category": "Content",
+      "description": "Repost (share) a post to your timeline",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "uri": {
+            "type": "string",
+            "description": "AT-URI of the post to repost"
+          }
+        },
+        "required": ["uri"]
+      }
+    },
+    {
+      "name": "post_delete",
+      "category": "Content",
+      "description": "Delete one of your own posts",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "uri": {
+            "type": "string",
+            "description": "AT-URI of the post to delete"
+          }
+        },
+        "required": ["uri"]
+      }
+    },
+    {
+      "name": "feed_read",
+      "category": "Feed",
+      "description": "Read posts from your timeline/feed",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "number",
+            "description": "Number of posts to retrieve (default: 10)"
+          }
+        }
+      }
+    },
+    {
+      "name": "feed_search",
+      "category": "Feed",
+      "description": "Search for posts matching a query",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search query"
+          },
+          "limit": {
+            "type": "number",
+            "description": "Number of results (default: 20)"
+          }
+        },
+        "required": ["query"]
+      }
+    },
+    {
+      "name": "feed_timeline",
+      "category": "Feed",
+      "description": "Get your personalized timeline",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "number",
+            "description": "Number of posts (default: 10)"
+          }
+        }
+      }
+    },
+    {
+      "name": "feed_notifications",
+      "category": "Feed",
+      "description": "Get your notifications",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "number",
+            "description": "Number of notifications (default: 20)"
+          }
+        }
+      }
+    },
+    {
+      "name": "profile_get",
+      "category": "Profile",
+      "description": "Get detailed profile information for a user",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "User handle (optional, defaults to authenticated user)"
+          }
+        }
+      }
+    },
+    {
+      "name": "profile_follow",
+      "category": "Profile",
+      "description": "Follow a user",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "Handle of user to follow"
+          }
+        },
+        "required": ["handle"]
+      }
+    },
+    {
+      "name": "profile_unfollow",
+      "category": "Profile",
+      "description": "Unfollow a user",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "Handle of user to unfollow"
+          }
+        },
+        "required": ["handle"]
+      }
+    },
+    {
+      "name": "profile_block",
+      "category": "Profile",
+      "description": "Block a user",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "Handle of user to block"
+          }
+        },
+        "required": ["handle"]
+      }
+    },
+    {
+      "name": "follow_user",
+      "category": "Social",
+      "description": "Follow a user on Bluesky",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "Handle or DID of user to follow"
+          }
+        },
+        "required": ["handle"]
+      }
+    },
+    {
+      "name": "unfollow_user",
+      "category": "Social",
+      "description": "Unfollow a user",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "Handle or DID of user to unfollow"
+          }
+        },
+        "required": ["handle"]
+      }
+    },
+    {
+      "name": "block_user",
+      "category": "Social",
+      "description": "Block a user",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "Handle of user to block"
+          }
+        },
+        "required": ["handle"]
+      }
+    },
+    {
+      "name": "unblock_user",
+      "category": "Social",
+      "description": "Unblock a previously blocked user",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "Handle of user to unblock"
+          }
+        },
+        "required": ["handle"]
+      }
+    },
+    {
+      "name": "get_followers",
+      "category": "Social",
+      "description": "Get list of followers for a user",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "User handle (optional, defaults to current user)"
+          },
+          "limit": {
+            "type": "number",
+            "description": "Number of followers (default: 50, max: 100)"
+          }
+        }
+      }
+    },
+    {
+      "name": "get_following",
+      "category": "Social",
+      "description": "Get list of users being followed",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "User handle (optional, defaults to current user)"
+          },
+          "limit": {
+            "type": "number",
+            "description": "Number of following (default: 50, max: 100)"
+          }
+        }
+      }
+    },
+    {
+      "name": "search_posts",
+      "category": "Search",
+      "description": "Search for posts matching a query",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search query string"
+          },
+          "limit": {
+            "type": "number",
+            "description": "Number of results (default: 20, max: 100)"
+          }
+        },
+        "required": ["query"]
+      }
+    },
+    {
+      "name": "search_users",
+      "category": "Search",
+      "description": "Search for users by handle or display name",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search query (handle or name)"
+          }
+        },
+        "required": ["query"]
+      }
+    },
+    {
+      "name": "search_timeline",
+      "category": "Search",
+      "description": "Search within your timeline",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search query"
+          },
+          "limit": {
+            "type": "number",
+            "description": "Number of results"
+          }
+        },
+        "required": ["query"]
+      }
+    },
+    {
+      "name": "batch_post",
+      "category": "Batch",
+      "description": "Create multiple posts from an array",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "posts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of post texts"
+          }
+        },
+        "required": ["posts"]
+      }
+    },
+    {
+      "name": "batch_follow",
+      "category": "Batch",
+      "description": "Follow multiple users at once",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "handles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of user handles"
+          }
+        },
+        "required": ["handles"]
+      }
+    },
+    {
+      "name": "batch_unfollow",
+      "category": "Batch",
+      "description": "Unfollow multiple users at once",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "handles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of user handles"
+          }
+        },
+        "required": ["handles"]
+      }
+    },
+    {
+      "name": "batch_like",
+      "category": "Batch",
+      "description": "Like multiple posts at once",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "uris": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of post URIs"
+          }
+        },
+        "required": ["uris"]
+      }
+    },
+    {
+      "name": "batch_from_file",
+      "category": "Batch",
+      "description": "Execute batch operations from a file",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "filepath": {
+            "type": "string",
+            "description": "Path to file with operations"
+          },
+          "operation": {
+            "type": "string",
+            "enum": ["post", "follow", "unfollow", "like"],
+            "description": "Type of batch operation"
+          }
+        },
+        "required": ["filepath", "operation"]
+      }
+    },
+    {
+      "name": "like_post",
+      "category": "Engagement",
+      "description": "Like a post on Bluesky",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "uri": {
+            "type": "string",
+            "description": "Post URI (at://...)"
+          }
+        },
+        "required": ["uri"]
+      }
+    },
+    {
+      "name": "repost_post",
+      "category": "Engagement",
+      "description": "Repost a post to your timeline",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "uri": {
+            "type": "string",
+            "description": "Post URI (at://...)"
+          }
+        },
+        "required": ["uri"]
+      }
+    },
+    {
+      "name": "delete_post",
+      "category": "Engagement",
+      "description": "Delete one of your posts",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "uri": {
+            "type": "string",
+            "description": "Post URI (at://...)"
+          }
+        },
+        "required": ["uri"]
+      }
+    }
+  ],
+  "examples": [
+    {
+      "title": "Authenticate and Post",
+      "description": "Login to Bluesky and create a post",
+      "steps": [
+        {
+          "tool": "auth_login",
+          "input": {
+            "handle": "user.bsky.social",
+            "password": "app-password-here"
+          }
+        },
+        {
+          "tool": "post_create",
+          "input": {
+            "text": "Hello from AI! 🤖 #atprotocol"
+          }
+        }
+      ]
+    },
+    {
+      "title": "Search and Analyze",
+      "description": "Search for posts about a topic and analyze them",
+      "steps": [
+        {
+          "tool": "search_posts",
+          "input": {
+            "query": "MCP",
+            "limit": 10
+          }
+        }
+      ]
+    },
+    {
+      "title": "Batch Follow Users",
+      "description": "Follow multiple users at once",
+      "steps": [
+        {
+          "tool": "batch_follow",
+          "input": {
+            "handles": ["alice.bsky.social", "bob.bsky.social", "charlie.bsky.social"]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Automated Content",
+      "description": "Create multiple posts from content",
+      "steps": [
+        {
+          "tool": "batch_post",
+          "input": {
+            "posts": [
+              "Post 1: Daily update 📊",
+              "Post 2: New features released! 🎉",
+              "Post 3: Thanks to our community! 🙏"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "capabilities": {
+    "authentication": true,
+    "posting": true,
+    "reading": true,
+    "social": true,
+    "search": true,
+    "batch_operations": true,
+    "media_upload": true,
+    "rich_text": true,
+    "notifications": true
+  },
+  "security": {
+    "app_passwords_recommended": true,
+    "session_encryption": "AES-256-CBC",
+    "secure_storage": true,
+    "rate_limiting": true
+  },
+  "links": {
+    "documentation": "https://github.com/p3nGu1nZz/atproto/blob/main/mcp-server/docs/MCP_TOOLS.md",
+    "quickstart": "https://github.com/p3nGu1nZz/atproto/blob/main/mcp-server/README.md",
+    "issues": "https://github.com/p3nGu1nZz/atproto/issues",
+    "discussions": "https://github.com/p3nGu1nZz/atproto/discussions"
+  }
+}

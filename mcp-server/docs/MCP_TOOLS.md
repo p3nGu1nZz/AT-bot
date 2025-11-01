@@ -1030,5 +1030,333 @@ See PLAN.md for timeline.
 
 ---
 
-*Last updated: October 28, 2025*  
-For integration examples, see MCP_INTEGRATION.md*
+## Common Usage Patterns
+
+### Pattern 1: Authentication Flow
+
+Always authenticate before making API calls:
+
+```javascript
+// Step 1: Check authentication
+const authStatus = await callTool('auth_is_authenticated');
+
+if (!authStatus.authenticated) {
+  // Step 2: Login if needed
+  await callTool('auth_login', {
+    handle: 'user.bsky.social',
+    password: 'app-password-here'
+  });
+}
+
+// Step 3: Verify authentication
+const userInfo = await callTool('auth_whoami');
+console.log(`Logged in as: ${userInfo.handle}`);
+```
+
+### Pattern 2: Create Post with Error Handling
+
+Robust post creation with error handling:
+
+```javascript
+try {
+  const result = await callTool('post_create', {
+    text: 'Hello from AI! 🤖 #atprotocol'
+  });
+  
+  if (result.success) {
+    console.log(`Post created: ${result.uri}`);
+  }
+} catch (error) {
+  if (error.code === 'auth_required') {
+    console.log('Please authenticate first');
+  } else if (error.code === 'rate_limited') {
+    console.log('Rate limited, waiting...');
+    await sleep(60000); // Wait 1 minute
+    // Retry...
+  } else {
+    console.error('Failed to create post:', error.message);
+  }
+}
+```
+
+### Pattern 3: Batch Following
+
+Follow multiple users efficiently:
+
+```javascript
+const usersToFollow = [
+  'alice.bsky.social',
+  'bob.bsky.social',
+  'charlie.bsky.social'
+];
+
+for (const handle of usersToFollow) {
+  try {
+    const result = await callTool('follow_user', { handle });
+    console.log(result.message);
+    
+    // Add delay to respect rate limits
+    await sleep(1000); // 1 second between follows
+  } catch (error) {
+    console.error(`Failed to follow ${handle}:`, error.message);
+  }
+}
+```
+
+### Pattern 4: Search and Filter
+
+Search for posts and filter results:
+
+```javascript
+// Search for posts
+const results = await callTool('search_posts', {
+  query: 'MCP',
+  limit: 50
+});
+
+// Parse and filter results
+const relevantPosts = results.message
+  .split('\n\n')
+  .filter(post => post.includes('Model Context Protocol'))
+  .slice(0, 10); // Top 10 most relevant
+
+console.log('Most relevant posts about MCP:');
+relevantPosts.forEach((post, idx) => {
+  console.log(`${idx + 1}. ${post}`);
+});
+```
+
+### Pattern 5: Content Moderation
+
+Automated content moderation workflow:
+
+```javascript
+// Get recent feed posts
+const feed = await callTool('read_feed', { limit: 20 });
+
+// Check for spam patterns
+const spamKeywords = ['crypto', 'NFT', 'pump', 'moon'];
+const suspiciousAccounts = [];
+
+// Parse feed and identify suspicious content
+// (implementation depends on feed format)
+
+// Block suspicious accounts
+for (const handle of suspiciousAccounts) {
+  await callTool('block_user', { handle });
+  console.log(`Blocked suspicious account: ${handle}`);
+}
+```
+
+### Pattern 6: Engagement Metrics
+
+Track and analyze engagement:
+
+```javascript
+// Get user profile
+const profile = await callTool('auth_whoami');
+
+// Get followers and following
+const followers = await callTool('get_followers', { limit: 100 });
+const following = await callTool('get_following', { limit: 100 });
+
+// Calculate metrics
+const metrics = {
+  handle: profile.handle,
+  followerCount: followers.message.split('\n').length - 2,
+  followingCount: following.message.split('\n').length - 2,
+  ratio: 0
+};
+
+metrics.ratio = (metrics.followerCount / metrics.followingCount).toFixed(2);
+
+console.log('Engagement Metrics:');
+console.log(`Followers: ${metrics.followerCount}`);
+console.log(`Following: ${metrics.followingCount}`);
+console.log(`Ratio: ${metrics.ratio}`);
+```
+
+### Pattern 7: Content Scheduling
+
+Simulate scheduled posting:
+
+```javascript
+const scheduledPosts = [
+  { time: '09:00', text: 'Good morning! ☀️ #goodvibes' },
+  { time: '12:00', text: 'Lunch break thoughts... 🍱' },
+  { time: '18:00', text: 'End of day summary 🌆' }
+];
+
+// Check current time and post if scheduled
+for (const post of scheduledPosts) {
+  const currentTime = new Date().toTimeString().slice(0, 5);
+  
+  if (currentTime === post.time) {
+    await callTool('post_create', { text: post.text });
+    console.log(`Posted scheduled content at ${post.time}`);
+  }
+}
+```
+
+### Pattern 8: Thread Creation
+
+Create a thread of posts:
+
+```javascript
+const threadPosts = [
+  "1/3 Let me explain how AT Protocol works...",
+  "2/3 AT Protocol is a decentralized social networking protocol...",
+  "3/3 You can build your own apps using AT Protocol! 🚀"
+];
+
+let previousUri = null;
+
+for (const text of threadPosts) {
+  if (previousUri) {
+    // Reply to previous post
+    const result = await callTool('post_reply', {
+      text: text,
+      replyTo: previousUri
+    });
+    previousUri = result.uri;
+  } else {
+    // First post
+    const result = await callTool('post_create', { text });
+    previousUri = result.uri;
+  }
+  
+  await sleep(2000); // Wait 2 seconds between posts
+}
+
+console.log('Thread created successfully!');
+```
+
+## Quick Reference
+
+### Essential Commands
+
+| Task | Tool | Key Parameters |
+|------|------|----------------|
+| Login | `auth_login` | `handle`, `password` |
+| Check auth | `auth_is_authenticated` | - |
+| Post text | `post_create` | `text` |
+| Post with image | `post_with_image` | `text`, `imagePath` |
+| Reply | `post_reply` | `text`, `replyTo` |
+| Like post | `post_like` | `postUri` |
+| Follow user | `follow_user` | `handle` |
+| Search posts | `search_posts` | `query`, `limit` |
+| Read feed | `read_feed` | `limit` |
+| Get followers | `get_followers` | `handle`, `limit` |
+
+### Rate Limits
+
+Respect AT Protocol rate limits:
+
+- **Posts:** ~20 per minute
+- **Follows:** ~10 per minute
+- **Searches:** ~30 per minute
+- **Reads:** ~60 per minute
+
+Add delays between operations:
+```javascript
+await sleep(1000); // 1 second delay
+```
+
+### Best Practices
+
+1. **Always check authentication** before API calls
+2. **Use app passwords** instead of main account password
+3. **Handle errors gracefully** with try-catch blocks
+4. **Add delays** between batch operations
+5. **Validate input** before making API calls
+6. **Log operations** for debugging and auditing
+7. **Test with small batches** before scaling up
+8. **Monitor rate limits** and back off when needed
+
+### Common Error Scenarios
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `auth_required` | Not logged in | Call `auth_login` |
+| `auth_invalid` | Wrong credentials | Check handle/password |
+| `rate_limited` | Too many requests | Wait and retry with backoff |
+| `not_found` | Invalid URI/handle | Verify resource exists |
+| `invalid_input` | Bad parameters | Check parameter format |
+| `network_error` | Connection issue | Check internet connectivity |
+
+### Testing Tools
+
+Before production use, test with these safe operations:
+
+```javascript
+// 1. Check authentication status (no side effects)
+await callTool('auth_is_authenticated');
+
+// 2. Read your own profile (read-only)
+await callTool('auth_whoami');
+
+// 3. Read feed (read-only)
+await callTool('read_feed', { limit: 5 });
+
+// 4. Search (read-only)
+await callTool('search_posts', { query: 'test', limit: 5 });
+```
+
+## Integration Examples
+
+### Example 1: Daily Summary Bot
+
+```javascript
+// Fetch trending posts
+const trends = await callTool('search_posts', {
+  query: '#trending',
+  limit: 10
+});
+
+// Analyze and summarize
+const summary = analyzeTrends(trends); // Your analysis function
+
+// Post summary
+await callTool('post_create', {
+  text: `📊 Daily Summary:\n\n${summary}\n\n#dailydigest`
+});
+```
+
+### Example 2: Engagement Bot
+
+```javascript
+// Get recent posts from followers
+const feed = await callTool('read_feed', { limit: 20 });
+
+// Like posts with specific keywords
+const postsToLike = filterPosts(feed, ['innovation', 'technology']);
+
+for (const post of postsToLike) {
+  await callTool('post_like', { postUri: post.uri });
+  await sleep(2000); // Delay between likes
+}
+```
+
+### Example 3: Content Curator
+
+```javascript
+// Search for quality content
+const content = await callTool('search_posts', {
+  query: 'AI research',
+  limit: 20
+});
+
+// Filter high-quality posts
+const qualityPosts = filterQuality(content); // Your filtering logic
+
+// Repost best content
+for (const post of qualityPosts.slice(0, 5)) {
+  await callTool('post_repost', { postUri: post.uri });
+  await sleep(3000);
+}
+```
+
+---
+
+*Last updated: November 1, 2025*  
+*For integration guides, see [docs/integrations/](./integrations/)*
