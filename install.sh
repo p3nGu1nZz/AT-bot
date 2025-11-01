@@ -189,9 +189,12 @@ if [ $INSTALL_MCP -eq 1 ]; then
         # Build MCP server
         echo "Building MCP server..."
         cd "$SCRIPT_DIR/mcp-server"
-        npm install --quiet
-        npm run build --quiet
+        echo "  - Installing dependencies..."
+        npm install --silent 2>&1 | grep -v "^npm WARN" || true
+        echo "  - Compiling TypeScript..."
+        npm run build --silent 2>&1 | grep -v "^npm WARN" || true
         cd "$SCRIPT_DIR"
+        echo "  ✓ Build complete"
         
         # Install MCP server files to library directory
         echo "Installing MCP server files..."

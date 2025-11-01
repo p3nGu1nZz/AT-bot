@@ -1,0 +1,25 @@
+#!/bin/bash
+# atproto MCP Server Wrapper Script
+# This script provides an easy way to run the atproto MCP server
+
+set -e
+
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SERVER_DIR="$SCRIPT_DIR"
+SERVER_JS="$SERVER_DIR/dist/index.js"
+
+# Check if the server is built
+if [ ! -f "$SERVER_JS" ]; then
+    echo "Error: MCP server not built. Please run 'npm install && npm run build' first." >&2
+    exit 1
+fi
+
+# Check if Node.js is available
+if ! command -v node >/dev/null 2>&1; then
+    echo "Error: Node.js is not installed or not in PATH" >&2
+    exit 1
+fi
+
+# Run the MCP server
+exec node "$SERVER_JS" "$@"

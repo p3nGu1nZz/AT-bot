@@ -88,6 +88,37 @@ mcp-server/
 
 ## Getting Started
 
+### Quick Start
+
+```bash
+# Install dependencies and build
+npm install
+npm run build
+
+# Test the server (it will wait for JSON-RPC input via stdin)
+./atproto-mcp
+# Should output: atproto MCP Server started successfully
+# Registered 29 tools
+# Press Ctrl+C to exit
+
+# Test with a command
+echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | ./atproto-mcp
+```
+
+### Integration Guides
+
+- **Claude Desktop**: See [docs/CLAUDE_DESKTOP_SETUP.md](docs/CLAUDE_DESKTOP_SETUP.md)
+- **VS Code Copilot**: See [docs/VSCODE_COPILOT_SETUP.md](docs/VSCODE_COPILOT_SETUP.md)
+
+### Configuration
+
+Copy and edit the example configuration:
+
+```bash
+cp config.example.json config.json
+# Edit config.json with your absolute paths
+```
+
 ### For Developers
 
 See [DEVELOPMENT.md](docs/DEVELOPMENT.md) for setup instructions.

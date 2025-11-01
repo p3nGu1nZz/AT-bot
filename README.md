@@ -416,10 +416,11 @@ atproto takes security seriously:
 
 ### Quick Reference Guides
 
+- **[QUICKSTART.md](doc/QUICKSTART.md)** - Quick start guide to get up and running in 5 minutes
+- **[MCP_QUICKSTART.md](doc/MCP_QUICKSTART.md)** - 🆕 **MCP Server Quick Start** - Get AI agents working with atproto in 5 minutes
 - **[FAQ.md](doc/FAQ.md)** - Frequently asked questions about installation, usage, troubleshooting, and security
 - **[EXAMPLES.md](doc/EXAMPLES.md)** - Practical code examples and automation scripts
 - **[ENVIRONMENT_VARIABLES.md](doc/ENVIRONMENT_VARIABLES.md)** - Complete reference for all supported environment variables
-- **[QUICKSTART.md](doc/QUICKSTART.md)** - Quick start guide to get up and running in 5 minutes
 
 ### Technical Documentation
 

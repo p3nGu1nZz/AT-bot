@@ -526,6 +526,156 @@ create_hashtag_facets() {
     fi
 }
 
+# Resolve a handle to a DID
+# Arguments:
+#   $1 - handle (e.g., user.bsky.social)
+# Returns:
+#   DID or empty string if not found
+resolve_handle_to_did() {
+    local handle="$1"
+    
+    # Query AT Protocol to resolve handle to DID
+    local response
+    response=$(curl -s -X GET \
+        "${ATP_PDS}/xrpc/com.atproto.identity.resolveHandle?handle=$handle" \
+        -H "Content-Type: application/json" 2>&1)
+    
+    if [ $? -eq 0 ]; then
+        # Extract DID from response
+        local did
+        did=$(echo "$response" | grep -o '"did":"[^"]*"' | cut -d'"' -f4)
+        echo "$did"
+    else
+        echo ""
+    fi
+}
+
+# Extract mentions and create facets for rich text
+# Arguments:
+#   $1 - text content
+# Returns:
+#   JSON array of facets for mentions
+create_mention_facets() {
+    local text="$1"
+    local facets="[]"
+    
+    # Find all mentions in the text using grep
+    # Pattern: @followed by valid handle characters (alphanumeric, dots, hyphens)
+    # Valid handle format: @user.bsky.social or @handle.domain.tld
+    # Must be at start of string or preceded by whitespace (not part of email address)
+    local mentions
+    mentions=$(echo "$text" | grep -oE '(^|[[:space:]])@[a-zA-Z0-9][a-zA-Z0-9.-]*\.[a-zA-Z][a-zA-Z0-9.-]*' | sed 's/^[[:space:]]*//' | sort -u)
+    
+    if [ -z "$mentions" ]; then
+        echo "[]"
+        return 0
+    fi
+    
+    # Build facets array
+    local facet_items=""
+    local first=true
+    
+    while IFS= read -r mention; do
+        [ -z "$mention" ] && continue
+        
+        # Extract handle (remove @ prefix)
+        local handle="${mention#@}"
+        
+        # Validate handle format (must have at least one dot)
+        if ! echo "$handle" | grep -q '\.'; then
+            continue
+        fi
+        
+        # Resolve handle to DID
+        local did
+        did=$(resolve_handle_to_did "$handle")
+        
+        # Skip if DID resolution failed
+        if [ -z "$did" ]; then
+            warning "Could not resolve handle: @$handle (skipping)"
+            continue
+        fi
+        
+        # Find all occurrences of this mention in the text
+        local search_pos=0
+        local remaining_text="$text"
+        
+        while [ -n "$remaining_text" ]; do
+            # Find position of mention
+            local before="${remaining_text%%$mention*}"
+            if [ "$before" = "$remaining_text" ]; then
+                # No more occurrences
+                break
+            fi
+            
+            # Calculate byte positions (UTF-8 aware)
+            local byte_start=$((search_pos + ${#before}))
+            local byte_end=$((byte_start + ${#mention}))
+            
+            # Add facet for this occurrence
+            if [ "$first" = true ]; then
+                first=false
+            else
+                facet_items="$facet_items,"
+            fi
+            
+            facet_items="$facet_items
+        {
+            \"index\": {
+                \"byteStart\": $byte_start,
+                \"byteEnd\": $byte_end
+            },
+            \"features\": [
+                {
+                    \"\$type\": \"app.bsky.richtext.facet#mention\",
+                    \"did\": \"$did\"
+                }
+            ]
+        }"
+            
+            # Move past this occurrence
+            search_pos=$byte_end
+            remaining_text="${remaining_text#*$mention}"
+        done
+    done <<< "$mentions"
+    
+    # Return JSON array
+    if [ -n "$facet_items" ]; then
+        echo "[$facet_items
+    ]"
+    else
+        echo "[]"
+    fi
+}
+
+# Merge multiple facet arrays into one
+# Arguments:
+#   $@ - multiple facet JSON arrays
+# Returns:
+#   Combined JSON array of all facets
+merge_facets() {
+    local all_facets="[]"
+    
+    for facet_array in "$@"; do
+        # Skip empty arrays
+        if [ "$facet_array" = "[]" ] || [ -z "$facet_array" ]; then
+            continue
+        fi
+        
+        # If all_facets is empty, use this array
+        if [ "$all_facets" = "[]" ]; then
+            all_facets="$facet_array"
+        else
+            # Merge: remove closing ] from first and opening [ from second
+            local first_content="${all_facets%]}"  # Remove closing ]
+            local second_content="${facet_array#[}"  # Remove opening [
+            all_facets="${first_content},${second_content}"
+        fi
+    done
+    
+    echo "$all_facets"
+}
+
 # Create a post on Bluesky
 # Arguments:
 #   $1 - post text content
@@ -561,13 +711,16 @@ atproto_post() {
     local timestamp
     timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
     
-    # Detect hashtags and create facets
-    local facets
-    facets=$(create_hashtag_facets "$text")
+    # Detect hashtags and mentions, then merge facets
+    local hashtag_facets mention_facets all_facets
+    hashtag_facets=$(create_hashtag_facets "$text")
+    mention_facets=$(create_mention_facets "$text")
+    all_facets=$(merge_facets "$hashtag_facets" "$mention_facets")
+    
     local facets_json=""
-    if [ "$facets" != "[]" ]; then
+    if [ "$all_facets" != "[]" ]; then
         facets_json=",
-        \"facets\": $facets"
+        \"facets\": $all_facets"
     fi
     
     # Upload image if provided

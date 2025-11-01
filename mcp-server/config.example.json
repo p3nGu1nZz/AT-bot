@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "atproto": {
+      "command": "node",
+      "args": [
+        "/path/to/atproto/mcp-server/dist/index.js"
+      ],
+      "env": {
+        "ATP_PDS": "https://bsky.social"
+      }
+    }
+  }
+}

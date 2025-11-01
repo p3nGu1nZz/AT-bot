@@ -21,10 +21,10 @@ This document tracks pending tasks, improvements, and features for the atproto p
 ### MCP Server Architecture & Design
 - [x] ✅ **COMPLETED** - Design MCP server architecture and communication protocol
 - [x] ✅ **COMPLETED** - Define MCP tool schemas for all core operations
-- [ ] Plan MCP server implementation (Python/Node.js/Go wrapper)
-- [ ] Design authentication and session management for MCP
-- [ ] Plan error handling and logging for MCP operations
-- [ ] Document MCP integration points in core library
+- [x] ✅ **COMPLETED** - Plan MCP server implementation (Node.js/TypeScript chosen) (October 31, 2025)
+- [x] ✅ **COMPLETED** - Design authentication and session management for MCP (October 31, 2025)
+- [x] ✅ **COMPLETED** - Plan error handling and logging for MCP operations (October 31, 2025)
+- [x] ✅ **COMPLETED** - Document MCP integration points in core library (October 31, 2025)
 
 ### MCP Server Development
 - [x] ✅ **COMPLETED** - Implement MCP server with stdio communication
@@ -32,12 +32,12 @@ This document tracks pending tasks, improvements, and features for the atproto p
 - [x] ✅ **COMPLETED** - Implement content tools (post_create, post_reply, post_like, post_repost, post_delete)
 - [x] ✅ **COMPLETED** - Implement feed tools (feed_read, feed_search, feed_timeline, feed_notifications)
 - [x] ✅ **COMPLETED** - Implement profile tools (profile_get, profile_follow, profile_unfollow, profile_block)
-- [ ] **HIGH PRIORITY** - Install Node.js dependencies and build MCP server
-- [ ] **HIGH PRIORITY** - Test MCP server with stdio transport
-- [ ] **HIGH PRIORITY** - Verify shell command execution from MCP tools
+- [x] ✅ **COMPLETED** - Install Node.js dependencies and build MCP server (October 31, 2025)
+- [x] ✅ **COMPLETED** - Test MCP server with stdio transport (October 31, 2025)
+- [x] ✅ **COMPLETED** - Verify shell command execution from MCP tools (October 31, 2025)
+- [x] ✅ **COMPLETED** - Create MCP server configuration file template (October 31, 2025)
+- [x] ✅ **COMPLETED** - Add MCP server wrapper script (atproto-mcp) (October 31, 2025)
 - [ ] **HIGH PRIORITY** - Test end-to-end authentication flow via MCP
-- [ ] **HIGH PRIORITY** - Create MCP server configuration file template
-- [ ] **HIGH PRIORITY** - Add MCP server to system PATH or create wrapper script
 - [ ] **HIGH PRIORITY** - Test MCP server integration with Claude Desktop/VS Code
 - [ ] Add batch operation support (batch_post, batch_follow, batch_schedule)
 - [ ] Add MCP server logging and debugging capabilities
@@ -45,12 +45,12 @@ This document tracks pending tasks, improvements, and features for the atproto p
 - [ ] Implement MCP server health check endpoint
 
 ### MCP Server Testing & Documentation
-- [ ] **HIGH PRIORITY** - Write basic smoke tests for MCP server startup
-- [ ] **HIGH PRIORITY** - Test tool discovery (list_tools request)
+- [x] ✅ **COMPLETED** - Write basic smoke tests for MCP server startup (October 31, 2025)
+- [x] ✅ **COMPLETED** - Test tool discovery (list_tools request) (October 31, 2025)
+- [x] ✅ **COMPLETED** - Create quickstart guide for MCP server setup (October 31, 2025)
+- [x] ✅ **COMPLETED** - Document MCP server configuration options (October 31, 2025)
+- [x] ✅ **COMPLETED** - Create example MCP client configuration (Claude Desktop, VS Code) (October 31, 2025)
 - [ ] **HIGH PRIORITY** - Test tool execution (call_tool request) for each category
-- [ ] **HIGH PRIORITY** - Create quickstart guide for MCP server setup
-- [ ] **HIGH PRIORITY** - Document MCP server configuration options
-- [ ] **HIGH PRIORITY** - Create example MCP client configuration (Claude Desktop, VS Code)
 - [ ] Write integration tests for MCP server
 - [ ] Create MCP server configuration guide
 - [ ] Write MCP client examples and tutorials
