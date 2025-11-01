@@ -167,13 +167,37 @@ launch_mcp_server() {
     fi
 
     # Check if Node.js MCP server exists (TypeScript version)
-    local project_root
+    local project_root node_mcp_server
     project_root="$(dirname "$SCRIPT_DIR")"
-    local node_mcp_server="$project_root/mcp-server/dist/index.js"
+    node_mcp_server="$project_root/mcp-server/dist/index.js"
+    
+    # Also check installed location
+    if [ ! -f "$node_mcp_server" ]; then
+        # Try installed location
+        if [ -d "$INSTALL_PREFIX/lib/atproto/mcp-server/dist" ]; then
+            node_mcp_server="$INSTALL_PREFIX/lib/atproto/mcp-server/dist/index.js"
+        fi
+    fi
+    
+    # Detect Node.js (including nvm installations)
+    local node_cmd=""
+    if command -v node &> /dev/null; then
+        node_cmd="node"
+    elif [ -x "$HOME/.nvm/versions/node/v22.16.0/bin/node" ]; then
+        node_cmd="$HOME/.nvm/versions/node/v22.16.0/bin/node"
+    elif [ -x "/root/.nvm/versions/node/v22.16.0/bin/node" ]; then
+        node_cmd="/root/.nvm/versions/node/v22.16.0/bin/node"
+    elif [ -d "$HOME/.nvm/versions/node" ]; then
+        # Find latest node version in nvm
+        latest_node=$(ls -1 "$HOME/.nvm/versions/node" | grep -E '^v[0-9]+' | sort -V | tail -1)
+        if [ -n "$latest_node" ] && [ -x "$HOME/.nvm/versions/node/$latest_node/bin/node" ]; then
+            node_cmd="$HOME/.nvm/versions/node/$latest_node/bin/node"
+        fi
+    fi
     
     # Try to use Node.js version if available
-    if [ -f "$node_mcp_server" ] && command -v node &> /dev/null; then
-        exec node "$node_mcp_server"
+    if [ -f "$node_mcp_server" ] && [ -n "$node_cmd" ]; then
+        exec "$node_cmd" "$node_mcp_server"
     fi
     
     # Fallback to shell-based MCP server wrapper

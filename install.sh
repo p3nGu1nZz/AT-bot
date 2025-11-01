@@ -193,9 +193,17 @@ if [ $INSTALL_MCP -eq 1 ]; then
         npm run build --quiet
         cd "$SCRIPT_DIR"
         
-        # Install MCP server wrapper
-        echo "Installing MCP server binary..."
-        # MCP server is now integrated into main atproto binary
+        # Install MCP server files to library directory
+        echo "Installing MCP server files..."
+        $SUDO mkdir -p "$LIBDIR/mcp-server/dist"
+        $SUDO cp -r "$SCRIPT_DIR/mcp-server/dist/"* "$LIBDIR/mcp-server/dist/"
+        $SUDO cp "$SCRIPT_DIR/mcp-server/package.json" "$LIBDIR/mcp-server/"
+        
+        # Install node_modules if they exist
+        if [ -d "$SCRIPT_DIR/mcp-server/node_modules" ]; then
+            $SUDO mkdir -p "$LIBDIR/mcp-server/node_modules"
+            $SUDO cp -r "$SCRIPT_DIR/mcp-server/node_modules/"* "$LIBDIR/mcp-server/node_modules/" 2>/dev/null || true
+        fi
         
         echo ""
         echo -e "${GREEN}✓ MCP server installed successfully!${NC}"
