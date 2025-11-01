@@ -37,7 +37,8 @@ This document tracks pending tasks, improvements, and features for the atproto p
 - [x] ✅ **COMPLETED** - Verify shell command execution from MCP tools (October 31, 2025)
 - [x] ✅ **COMPLETED** - Create MCP server configuration file template (October 31, 2025)
 - [x] ✅ **COMPLETED** - Add MCP server wrapper script (atproto-mcp) (October 31, 2025)
-- [ ] **HIGH PRIORITY** - Test end-to-end authentication flow via MCP
+- [x] ✅ **COMPLETED** - Test end-to-end authentication flow via MCP (October 31, 2025)
+- [x] ✅ **COMPLETED** - Create comprehensive MCP test suite (test_mcp_auth.sh) (October 31, 2025)
 - [ ] **HIGH PRIORITY** - Test MCP server integration with Claude Desktop/VS Code
 - [ ] Add batch operation support (batch_post, batch_follow, batch_schedule)
 - [ ] Add MCP server logging and debugging capabilities
@@ -50,8 +51,9 @@ This document tracks pending tasks, improvements, and features for the atproto p
 - [x] ✅ **COMPLETED** - Create quickstart guide for MCP server setup (October 31, 2025)
 - [x] ✅ **COMPLETED** - Document MCP server configuration options (October 31, 2025)
 - [x] ✅ **COMPLETED** - Create example MCP client configuration (Claude Desktop, VS Code) (October 31, 2025)
-- [ ] **HIGH PRIORITY** - Test tool execution (call_tool request) for each category
-- [ ] Write integration tests for MCP server
+- [x] ✅ **COMPLETED** - Test tool execution (call_tool request) for each category (October 31, 2025)
+- [x] ✅ **COMPLETED** - Write MCP authentication flow tests (test_mcp_auth.sh) (October 31, 2025)
+- [ ] Write integration tests for MCP server with real Bluesky operations
 - [ ] Create MCP server configuration guide
 - [ ] Write MCP client examples and tutorials
 - [ ] Document MCP tool schemas and capabilities
