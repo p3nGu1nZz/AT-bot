@@ -44,6 +44,9 @@ Usage: atproto [OPTIONS] [COMMAND] [ARGS...]
 Global Options:
     --json              Output in JSON format (machine-readable)
     --text              Output in text format (human-readable, default)
+    --quiet, -q         Suppress non-error output
+    --verbose, -v       Show detailed output including debug messages
+    --color <mode>      Color output mode: auto (default), always, never
 
 Commands:
     login               Login to your Bluesky account
@@ -91,6 +94,9 @@ Examples:
     atproto login                    # Interactive login
     atproto whoami                   # Check current user
     atproto --json whoami            # Check current user (JSON output)
+    atproto --quiet post "Hello!"    # Post without status messages
+    atproto --verbose feed           # Show detailed feed output
+    atproto --color never feed       # Disable colored output
     atproto post "Hello Bluesky!"    # Create a post
     atproto post --image photo.jpg "Check this out!"  # Post with image
     atproto reply at://... "Great!"  # Reply to a post
@@ -252,6 +258,19 @@ main() {
                 ;;
             --text)
                 export ATP_OUTPUT_FORMAT="text"
+                shift
+                ;;
+            --quiet|-q)
+                export ATP_VERBOSITY=0
+                shift
+                ;;
+            --verbose|-v)
+                export ATP_VERBOSITY=2
+                shift
+                ;;
+            --color)
+                shift
+                export ATP_COLOR="$1"
                 shift
                 ;;
             *)

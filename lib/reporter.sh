@@ -10,7 +10,29 @@
 # Auto-detect if output is to a terminal and enable colors accordingly
 # Only define if not already defined (to support multiple sourcing)
 if [ -z "${AT_BOT_COLORS_DEFINED:-}" ]; then
-    if [ -t 1 ]; then
+    # Check color output preference
+    COLOR_MODE="${ATP_COLOR:-auto}"
+    
+    case "$COLOR_MODE" in
+        always)
+            # Force colors on
+            COLORS_ENABLED=1
+            ;;
+        never)
+            # Force colors off
+            COLORS_ENABLED=0
+            ;;
+        auto|*)
+            # Auto-detect terminal
+            if [ -t 1 ]; then
+                COLORS_ENABLED=1
+            else
+                COLORS_ENABLED=0
+            fi
+            ;;
+    esac
+    
+    if [ "$COLORS_ENABLED" -eq 1 ]; then
         # Terminal output - enable colors
         RED='\033[0;31m'
         GREEN='\033[0;32m'
@@ -41,13 +63,65 @@ if [ -z "${AT_BOT_COLORS_DEFINED:-}" ]; then
 fi
 
 # ============================================================================
+# Verbosity Control
+# ============================================================================
+
+# Verbosity levels:
+# 0 = quiet (errors only)
+# 1 = normal (errors, warnings, success)
+# 2 = verbose (errors, warnings, success, info, debug)
+ATP_VERBOSITY="${ATP_VERBOSITY:-1}"
+
+# Check if quiet mode is enabled
+is_quiet() {
+    [ "$ATP_VERBOSITY" -eq 0 ]
+}
+
+# Check if verbose mode is enabled
+is_verbose() {
+    [ "$ATP_VERBOSITY" -ge 2 ]
+}
+
+# ============================================================================
 # Basic Logging Functions
 # ============================================================================
 
-# Print error message to stderr
+# Print error message to stderr (always shown)
 # Usage: error "message"
 error() {
     echo -e "${RED}Error:${NC} $*" >&2
+}
+
+# Print success message (hidden in quiet mode)
+# Usage: success "message"
+success() {
+    if ! is_quiet; then
+        echo -e "${GREEN}$*${NC}"
+    fi
+}
+
+# Print warning message (hidden in quiet mode)
+# Usage: warning "message"
+warning() {
+    if ! is_quiet; then
+        echo -e "${YELLOW}Warning:${NC} $*" >&2
+    fi
+}
+
+# Print info message (only in verbose mode)
+# Usage: info "message"
+info() {
+    if is_verbose; then
+        echo -e "${BLUE}Info:${NC} $*"
+    fi
+}
+
+# Print debug message (only in verbose mode)
+# Usage: debug "message"
+debug() {
+    if is_verbose; then
+        echo -e "${DIM}Debug:${NC} $*" >&2
+    fi
 }
 
 # Print success message
