@@ -18,8 +18,9 @@ It provides simple authentication and session management, making it easy to auto
 - 💾 Session management with persistent authentication
 - 🔐 AES-256-CBC encrypted credential storage (optional)
 - 🛡️ Secure storage of session tokens (not passwords)
-- 📝 Create posts and read your timeline
-- 👥 Social interactions (follow, unfollow - coming soon)
+- 📝 Create posts with automatic hashtag detection and formatting
+- 📰 Read your timeline
+- 👥 Social interactions (follow, unfollow, block, mute)
 - 💬 Simple, intuitive command-line interface
 - 🏦 Optional local encrypted credential storage
 - ⚙️ MCP server for AI agent integration (in development)
@@ -90,9 +91,12 @@ Displays information about the currently authenticated user.
 
 ```bash
 atproto post "Hello Bluesky! 🚀"
+
+# Posts with hashtags (automatically detected and made clickable)
+atproto post "Loving the #ATProtocol and #Bluesky! #OpenSource"
 ```
 
-Creates a new post on your Bluesky feed.
+Creates a new post on your Bluesky feed. Hashtags are automatically detected and formatted as clickable links.
 
 ### Read Your Feed
 

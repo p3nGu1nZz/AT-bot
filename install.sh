@@ -61,12 +61,39 @@ NC='\033[0m'
 
 # Detect Node.js path before potential sudo (nvm requires user environment)
 NODE_PATH=""
+NODE_VERSION=""
+
+# Check if node is in PATH
 if command -v node &> /dev/null; then
     NODE_PATH="$(command -v node)"
+    NODE_VERSION="$(node --version 2>/dev/null || echo '')"
+# Check common nvm locations
 elif [ -x "$HOME/.nvm/versions/node/v22.16.0/bin/node" ]; then
     NODE_PATH="$HOME/.nvm/versions/node/v22.16.0/bin/node"
+    NODE_VERSION="$($NODE_PATH --version 2>/dev/null || echo '')"
 elif [ -x "/root/.nvm/versions/node/v22.16.0/bin/node" ]; then
     NODE_PATH="/root/.nvm/versions/node/v22.16.0/bin/node"
+    NODE_VERSION="$($NODE_PATH --version 2>/dev/null || echo '')"
+# Try to find any nvm node installation
+elif [ -d "$HOME/.nvm/versions/node" ]; then
+    # Find latest node version in nvm
+    latest_node=$(ls -1 "$HOME/.nvm/versions/node" | grep -E '^v[0-9]+' | sort -V | tail -1)
+    if [ -n "$latest_node" ] && [ -x "$HOME/.nvm/versions/node/$latest_node/bin/node" ]; then
+        NODE_PATH="$HOME/.nvm/versions/node/$latest_node/bin/node"
+        NODE_VERSION="$($NODE_PATH --version 2>/dev/null || echo '')"
+    fi
+elif [ -d "/root/.nvm/versions/node" ]; then
+    # Find latest node version in root's nvm
+    latest_node=$(ls -1 "/root/.nvm/versions/node" | grep -E '^v[0-9]+' | sort -V | tail -1)
+    if [ -n "$latest_node" ] && [ -x "/root/.nvm/versions/node/$latest_node/bin/node" ]; then
+        NODE_PATH="/root/.nvm/versions/node/$latest_node/bin/node"
+        NODE_VERSION="$($NODE_PATH --version 2>/dev/null || echo '')"
+    fi
+fi
+
+# Export NODE_PATH so npm can be found too
+if [ -n "$NODE_PATH" ]; then
+    export PATH="$(dirname "$NODE_PATH"):$PATH"
 fi
 
 echo "atproto Installation Script"
@@ -142,9 +169,9 @@ if [ $INSTALL_MCP -eq 1 ]; then
     echo -e "${BLUE}Installing MCP Server...${NC}"
     echo ""
     
-    # Check for Node.js
-    if ! command -v node &> /dev/null; then
-        echo -e "${YELLOW}Warning: Node.js is not installed${NC}"
+    # Check for Node.js (including nvm installations)
+    if [ -z "$NODE_PATH" ] || [ ! -x "$NODE_PATH" ]; then
+        echo -e "${YELLOW}Warning: Node.js is not installed or not found${NC}"
         echo "Please install Node.js 18+ from https://nodejs.org/"
         echo ""
         if [ $AUTO_YES -eq 0 ]; then
@@ -154,10 +181,11 @@ if [ $INSTALL_MCP -eq 1 ]; then
                 echo "Installation cancelled."
                 exit 1
             fi
-        else
-            echo "Skipping MCP server installation (Node.js not found)"
         fi
+        echo "Skipping MCP server installation (Node.js not found)"
     else
+        echo "Found Node.js: $NODE_VERSION"
+        
         # Build MCP server
         echo "Building MCP server..."
         cd "$SCRIPT_DIR/mcp-server"
@@ -194,14 +222,11 @@ echo -e "${GREEN}Installation complete!${NC}"
 echo ""
 echo "atproto is now installed. Try running:"
 echo "  atproto help"
-if [ $INSTALL_MCP -eq 1 ] && command -v node &> /dev/null; then
+if [ $INSTALL_MCP -eq 1 ] && [ -n "$NODE_PATH" ]; then
     echo "  atproto mcp-server (for AI agents)"
 fi
 echo ""
 echo "To uninstall, run:"
 echo "  $SUDO rm -f $BINDIR/atproto"
-if [ $INSTALL_MCP -eq 1 ]; then
-    # MCP server functionality is now integrated
-fi
 echo "  $SUDO rm -rf $LIBDIR"
 echo "  $SUDO rm -rf $DOCDIR"

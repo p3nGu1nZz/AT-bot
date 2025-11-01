@@ -81,6 +81,7 @@ This document tracks pending tasks, improvements, and features for the atproto p
 
 ### AT Protocol Integration
 - [x] ✅ **COMPLETED** - Add post creation functionality (`atproto post "message"`)
+- [x] ✅ **COMPLETED** - Add automatic hashtag detection and rich text facets (October 31, 2025)
 - [x] ✅ **COMPLETED** - Implement timeline/feed reading capabilities
 - [x] ✅ **COMPLETED** - Add follow/unfollow user commands (atproto_follow, atproto_unfollow)
 - [x] ✅ **COMPLETED** - Support for image/media uploads in posts (post_with_image, post_with_gallery, upload_media)
@@ -93,6 +94,8 @@ This document tracks pending tasks, improvements, and features for the atproto p
 - [ ] Add support for custom feeds
 - [ ] Implement pinned posts support
 - [ ] Add repost functionality with custom text
+- [ ] Add support for mentions (@-mentions) with facets
+- [ ] Add support for URL detection and link facets
 
 ### Error Handling & Resilience  
 - [ ] Improve network error handling and retry logic

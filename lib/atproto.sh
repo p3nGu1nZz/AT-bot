@@ -447,6 +447,85 @@ atproto_upload_blob() {
 EOF
 }
 
+# Extract hashtags and create facets for rich text
+# Arguments:
+#   $1 - text content
+# Returns:
+#   JSON array of facets for hashtags
+create_hashtag_facets() {
+    local text="$1"
+    local facets="[]"
+    
+    # Find all hashtags in the text using grep
+    # Pattern: #followed by alphanumeric characters, underscores, or hyphens
+    local hashtags
+    hashtags=$(echo "$text" | grep -o '#[a-zA-Z0-9_-]\+' | sort -u)
+    
+    if [ -z "$hashtags" ]; then
+        echo "[]"
+        return 0
+    fi
+    
+    # Build facets array
+    local facet_items=""
+    local first=true
+    
+    while IFS= read -r hashtag; do
+        [ -z "$hashtag" ] && continue
+        
+        # Find all occurrences of this hashtag in the text
+        local tag_without_hash="${hashtag#\#}"
+        local search_pos=0
+        local remaining_text="$text"
+        
+        while [ -n "$remaining_text" ]; do
+            # Find position of hashtag
+            local before="${remaining_text%%$hashtag*}"
+            if [ "$before" = "$remaining_text" ]; then
+                # No more occurrences
+                break
+            fi
+            
+            # Calculate byte positions (UTF-8 aware)
+            local byte_start=$((search_pos + ${#before}))
+            local byte_end=$((byte_start + ${#hashtag}))
+            
+            # Add facet for this occurrence
+            if [ "$first" = true ]; then
+                first=false
+            else
+                facet_items="$facet_items,"
+            fi
+            
+            facet_items="$facet_items
+        {
+            \"index\": {
+                \"byteStart\": $byte_start,
+                \"byteEnd\": $byte_end
+            },
+            \"features\": [
+                {
+                    \"\$type\": \"app.bsky.richtext.facet#tag\",
+                    \"tag\": \"$tag_without_hash\"
+                }
+            ]
+        }"
+            
+            # Move past this occurrence
+            search_pos=$byte_end
+            remaining_text="${remaining_text#*$hashtag}"
+        done
+    done <<< "$hashtags"
+    
+    # Return JSON array
+    if [ -n "$facet_items" ]; then
+        echo "[$facet_items
+    ]"
+    else
+        echo "[]"
+    fi
+}
+
 # Create a post on Bluesky
 # Arguments:
 #   $1 - post text content
@@ -481,6 +560,15 @@ atproto_post() {
     # Get current timestamp in ISO 8601 format
     local timestamp
     timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
+    
+    # Detect hashtags and create facets
+    local facets
+    facets=$(create_hashtag_facets "$text")
+    local facets_json=""
+    if [ "$facets" != "[]" ]; then
+        facets_json=",
+        \"facets\": $facets"
+    fi
     
     # Upload image if provided
     local embed_json=""
@@ -545,7 +633,7 @@ EOF
     "record": {
         "\$type": "app.bsky.feed.post",
         "text": "$text",
-        "createdAt": "$timestamp",
+        "createdAt": "$timestamp"$facets_json,
         "reply": {
             "root": {
                 "uri": "$root_uri",
@@ -568,7 +656,7 @@ EOF
     "record": {
         "\$type": "app.bsky.feed.post",
         "text": "$text",
-        "createdAt": "$timestamp"$embed_json
+        "createdAt": "$timestamp"$facets_json$embed_json
     }
 }
 EOF
