@@ -105,9 +105,9 @@ This document tracks pending tasks, improvements, and features for the atproto p
 - [x] ✅ **COMPLETED** - Fixed UTF-8 byte position calculation for facets (November 1, 2025)
 - [x] ✅ **COMPLETED** - Add support for bare domain URLs (github.com/path) (November 1, 2025)
 - [x] ✅ **COMPLETED** - Add delete post functionality (November 1, 2025)
+- [x] ✅ **COMPLETED** - Add repost functionality with custom text (quote posts) (November 1, 2025)
 - [ ] Add support for custom feeds
 - [ ] Implement pinned posts support
-- [ ] Add repost functionality with custom text
 
 ### Error Handling & Resilience  
 - [x] ✅ **COMPLETED** - Improve network error handling and retry logic (October 31, 2025)
@@ -122,11 +122,11 @@ This document tracks pending tasks, improvements, and features for the atproto p
 ### CLI Interface
 - [x] ✅ **COMPLETED** - Add bash/zsh completion scripts
 - [x] ✅ **COMPLETED** - Support for output formatting options (JSON via --json flag) - October 31, 2025
+- [x] ✅ **COMPLETED** - Implement `--quiet` and `--verbose` flags (November 1, 2025)
+- [x] ✅ **COMPLETED** - Add color output configuration options (November 1, 2025)
+- [x] ✅ **COMPLETED** - Add progress indicators for long-running operations (November 1, 2025)
 - [ ] Implement interactive mode for complex operations
 - [ ] Add configuration file support for user preferences
-- [ ] Add progress indicators for long-running operations
-- [ ] Implement `--quiet` and `--verbose` flags
-- [ ] Add color output configuration options
 
 ### Documentation & Help
 - [x] ✅ **COMPLETED** - Documentation compilation system (`lib/doc.sh`)
