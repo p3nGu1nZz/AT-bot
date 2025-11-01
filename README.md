@@ -23,13 +23,31 @@ It provides simple authentication and session management, making it easy to auto
 - 👥 Social interactions (follow, unfollow, block, mute)
 - 💬 Simple, intuitive command-line interface
 - 🏦 Optional local encrypted credential storage
-- ⚙️ MCP server for AI agent integration (in development)
+- 🤖 **MCP server with 29 tools for AI agents** (GitHub Copilot, Claude)
+- 🎨 VS Code extension with zero-configuration setup
 - 🐧 POSIX-compliant for Linux/WSL/Ubuntu environments
-- 🔗 Fully compatible with Claude Copilot and other MCP-based tools
+- 🔗 Fully compatible with Model Context Protocol (MCP)
 
 ## Installation
 
-### Quick Install (Recommended)
+### Quick Install with MCP Server (Recommended)
+
+Install atproto CLI and MCP server for AI agent integration:
+
+```bash
+git clone https://github.com/p3nGu1nZz/atproto.git
+cd atproto
+sudo ./install.sh --mcp
+```
+
+This installs:
+- ✅ atproto CLI tool (`/usr/local/bin/atproto`)
+- ✅ MCP server with 29 tools for AI agents
+- ✅ All required dependencies
+
+### CLI Only Installation
+
+For command-line use without MCP server:
 
 ```bash
 git clone https://github.com/p3nGu1nZz/atproto.git
@@ -197,6 +215,58 @@ atproto config reset
 Configuration is stored in `~/.config/atproto/config.json` and can be overridden with environment variables (e.g., `ATP_PDS`, `ATP_FEED_LIMIT`).
 
 **For complete configuration documentation, see [doc/CONFIGURATION.md](doc/CONFIGURATION.md)**
+
+## MCP Server for AI Agents
+
+atproto includes a Model Context Protocol (MCP) server that exposes 29 tools for AI agents like GitHub Copilot and Claude.
+
+### Quick Start with GitHub Copilot
+
+1. **Install with MCP support:**
+   ```bash
+   sudo ./install.sh --mcp
+   ```
+
+2. **Configure VS Code** (add to `.vscode/settings.json` or user settings):
+   ```json
+   {
+     "github.copilot.chat.mcp.enabled": true,
+     "github.copilot.chat.mcp.servers": {
+       "atproto": {
+         "command": "/usr/local/bin/atproto",
+         "args": ["mcp-server"]
+       }
+     }
+   }
+   ```
+
+3. **Reload VS Code:**
+   - Press `Ctrl+Shift+P` → `Developer: Reload Window`
+
+4. **Test in Copilot Chat:**
+   ```
+   @workspace Use atproto to check who I'm logged in as
+   @workspace Use atproto to post "Hello from Copilot! #AI #Bluesky"
+   ```
+
+### MCP Tools Available
+
+| Category | Tools |
+|----------|-------|
+| **Authentication** | login, logout, whoami, is_authenticated |
+| **Content** | post_create, post_reply, post_like, post_repost, post_delete |
+| **Feeds** | feed_read, feed_search, feed_timeline, feed_notifications |
+| **Profile** | profile_get, profile_follow, profile_unfollow, profile_block |
+| **Search** | search_posts, search_users, search_feeds |
+| **Social** | follow_user, unfollow_user, block_user, get_followers, get_following |
+| **Media** | upload_media, post_with_image, post_with_gallery |
+
+### MCP Documentation
+
+- **[VS Code Setup Guide](mcp-server/docs/VSCODE_SETUP.md)** - Complete setup instructions
+- **[Quick Reference](mcp-server/docs/QUICKREF.md)** - Common commands and tips
+- **[MCP Tools Documentation](mcp-server/docs/MCP_TOOLS.md)** - Detailed tool reference
+- **[Integration Guide](mcp-server/docs/MCP_INTEGRATION.md)** - Integration patterns
 
 ### Session Storage
 
