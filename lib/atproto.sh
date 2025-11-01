@@ -296,6 +296,27 @@ json_get_field() {
     echo "$value"
 }
 
+# Escape string for JSON
+# Handles: quotes, backslashes, newlines, tabs, control characters, and UTF-8
+# Usage: json_escape_string "text with \"quotes\" and 🎉 emojis"
+json_escape_string() {
+    local text="$1"
+    # Use python if available for robust JSON escaping, otherwise use sed
+    if command -v python3 >/dev/null 2>&1; then
+        python3 -c 'import json, sys; print(json.dumps(sys.argv[1], ensure_ascii=False)[1:-1])' "$text"
+    elif command -v python >/dev/null 2>&1; then
+        python -c 'import json, sys; print(json.dumps(sys.argv[1], ensure_ascii=False)[1:-1])' "$text"
+    else
+        # Fallback to sed (handles most cases but not all control characters)
+        printf '%s' "$text" | sed \
+            -e 's/\\/\\\\/g' \
+            -e 's/"/\\"/g' \
+            -e 's/\t/\\t/g' \
+            -e ':a' -e 'N' -e '$!ba' -e 's/\n/\\n/g' \
+            -e 's/\r/\\r/g'
+    fi
+}
+
 # Login to Bluesky
 atproto_login() {
     local identifier="${BLUESKY_HANDLE:-}"
@@ -923,6 +944,10 @@ atproto_post() {
     local timestamp
     timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
     
+    # Escape text for JSON to handle UTF-8, special characters, etc.
+    local escaped_text
+    escaped_text=$(json_escape_string "$text")
+    
     # Detect hashtags, mentions, and URLs, then merge facets
     local hashtag_facets mention_facets url_facets all_facets
     hashtag_facets=$(create_hashtag_facets "$text")
@@ -964,7 +989,7 @@ EOF
 )
     fi
     
-    # Build post record
+    # Build post record using printf to avoid heredoc expansion issues
     local record
     if [ -n "$reply_to" ]; then
         # Get parent post details for reply
@@ -992,41 +1017,13 @@ EOF
             root_cid="$parent_cid"
         fi
         
-        record=$(cat <<EOF
-{
-    "repo": "$repo",
-    "collection": "app.bsky.feed.post",
-    "record": {
-        "\$type": "app.bsky.feed.post",
-        "text": "$text",
-        "createdAt": "$timestamp"$facets_json,
-        "reply": {
-            "root": {
-                "uri": "$root_uri",
-                "cid": "$root_cid"
-            },
-            "parent": {
-                "uri": "$parent_uri",
-                "cid": "$parent_cid"
-            }
-        }$embed_json
-    }
-}
-EOF
-)
+        # Use printf to build JSON to avoid shell expansion issues
+        printf -v record '{"repo":"%s","collection":"app.bsky.feed.post","record":{"$type":"app.bsky.feed.post","text":"%s","createdAt":"%s"%s,"reply":{"root":{"uri":"%s","cid":"%s"},"parent":{"uri":"%s","cid":"%s"}}%s}}' \
+            "$repo" "$escaped_text" "$timestamp" "$facets_json" "$root_uri" "$root_cid" "$parent_uri" "$parent_cid" "$embed_json"
     else
-        record=$(cat <<EOF
-{
-    "repo": "$repo",
-    "collection": "app.bsky.feed.post",
-    "record": {
-        "\$type": "app.bsky.feed.post",
-        "text": "$text",
-        "createdAt": "$timestamp"$facets_json$embed_json
-    }
-}
-EOF
-)
+        # Use printf to build JSON to avoid shell expansion issues
+        printf -v record '{"repo":"%s","collection":"app.bsky.feed.post","record":{"$type":"app.bsky.feed.post","text":"%s","createdAt":"%s"%s%s}}' \
+            "$repo" "$escaped_text" "$timestamp" "$facets_json" "$embed_json"
     fi
     
     echo "Posting..."
