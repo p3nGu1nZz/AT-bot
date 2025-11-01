@@ -826,14 +826,14 @@ create_url_facets() {
     local text="$1"
     local facets="[]"
     
-    # URL regex pattern - matches http://, https://, and standalone domains
+    # URL regex pattern - matches http://, https://, www., and bare domains
     # Pattern must not match within hashtags or mentions
     # Require word boundary or whitespace before URL
     local url_pattern='(^|[[:space:]])((https?://|www\.)[^[:space:]<>"'"'"'#@]+)'
     
-    # Find all URLs in the text
+    # Find all URLs in the text - including bare domains like github.com
     local urls
-    urls=$(echo "$text" | grep -oE "(https?://[^[:space:]<>\"'#@]+|www\.[^[:space:]<>\"'#@]+)" | sort -u)
+    urls=$(echo "$text" | grep -oE "(https?://[^[:space:]<>\"'#@]+|www\.[^[:space:]<>\"'#@]+|[a-zA-Z0-9][a-zA-Z0-9-]*\.(com|org|net|edu|gov|io|dev|app|ai|co|me|info|xyz)/[^[:space:]<>\"'#@]*)" | sort -u)
     
     if [ -z "$urls" ]; then
         echo "[]"
@@ -847,9 +847,12 @@ create_url_facets() {
     while IFS= read -r url; do
         [ -z "$url" ] && continue
         
-        # Normalize URL - add https:// prefix if www. only
+        # Normalize URL - add https:// prefix if needed
         local normalized_url="$url"
         if echo "$url" | grep -q '^www\.'; then
+            normalized_url="https://$url"
+        elif ! echo "$url" | grep -q '^https\?://'; then
+            # Bare domain like github.com/path
             normalized_url="https://$url"
         fi
         
