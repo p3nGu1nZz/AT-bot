@@ -1089,7 +1089,7 @@ EOF
 #   $1 - optional feed type (home|timeline) default: timeline
 #   $2 - optional limit (default: from config or 10)
 atproto_feed() {
-    local feed_type="${1:-timeline}"
+    local feed_uri="${1:-}"
     local limit="${2:-$DEFAULT_FEED_LIMIT}"
     
     if [ ! -f "$SESSION_FILE" ]; then
@@ -1107,10 +1107,25 @@ atproto_feed() {
         return 1
     fi
     
-    echo "Fetching feed..."
+    info "Fetching feed..."
     
     local response endpoint
-    endpoint="/xrpc/app.bsky.feed.getTimeline?limit=$limit"
+    
+    # Determine which feed to fetch
+    if [ -z "$feed_uri" ]; then
+        # Default to timeline
+        endpoint="/xrpc/app.bsky.feed.getTimeline?limit=$limit"
+        debug "Fetching timeline feed"
+    elif [[ "$feed_uri" == at://* ]]; then
+        # Custom feed generator
+        local encoded_uri
+        encoded_uri=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$feed_uri', safe=''))" 2>/dev/null || echo "$feed_uri")
+        endpoint="/xrpc/app.bsky.feed.getFeed?feed=$encoded_uri&limit=$limit"
+        debug "Fetching custom feed: $feed_uri"
+    else
+        error "Invalid feed URI. Must start with 'at://' or omit for timeline"
+        return 1
+    fi
     
     response=$(api_request GET "$endpoint" "" "$access_token")
     
@@ -1147,6 +1162,95 @@ atproto_feed() {
             fi
             
             printf "%12d    %s\n" "$count" "$post_text"
+        done
+    fi
+    
+    return 0
+}
+
+# List available feed generators
+#
+# Lists popular and user-created feed generators from Bluesky.
+#
+# Arguments:
+#   $1 - limit (optional, default: 25)
+#
+# Returns:
+#   0 - Success
+#   1 - Failed to fetch feeds
+#
+# Environment:
+#   SESSION_FILE - Session with valid access token
+#
+# API:
+#   Uses: app.bsky.feed.getActorFeeds
+atproto_list_feeds() {
+    local target="${1:-}"
+    local limit="${2:-25}"
+    
+    if [ ! -f "$SESSION_FILE" ]; then
+        error "Not logged in. Run 'atproto login' first."
+        return 1
+    fi
+    
+    local access_token did
+    access_token=$(get_access_token) || {
+        error "Failed to get access token"
+        return 1
+    }
+    
+    did=$(get_session_did) || {
+        error "Failed to get user DID"
+        return 1
+    }
+    
+    # Use current user's DID if no target specified
+    local actor="${target:-$did}"
+    
+    info "Fetching feed generators..."
+    
+    local response
+    response=$(api_request GET "/xrpc/app.bsky.feed.getActorFeeds?actor=$actor&limit=$limit" "" "$access_token")
+    
+    # Check for errors
+    if echo "$response" | grep -q '"error"'; then
+        local error_msg
+        error_msg=$(json_get_field "$response" "message")
+        error "Failed to fetch feeds: ${error_msg:-Unknown error}"
+        return 1
+    fi
+    
+    # Output in requested format
+    if is_json_output; then
+        echo "$response"
+    else
+        success "Feed generators retrieved!"
+        echo ""
+        
+        # Parse and display feeds
+        # Extract feed URIs and display names
+        local count=0
+        local feeds_json
+        feeds_json=$(echo "$response" | python3 -c "import sys, json; data=json.load(sys.stdin); feeds=data.get('feeds', []); print('\n'.join([f\"{feed.get('uri', '')}|{feed.get('displayName', 'Unnamed')}|{feed.get('description', '')}\" for feed in feeds]))" 2>/dev/null)
+        
+        if [ -z "$feeds_json" ]; then
+            warning "No feed generators found"
+            return 0
+        fi
+        
+        echo "$feeds_json" | while IFS='|' read -r uri name description; do
+            count=$((count + 1))
+            echo "[$count] $name"
+            echo "    URI: $uri"
+            if [ -n "$description" ]; then
+                # Truncate description at 100 chars
+                local desc_short="$description"
+                if [ ${#description} -gt 100 ]; then
+                    desc_short="${description:0:97}..."
+                fi
+                echo "    $desc_short"
+            fi
+            echo ""
         done
     fi
     
@@ -1669,7 +1773,7 @@ atproto_quote() {
     access_token=$(get_access_token) || {
         error "Failed to get access token"
         return 1
-    fi
+    }
     
     # Get session data for repo
     local session_data repo

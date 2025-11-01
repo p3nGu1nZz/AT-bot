@@ -27,6 +27,8 @@ source "$LIB_DIR/atproto.sh"
 source "$LIB_DIR/config.sh"
 # shellcheck source=../lib/cli-utils.sh
 source "$LIB_DIR/cli-utils.sh"
+# shellcheck source=../lib/interactive.sh
+source "$LIB_DIR/interactive.sh"
 
 # Configuration
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/atproto"
@@ -47,6 +49,7 @@ Global Options:
     --quiet, -q         Suppress non-error output
     --verbose, -v       Show detailed output including debug messages
     --color <mode>      Color output mode: auto (default), always, never
+    --interactive, -i   Launch interactive mode with guided prompts
 
 Commands:
     login               Login to your Bluesky account
@@ -59,7 +62,8 @@ Commands:
     repost <uri>        Repost a post
     quote <uri> <text>  Quote post with your own text
     delete <uri>        Delete a post (must be your own post)
-    feed [limit]        Read your timeline (default: 10 posts)
+    feed [uri] [limit]  Read timeline or custom feed (supports at:// URIs)
+    feeds [handle]      List available feed generators
     follow <handle>     Follow a user
     unfollow <handle>   Unfollow a user
     followers [handle]  View followers (defaults to current user)
@@ -67,6 +71,7 @@ Commands:
     search <query>      Search for posts
     profile [handle]    View profile (defaults to current user)
     profile-edit        Edit your profile
+    interactive         Launch interactive mode with guided prompts
     config              Manage configuration
     clear-credentials   Clear saved credentials
     mcp-server          Launch MCP server for AI agents
@@ -107,6 +112,9 @@ Examples:
     atproto delete at://...          # Delete a post
     atproto feed                     # Read timeline (10 posts)
     atproto feed 20                  # Read timeline (20 posts)
+    atproto feed at://did:plc:.../app.bsky.feed.generator/xyz # Read custom feed
+    atproto feeds                    # List your feed generators
+    atproto feeds user.bsky.social   # List another user's feed generators
     atproto --json feed 10           # Read timeline (JSON output)
     atproto follow user.bsky.social  # Follow a user
     atproto unfollow user.bsky.social # Unfollow a user
@@ -125,6 +133,8 @@ Examples:
     atproto refresh                  # Refresh session
     atproto config list              # Show configuration
     atproto config set feed_limit 50 # Change default feed limit
+    atproto --interactive            # Launch interactive mode
+    atproto interactive              # Launch interactive mode
     atproto logout                   # Clear session
     atproto mcp-server               # Launch MCP server for AI agents
 
@@ -275,12 +285,22 @@ main() {
                 export ATP_COLOR="$1"
                 shift
                 ;;
+            --interactive|-i)
+                export ATP_INTERACTIVE=1
+                shift
+                ;;
             *)
                 # Not a global flag, break to process command
                 break
                 ;;
         esac
     done
+    
+    # If interactive mode enabled without command, launch interactive menu
+    if [ "${ATP_INTERACTIVE:-0}" = "1" ] && [ $# -eq 0 ]; then
+        interactive_menu
+        exit $?
+    fi
     
     # Parse command
     case "${1:-help}" in
@@ -399,6 +419,10 @@ main() {
         feed)
             shift
             atproto_feed "$@"
+            ;;
+        feeds)
+            shift
+            atproto_list_feeds "$@"
             ;;
         follow)
             shift
@@ -520,6 +544,11 @@ main() {
             ;;
         clear-credentials)
             clear_credentials
+            ;;
+        interactive)
+            # Launch interactive mode
+            export ATP_INTERACTIVE=1
+            interactive_menu
             ;;
         mcp-server)
             # Launch MCP server mode
