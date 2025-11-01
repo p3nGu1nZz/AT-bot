@@ -124,6 +124,72 @@ debug() {
     fi
 }
 
+# ============================================================================
+# Progress Indicators
+# ============================================================================
+
+# Show a spinner for long-running operations
+# Usage: show_spinner "message" & SPINNER_PID=$!; do_work; stop_spinner $SPINNER_PID
+show_spinner() {
+    local message="$1"
+    local spinstr='|/-\'
+    
+    # Don't show spinner in quiet mode or non-terminal
+    if is_quiet || [ ! -t 1 ]; then
+        return 0
+    fi
+    
+    while true; do
+        local temp=${spinstr#?}
+        printf " [%c]  %s\r" "$spinstr" "$message"
+        local spinstr=$temp${spinstr%"$temp"}
+        sleep 0.1
+    done
+}
+
+# Stop a spinner
+# Usage: stop_spinner $SPINNER_PID "Done message"
+stop_spinner() {
+    local pid="$1"
+    local message="${2:-Done}"
+    
+    if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
+        kill "$pid" 2>/dev/null
+        wait "$pid" 2>/dev/null
+    fi
+    
+    if ! is_quiet && [ -t 1 ]; then
+        printf "\r\033[K"  # Clear line
+        success "$message"
+    fi
+}
+
+# Show progress bar
+# Usage: show_progress current total "message"
+show_progress() {
+    local current="$1"
+    local total="$2"
+    local message="${3:-Processing}"
+    
+    # Don't show progress in quiet mode or non-terminal
+    if is_quiet || [ ! -t 1 ]; then
+        return 0
+    fi
+    
+    local percent=$((current * 100 / total))
+    local filled=$((percent / 2))
+    local empty=$((50 - filled))
+    
+    printf "\r${message}: ["
+    printf "%${filled}s" | tr ' ' '='
+    printf "%${empty}s" | tr ' ' ' '
+    printf "] %3d%%" "$percent"
+    
+    if [ "$current" -eq "$total" ]; then
+        printf "\n"
+    fi
+}
+
 # Print success message
 # Usage: success "message"
 success() {
