@@ -94,11 +94,11 @@ This document tracks pending tasks, improvements, and features for the atproto p
 - [x] ✅ **COMPLETED** - Enhanced profile display with stats, content, and activity dates (October 31, 2025)
 - [x] ✅ **COMPLETED** - Fixed JSON parsing for numeric values and nested objects (json_get_field enhancement)
 - [x] ✅ **COMPLETED** - Added get_session_did() helper function for profile operations
+- [x] ✅ **COMPLETED** - Add support for mentions (@-mentions) with facets (October 31, 2025)
+- [x] ✅ **COMPLETED** - Add support for URL detection and link facets (October 31, 2025)
 - [ ] Add support for custom feeds
 - [ ] Implement pinned posts support
 - [ ] Add repost functionality with custom text
-- [ ] Add support for mentions (@-mentions) with facets
-- [ ] Add support for URL detection and link facets
 
 ### Error Handling & Resilience  
 - [ ] Improve network error handling and retry logic

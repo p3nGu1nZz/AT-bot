@@ -676,6 +676,106 @@ merge_facets() {
     echo "$all_facets"
 }
 
+# Extract URLs and create link facets for rich text
+# Arguments:
+#   $1 - text content
+# Returns:
+#   JSON array of facets for URLs
+create_url_facets() {
+    local text="$1"
+    local facets="[]"
+    
+    # URL regex pattern - matches http://, https://, and www. URLs
+    # Pattern breakdown:
+    # - https?:// - HTTP or HTTPS protocol
+    # - OR www\. - www prefix
+    # - [^\s<>"']+ - URL characters (not whitespace, angle brackets, quotes)
+    local url_pattern='(https?://[^[:space:]<>"'"'"']+|www\.[^[:space:]<>"'"'"']+)'
+    
+    # Find all URLs in the text
+    local urls
+    urls=$(echo "$text" | grep -oE "$url_pattern" | sort -u)
+    
+    if [ -z "$urls" ]; then
+        echo "[]"
+        return 0
+    fi
+    
+    # Build facets array
+    local facet_items=""
+    local first=true
+    
+    while IFS= read -r url; do
+        [ -z "$url" ] && continue
+        
+        # Normalize URL - add https:// prefix if www. only
+        local normalized_url="$url"
+        if echo "$url" | grep -q '^www\.'; then
+            normalized_url="https://$url"
+        fi
+        
+        # Validate URL format (basic validation)
+        if ! echo "$normalized_url" | grep -qE '^https?://[a-zA-Z0-9]'; then
+            warning "Invalid URL format: $url (skipping)"
+            continue
+        fi
+        
+        # Find all occurrences of this URL in the text
+        local search_pos=0
+        local remaining_text="$text"
+        
+        while [ -n "$remaining_text" ]; do
+            # Find position of URL
+            local before="${remaining_text%%$url*}"
+            if [ "$before" = "$remaining_text" ]; then
+                # No more occurrences
+                break
+            fi
+            
+            # Calculate byte positions (UTF-8 aware)
+            local byte_start=$((search_pos + ${#before}))
+            local byte_end=$((byte_start + ${#url}))
+            
+            # Add facet for this occurrence
+            if [ "$first" = true ]; then
+                first=false
+            else
+                facet_items="$facet_items,"
+            fi
+            
+            # Escape special characters in URL for JSON
+            local escaped_url
+            escaped_url=$(echo "$normalized_url" | sed 's/"/\\"/g')
+            
+            facet_items="$facet_items
+        {
+            \"index\": {
+                \"byteStart\": $byte_start,
+                \"byteEnd\": $byte_end
+            },
+            \"features\": [
+                {
+                    \"\$type\": \"app.bsky.richtext.facet#link\",
+                    \"uri\": \"$escaped_url\"
+                }
+            ]
+        }"
+            
+            # Move past this occurrence
+            search_pos=$byte_end
+            remaining_text="${remaining_text#*$url}"
+        done
+    done <<< "$urls"
+    
+    # Return JSON array
+    if [ -n "$facet_items" ]; then
+        echo "[$facet_items
+    ]"
+    else
+        echo "[]"
+    fi
+}
+
 # Create a post on Bluesky
 # Arguments:
 #   $1 - post text content
@@ -711,11 +811,12 @@ atproto_post() {
     local timestamp
     timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
     
-    # Detect hashtags and mentions, then merge facets
-    local hashtag_facets mention_facets all_facets
+    # Detect hashtags, mentions, and URLs, then merge facets
+    local hashtag_facets mention_facets url_facets all_facets
     hashtag_facets=$(create_hashtag_facets "$text")
     mention_facets=$(create_mention_facets "$text")
-    all_facets=$(merge_facets "$hashtag_facets" "$mention_facets")
+    url_facets=$(create_url_facets "$text")
+    all_facets=$(merge_facets "$hashtag_facets" "$mention_facets" "$url_facets")
     
     local facets_json=""
     if [ "$all_facets" != "[]" ]; then
