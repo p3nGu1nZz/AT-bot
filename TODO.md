@@ -2,15 +2,20 @@
 
 This document tracks pending tasks, improvements, and features for the atproto project. Items are organized by priority and category.
 
-## 🚀 Current Focus: MCP Server Activation (October 31, 2025)
+## 🚀 Current Focus: MCP Publishing & Phase 2 Planning (November 1, 2025)
 
-**Priority Goal**: Get the MCP server operational to accelerate development through AI-assisted workflows.
+**Status**: Phase 1 COMPLETE ✅ | MCP Server OPERATIONAL ✅ | Publishing IN PROGRESS
 
-**Why This Matters**: Once the MCP server is working, we can use it directly in Claude/Copilot conversations to:
-- Test features interactively during development
-- Automate common development tasks
-- Rapidly prototype and validate new functionality
-- Enable true agent-driven development workflows
+**Recent Milestones:**
+- ✅ MCP server fully operational and tested (October 31, 2025)
+- ✅ Critical facet/UTF-8 bugs fixed (November 1, 2025)
+- ✅ Input validation library added (November 1, 2025)
+- ✅ Announcement posted to Bluesky (November 1, 2025)
+
+**Next Steps:**
+- Publish to NPM (requires credentials)
+- Submit to MCP registry
+- Begin Phase 2 features (packaging, automation)
 
 **See Active Todo List Below** for detailed implementation steps.
 
@@ -423,3 +428,34 @@ Phase 2 will focus on:
 - Third-party integrations
 
 *Last updated: October 31, 2025*
+
+## November 1, 2025 - Bug Fixes & Validation Update
+
+### Critical Bug Fixes (November 1, 2025)
+- [x] ✅ **COMPLETED** - Fixed UTF-8 byte position calculation for facets (emojis now work correctly)
+- [x] ✅ **COMPLETED** - Fixed URL detection to support bare domains (github.com/path)
+- [x] ✅ **COMPLETED** - Fixed hashtag facet overlap with URL detection
+- [x] ✅ **COMPLETED** - Successfully posted MCP server announcement to Bluesky
+
+### New Features (November 1, 2025)
+- [x] ✅ **COMPLETED** - Added delete command to CLI (`atproto delete <uri>`)
+- [x] ✅ **COMPLETED** - Created comprehensive input validation library (lib/validation.sh)
+  - 10 validation functions (post text, handles, URIs, DIDs, files, limits, URLs, emails)
+  - 41 passing tests with 100% pass rate
+  - Integrated into main library with improved error messages
+- [x] ✅ **COMPLETED** - Created MCP registry submission guide (mcp-server/docs/MCP_REGISTRY_SUBMISSION.md)
+
+### November 1 Metrics
+- **Git Commits**: 9
+- **New Code**: ~500 lines (validation library)
+- **Tests Added**: 41 (all passing)
+- **Bug Fixes**: 3 critical issues resolved
+- **Features**: 2 major features added
+
+### Publishing Progress
+- ✅ Announcement posted to Bluesky (with proper formatting)
+- ✅ MCP registry submission guide created
+- ⏳ NPM publish (waiting for credentials)
+- ⏳ MCP registry submission (ready to submit)
+
+*Session updated: November 1, 2025*
