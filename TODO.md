@@ -109,7 +109,7 @@ This document tracks pending tasks, improvements, and features for the atproto p
 - [x] ✅ **COMPLETED** - Implement graceful handling of API rate limits (429 detection with exponential backoff) (October 31, 2025)
 - [x] ✅ **COMPLETED** - Add connection timeout configuration (30s default) (October 31, 2025)
 - [x] ✅ **COMPLETED** - Better error messages for common failure scenarios (HTTP status codes) (October 31, 2025)
-- [ ] Add better validation for user inputs
+- [x] ✅ **COMPLETED** - Add better validation for user inputs (November 1, 2025)
 - [ ] Add debug mode for troubleshooting (`--debug` flag)
 
 ## User Experience
