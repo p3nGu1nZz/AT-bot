@@ -57,6 +57,7 @@ Commands:
     reply <uri> <text>  Reply to a post
     like <uri>          Like a post
     repost <uri>        Repost a post
+    quote <uri> <text>  Quote post with your own text
     delete <uri>        Delete a post (must be your own post)
     feed [limit]        Read your timeline (default: 10 posts)
     follow <handle>     Follow a user
@@ -102,6 +103,7 @@ Examples:
     atproto reply at://... "Great!"  # Reply to a post
     atproto like at://...            # Like a post
     atproto repost at://...          # Repost a post
+    atproto quote at://... "I agree with this!" # Quote post
     atproto delete at://...          # Delete a post
     atproto feed                     # Read timeline (10 posts)
     atproto feed 20                  # Read timeline (20 posts)
@@ -373,6 +375,17 @@ main() {
                 exit 1
             fi
             atproto_repost "$@"
+            ;;
+        quote)
+            shift
+            if [ -z "$1" ] || [ -z "$2" ]; then
+                error "Post URI and quote text are required"
+                echo "Usage: atproto quote <post-uri> <text>" >&2
+                exit 1
+            fi
+            local uri="$1"
+            shift
+            atproto_quote "$uri" "$*"
             ;;
         delete)
             shift

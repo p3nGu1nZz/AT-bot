@@ -1624,6 +1624,157 @@ EOF
     return 0
 }
 
+# Quote post (repost with custom text)
+#
+# Create a quote post - a new post that embeds the quoted post
+#
+# Arguments:
+#   $1 - post URI to quote
+#   $2 - quote text
+#
+# Returns:
+#   0 - Success, quote post created
+#   1 - Quote failed
+#
+# Environment:
+#   SESSION_FILE - Session with valid access token
+#
+# API:
+#   POST /xrpc/com.atproto.repo.createRecord (app.bsky.feed.post with embed)
+#
+# Example:
+#   atproto_quote "at://did:plc:.../app.bsky.feed.post/abc" "Great point!"
+atproto_quote() {
+    local post_uri="$1"
+    local quote_text="$2"
+    
+    if [ -z "$post_uri" ] || [ -z "$quote_text" ]; then
+        error "Post URI and quote text are required"
+        echo "Usage: atproto quote <post-uri> <text>"
+        return 1
+    fi
+    
+    # Validate quote text
+    if ! validate_post_text "$quote_text"; then
+        return 1
+    fi
+    
+    # Check if logged in
+    if [ ! -f "$SESSION_FILE" ]; then
+        error "Not logged in. Use 'atproto login' first."
+        return 1
+    fi
+    
+    local access_token
+    access_token=$(get_access_token) || {
+        error "Failed to get access token"
+        return 1
+    fi
+    
+    # Get session data for repo
+    local session_data repo
+    session_data=$(cat "$SESSION_FILE")
+    repo=$(json_get_field "$session_data" "did")
+    
+    # Extract DID and rkey from URI
+    local post_did post_rkey
+    post_did=$(echo "$post_uri" | cut -d'/' -f3)
+    post_rkey=$(echo "$post_uri" | awk -F'/' '{print $NF}')
+    
+    # Get post details to get CID
+    info "Fetching quoted post details..."
+    local post_response
+    post_response=$(api_request GET "/xrpc/com.atproto.repo.getRecord?repo=$post_did&collection=app.bsky.feed.post&rkey=$post_rkey" "" "$access_token")
+    
+    if echo "$post_response" | grep -q '"error"'; then
+        error "Failed to fetch quoted post"
+        return 1
+    fi
+    
+    local post_cid
+    post_cid=$(json_get_field "$post_response" "cid")
+    
+    if [ -z "$post_cid" ]; then
+        error "Could not get post CID"
+        return 1
+    fi
+    
+    # Get current timestamp
+    local timestamp
+    timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
+    
+    # Escape text for JSON
+    local escaped_text
+    escaped_text=$(json_escape_string "$quote_text")
+    
+    # Create facets (hashtags, mentions, URLs)
+    local hashtag_facets mention_facets url_facets all_facets
+    hashtag_facets=$(create_hashtag_facets "$quote_text")
+    mention_facets=$(create_mention_facets "$quote_text")
+    url_facets=$(create_url_facets "$quote_text")
+    all_facets=$(merge_facets "$hashtag_facets" "$mention_facets" "$url_facets")
+    
+    # Build facets JSON (empty array if no facets)
+    local facets_json
+    if [ "$all_facets" = "[]" ] || [ -z "$all_facets" ]; then
+        facets_json=""
+    else
+        facets_json=",\"facets\":$all_facets"
+    fi
+    
+    # Create quote post with embed
+    local post_data
+    post_data=$(printf '{
+        "repo": "%s",
+        "collection": "app.bsky.feed.post",
+        "record": {
+            "$type": "app.bsky.feed.post",
+            "text": %s,
+            "embed": {
+                "$type": "app.bsky.embed.record",
+                "record": {
+                    "uri": "%s",
+                    "cid": "%s"
+                }
+            }%s,
+            "createdAt": "%s"
+        }
+    }' "$repo" "$escaped_text" "$post_uri" "$post_cid" "$facets_json" "$timestamp")
+    
+    info "Creating quote post..."
+    
+    local response
+    response=$(api_request POST "/xrpc/com.atproto.repo.createRecord" "$post_data" "$access_token")
+    
+    # Check for errors
+    if echo "$response" | grep -q '"error"'; then
+        local error_msg
+        error_msg=$(json_get_field "$response" "message")
+        error "Quote post failed: ${error_msg:-Unknown error}"
+        return 1
+    fi
+    
+    # Output in requested format
+    if is_json_output; then
+        # JSON output
+        local uri
+        uri=$(json_get_field "$response" "uri")
+        cat << EOF
+{
+  "success": true,
+  "action": "quote",
+  "quoted_uri": "$post_uri",
+  "quote_uri": "$uri"
+}
+EOF
+    else
+        # Text output
+        success "Quote post created successfully!"
+    fi
+    
+    return 0
+}
+
 # Delete a post
 # 
 # Delete a post from Bluesky. Can only delete your own posts.
