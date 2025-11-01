@@ -1,4 +1,8 @@
 import * as vscode from 'vscode';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execPromise = promisify(exec);
 
 export interface AuthCredentials {
     handle: string;
@@ -54,8 +58,22 @@ export class AuthManager {
     }
 
     async isAuthenticated(): Promise<boolean> {
+        // Check if we have stored credentials
         const credentials = await this.getCredentials();
-        return credentials !== null;
+        if (!credentials) {
+            return false;
+        }
+        
+        // Verify the CLI session is still valid
+        try {
+            const { stdout } = await execPromise('atproto whoami', { timeout: 5000 });
+            // If whoami succeeds without error, we're authenticated
+            return stdout.includes('Handle:') || stdout.includes('DID:');
+        } catch (error) {
+            // If whoami fails, clear stored credentials and return false
+            await this.clearCredentials();
+            return false;
+        }
     }
 
     async checkAuthState(): Promise<void> {
@@ -65,24 +83,48 @@ export class AuthManager {
 
     // Method to authenticate with Bluesky using handle and password
     async authenticate(handle: string, password: string): Promise<AuthCredentials> {
-        // This would integrate with the existing atproto CLI authentication
-        // For now, we'll simulate the authentication flow
-        
-        // In a real implementation, this would:
-        // 1. Call the atproto CLI login command or
-        // 2. Make direct API calls to the AT Protocol server
-        // 3. Parse the response and extract tokens
-        
-        // For development, we'll use a placeholder
-        const credentials: AuthCredentials = {
-            handle: handle,
-            accessToken: 'placeholder_access_token',
-            refreshToken: 'placeholder_refresh_token',
-            did: 'did:plc:placeholder'
-        };
+        // Use the atproto CLI for actual authentication
+        try {
+            // Try to find atproto command
+            const atprotoCmd = 'atproto';
+            
+            // Execute login command using environment variables
+            const { stdout, stderr } = await execPromise(
+                `${atprotoCmd} login`,
+                {
+                    env: {
+                        ...process.env,
+                        BLUESKY_HANDLE: handle,
+                        BLUESKY_PASSWORD: password
+                    },
+                    timeout: 10000 // 10 second timeout
+                }
+            );
+            
+            // If login succeeded, get the session info
+            const { stdout: whoamiOutput } = await execPromise(`${atprotoCmd} whoami`, {
+                timeout: 5000
+            });
+            
+            // Parse the whoami output to extract DID
+            const didMatch = whoamiOutput.match(/DID:\s*(\S+)/i);
+            const did = didMatch ? didMatch[1] : 'did:plc:unknown';
+            
+            // Store credentials (CLI manages actual tokens in session file)
+            const credentials: AuthCredentials = {
+                handle: handle,
+                accessToken: 'managed_by_cli',
+                refreshToken: 'managed_by_cli',
+                did: did
+            };
 
-        await this.storeCredentials(credentials);
-        return credentials;
+            await this.storeCredentials(credentials);
+            return credentials;
+            
+        } catch (error: any) {
+            console.error('Authentication failed:', error);
+            throw new Error(`Authentication failed: ${error.message || 'Unknown error'}`);
+        }
     }
 
     // Method to refresh tokens if needed

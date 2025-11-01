@@ -4,6 +4,7 @@
   "description": "AT Protocol/Bluesky integration for AI agents via MCP",
   "version": "0.1.0",
   "publisher": "p3ngu1nzz",
+  "icon": "media/icon.png",
   "engines": {
     "vscode": "^1.96.0"
   },

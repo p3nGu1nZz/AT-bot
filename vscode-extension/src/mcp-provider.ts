@@ -40,29 +40,22 @@ export class AtprotoMcpProvider implements vscode.McpServerDefinitionProvider {
         server: vscode.McpServerDefinition,
         token: vscode.CancellationToken
     ): Promise<vscode.McpServerDefinition> {
-        // Check if user is authenticated
+        // Check if user is authenticated (only check once per resolve)
         const isAuthenticated = await this.authManager.isAuthenticated();
         
         if (!isAuthenticated) {
-            // Prompt for authentication
-            const shouldLogin = await vscode.window.showInformationMessage(
-                'atproto requires authentication to access Bluesky',
-                { modal: true },
-                'Login Now',
-                'Cancel'
+            // Show a non-blocking notification with action
+            const action = await vscode.window.showWarningMessage(
+                'atproto: Please login to Bluesky to use MCP tools',
+                'Login Now'
             );
 
-            if (shouldLogin === 'Login Now') {
+            if (action === 'Login Now') {
                 await vscode.commands.executeCommand('atproto.login');
-                
-                // Check if authentication was successful
-                const isNowAuthenticated = await this.authManager.isAuthenticated();
-                if (!isNowAuthenticated) {
-                    throw new Error('Authentication failed or was cancelled');
-                }
-            } else {
-                throw new Error('Authentication required to use atproto MCP server');
             }
+            
+            // Don't throw - let the MCP server start anyway
+            // Individual tool calls will fail with auth errors if not logged in
         }
 
         return server;
