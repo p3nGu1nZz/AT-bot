@@ -54,6 +54,7 @@ Commands:
     reply <uri> <text>  Reply to a post
     like <uri>          Like a post
     repost <uri>        Repost a post
+    delete <uri>        Delete a post (must be your own post)
     feed [limit]        Read your timeline (default: 10 posts)
     follow <handle>     Follow a user
     unfollow <handle>   Unfollow a user
@@ -95,6 +96,7 @@ Examples:
     atproto reply at://... "Great!"  # Reply to a post
     atproto like at://...            # Like a post
     atproto repost at://...          # Repost a post
+    atproto delete at://...          # Delete a post
     atproto feed                     # Read timeline (10 posts)
     atproto feed 20                  # Read timeline (20 posts)
     atproto --json feed 10           # Read timeline (JSON output)
@@ -352,6 +354,15 @@ main() {
                 exit 1
             fi
             atproto_repost "$@"
+            ;;
+        delete)
+            shift
+            if [ -z "$1" ]; then
+                error "Post URI is required"
+                echo "Usage: atproto delete <post-uri>" >&2
+                exit 1
+            fi
+            atproto_delete "$@"
             ;;
         feed)
             shift

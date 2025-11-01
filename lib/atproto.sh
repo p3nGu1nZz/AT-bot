@@ -1612,6 +1612,99 @@ EOF
     return 0
 }
 
+# Delete a post
+# 
+# Delete a post from Bluesky. Can only delete your own posts.
+#
+# Arguments:
+#   $1 - post URI (at://did:plc:.../app.bsky.feed.post/rkey)
+#
+# Returns:
+#   0 - Success, post deleted
+#   1 - Delete failed (not found, not your post, or API error)
+#
+# Environment:
+#   SESSION_FILE - Session with valid access token
+#
+# API:
+#   POST /xrpc/com.atproto.repo.deleteRecord
+#
+# Example:
+#   atproto_delete "at://did:plc:.../app.bsky.feed.post/3m4ka7pe44y2b"
+atproto_delete() {
+    local post_uri="$1"
+    
+    if [ -z "$post_uri" ]; then
+        error "Post URI is required"
+        echo "Usage: atproto delete <post-uri>"
+        return 1
+    fi
+    
+    # Check if logged in
+    if [ ! -f "$SESSION_FILE" ]; then
+        error "Not logged in. Use 'atproto login' first."
+        return 1
+    fi
+    
+    local access_token
+    access_token=$(get_access_token) || {
+        error "Failed to get access token"
+        return 1
+    }
+    
+    # Get session data for repo
+    local session_data repo
+    session_data=$(cat "$SESSION_FILE")
+    repo=$(json_get_field "$session_data" "did")
+    
+    # Extract DID and rkey from URI
+    # Format: at://did:plc:xxx/app.bsky.feed.post/rkey
+    local post_did post_rkey
+    post_did=$(echo "$post_uri" | cut -d'/' -f3)
+    post_rkey=$(echo "$post_uri" | awk -F'/' '{print $NF}')
+    
+    # Verify it's the user's own post
+    if [ "$post_did" != "$repo" ]; then
+        error "Can only delete your own posts"
+        return 1
+    fi
+    
+    # Create delete request
+    local delete_data
+    delete_data=$(printf '{"repo":"%s","collection":"app.bsky.feed.post","rkey":"%s"}' \
+        "$repo" "$post_rkey")
+    
+    debug "Deleting post: $post_uri"
+    
+    local response
+    response=$(api_request POST "/xrpc/com.atproto.repo.deleteRecord" "$delete_data" "$access_token")
+    
+    # Check for errors
+    if echo "$response" | grep -q '"error"'; then
+        local error_msg
+        error_msg=$(json_get_field "$response" "message")
+        error "Delete failed: ${error_msg:-Unknown error}"
+        return 1
+    fi
+    
+    # Output in requested format
+    if is_json_output; then
+        # JSON output
+        cat << EOF
+{
+  "success": true,
+  "action": "delete",
+  "post_uri": "$post_uri"
+}
+EOF
+    else
+        # Text output
+        success "Post deleted successfully!"
+    fi
+    
+    return 0
+}
+
 # Search for posts
 # 
 # Search Bluesky for posts matching a query string.
