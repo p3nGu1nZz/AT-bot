@@ -62,7 +62,8 @@ This document tracks pending tasks, improvements, and features for the atproto p
 - [ ] Add performance benchmarks for MCP operations
 
 ### MCP Ecosystem Integration
-- [ ] Publish MCP server to package registries
+- [x] ✅ **COMPLETED** - Create MCP registry submission guide (November 1, 2025)
+- [ ] Publish MCP server to package registries (NPM - requires credentials)
 - [ ] Create VS Code Copilot integration guide
 - [ ] Submit to Claude Projects for discovery
 - [ ] Create GitHub-hosted MCP registry entry
@@ -96,6 +97,9 @@ This document tracks pending tasks, improvements, and features for the atproto p
 - [x] ✅ **COMPLETED** - Added get_session_did() helper function for profile operations
 - [x] ✅ **COMPLETED** - Add support for mentions (@-mentions) with facets (October 31, 2025)
 - [x] ✅ **COMPLETED** - Add support for URL detection and link facets (October 31, 2025)
+- [x] ✅ **COMPLETED** - Fixed UTF-8 byte position calculation for facets (November 1, 2025)
+- [x] ✅ **COMPLETED** - Add support for bare domain URLs (github.com/path) (November 1, 2025)
+- [x] ✅ **COMPLETED** - Add delete post functionality (November 1, 2025)
 - [ ] Add support for custom feeds
 - [ ] Implement pinned posts support
 - [ ] Add repost functionality with custom text
@@ -338,7 +342,7 @@ For more details, see [CONTRIBUTING.md](doc/CONTRIBUTING.md).
 
 ---
 
-*Last updated: October 31, 2025*
+*Last updated: November 1, 2025*
 *This is a living document - items may be added, removed, or reprioritized based on community feedback and project evolution.*
 
 ## Phase 1 Completion Summary

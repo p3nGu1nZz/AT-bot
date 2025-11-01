@@ -11,6 +11,7 @@ ENCRYPTION_KEY_FILE="$CONFIG_DIR/.key"
 # Source required libraries
 # shellcheck source=./reporter.sh
 # shellcheck source=./crypt.sh
+# shellcheck source=./validation.sh
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Source reporter library (console display functions)
@@ -26,6 +27,14 @@ if [ -f "$SCRIPT_DIR/crypt.sh" ]; then
     source "$SCRIPT_DIR/crypt.sh"
 else
     echo "Error: crypt.sh not found in $SCRIPT_DIR" >&2
+    exit 1
+fi
+
+# Source validation library
+if [ -f "$SCRIPT_DIR/validation.sh" ]; then
+    source "$SCRIPT_DIR/validation.sh"
+else
+    echo "Error: validation.sh not found in $SCRIPT_DIR" >&2
     exit 1
 fi
 
