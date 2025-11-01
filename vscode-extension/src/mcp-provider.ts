@@ -12,18 +12,8 @@ export class AtprotoMcpProvider implements vscode.McpServerDefinitionProvider {
     ) {}
 
     async provideMcpServerDefinitions(): Promise<vscode.McpServerDefinition[]> {
-        // Use integrated binary approach from the main project
-        const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-        let command = 'atproto';
-        
-        // If we're in development (extension is in workspace), use relative path
-        if (workspaceFolder && 
-            workspaceFolder.uri.fsPath.includes('atproto') &&
-            workspaceFolder.uri.fsPath.includes('vscode-extension')) {
-            // We're in the extension development workspace
-            const projectRoot = path.dirname(workspaceFolder.uri.fsPath);
-            command = path.join(projectRoot, 'bin', 'atproto');
-        }
+        // Find the atproto binary
+        let command = await this.findAtprotoCommand();
 
         return [{
             label: 'atproto (AT Protocol)',
@@ -34,6 +24,56 @@ export class AtprotoMcpProvider implements vscode.McpServerDefinitionProvider {
                 MCP_LOG_LEVEL: vscode.workspace.getConfiguration('atproto').get('debugMode', false) ? 'debug' : 'info'
             }
         }];
+    }
+
+    private async findAtprotoCommand(): Promise<string> {
+        const { exec } = require('child_process');
+        const { promisify } = require('util');
+        const execPromise = promisify(exec);
+        
+        // Try multiple locations in order of preference
+        const locations = [
+            '/usr/local/bin/atproto',           // Standard installation
+            '/usr/bin/atproto',                 // Alternative installation
+            process.env.HOME + '/.local/bin/atproto',  // User installation
+        ];
+
+        // Check if we're in the development workspace
+        const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+        if (workspaceFolder) {
+            const wsPath = workspaceFolder.uri.fsPath;
+            // If workspace is the atproto project, use the bin/ directory
+            if (wsPath.includes('atproto')) {
+                const devPath = path.join(wsPath, 'bin', 'atproto');
+                locations.unshift(devPath);  // Highest priority
+            }
+        }
+
+        // Try each location
+        for (const location of locations) {
+            try {
+                const fs = require('fs');
+                if (fs.existsSync(location)) {
+                    return location;
+                }
+            } catch (error) {
+                // Continue to next location
+            }
+        }
+
+        // Fallback: try to find in PATH
+        try {
+            const { stdout } = await execPromise('which atproto');
+            const pathLocation = stdout.trim();
+            if (pathLocation) {
+                return pathLocation;
+            }
+        } catch (error) {
+            // Not in PATH
+        }
+
+        // Last resort: assume it's in PATH and let the system find it
+        return 'atproto';
     }
 
     async resolveMcpServerDefinition(
