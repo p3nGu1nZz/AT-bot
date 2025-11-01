@@ -619,9 +619,9 @@ create_hashtag_facets() {
                 break
             fi
             
-            # Calculate byte positions (UTF-8 aware)
-            local byte_start=$((search_pos + ${#before}))
-            local byte_end=$((byte_start + ${#hashtag}))
+            # Calculate byte positions (UTF-8 aware using printf and wc)
+            local byte_start=$(printf '%s' "${text:0:$((search_pos + ${#before}))}" | wc -c | tr -d ' ')
+            local byte_end=$(printf '%s' "${text:0:$((search_pos + ${#before} + ${#hashtag}))}" | wc -c | tr -d ' ')
             
             # Add facet for this occurrence
             if [ "$first" = true ]; then
@@ -741,9 +741,9 @@ create_mention_facets() {
                 break
             fi
             
-            # Calculate byte positions (UTF-8 aware)
-            local byte_start=$((search_pos + ${#before}))
-            local byte_end=$((byte_start + ${#mention}))
+            # Calculate byte positions (UTF-8 aware using printf and wc)
+            local byte_start=$(printf '%s' "${text:0:$((search_pos + ${#before}))}" | wc -c | tr -d ' ')
+            local byte_end=$(printf '%s' "${text:0:$((search_pos + ${#before} + ${#mention}))}" | wc -c | tr -d ' ')
             
             # Add facet for this occurrence
             if [ "$first" = true ]; then
@@ -871,9 +871,9 @@ create_url_facets() {
                 break
             fi
             
-            # Calculate byte positions (UTF-8 aware)
-            local byte_start=$((search_pos + ${#before}))
-            local byte_end=$((byte_start + ${#url}))
+            # Calculate byte positions (UTF-8 aware using printf and wc)
+            local byte_start=$(printf '%s' "${text:0:$((search_pos + ${#before}))}" | wc -c | tr -d ' ')
+            local byte_end=$(printf '%s' "${text:0:$((search_pos + ${#before} + ${#url}))}" | wc -c | tr -d ' ')
             
             # Add facet for this occurrence
             if [ "$first" = true ]; then
