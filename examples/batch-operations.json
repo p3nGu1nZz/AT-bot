@@ -1,0 +1,18 @@
+{
+  "posts": [
+    {
+      "text": "🚀 Announcing atproto v0.4.0 with batch operations! Now you can automate multiple actions efficiently. #opensource #bluesky"
+    },
+    {
+      "text": "New feature spotlight: Batch operations allow you to post, follow, and like in bulk. Perfect for automation and content management. 🎯"
+    },
+    {
+      "text": "Check out the new batch_post, batch_follow, and batch_like tools in the MCP server. Full documentation at github.com/p3nGu1nZz/atproto 📚"
+    }
+  ],
+  "follows": [
+    "bsky.app",
+    "atproto.com"
+  ],
+  "likes": []
+}

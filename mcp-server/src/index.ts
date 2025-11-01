@@ -21,6 +21,7 @@ import { engagementTools } from './tools/engagement-tools.js';
 import { socialTools } from './tools/social-tools.js';
 import { searchTools } from './tools/search-tools.js';
 import { mediaTools } from './tools/media-tools.js';
+import { batchTools } from './tools/batch-tools.js';
 import { executeShellCommand } from './lib/shell-executor.js';
 
 /**
@@ -54,6 +55,7 @@ class ATBotMCPServer {
       ...socialTools,
       ...searchTools,
       ...mediaTools,
+      ...batchTools,
     ];
     
     this.tools = new Map(allTools.map(tool => [tool.name, tool]));
