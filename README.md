@@ -1,5 +1,9 @@
 # atproto - AT Protocol CLI & VS Code Extension
 
+[![npm version](https://img.shields.io/npm/v/@atproto/mcp-server.svg)](https://www.npmjs.com/package/@atproto/mcp-server)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/node/v/@atproto/mcp-server.svg)](https://nodejs.org)
+
 A simple but powerful CLI tool, MCP server, and VS Code extension for Bluesky/AT Protocol automation, designed for both traditional users and AI agents.
 
 ## Overview
@@ -218,9 +222,97 @@ Configuration is stored in `~/.config/atproto/config.json` and can be overridden
 
 ## MCP Server for AI Agents
 
-atproto includes a Model Context Protocol (MCP) server that exposes 29 tools for AI agents like GitHub Copilot and Claude.
+atproto includes a Model Context Protocol (MCP) server that exposes 34 tools for AI agents like GitHub Copilot, Claude Desktop, and other MCP-compatible applications.
 
-### Quick Start with GitHub Copilot
+### Installation Options
+
+**Option 1: npm (Easiest)**
+```bash
+npm install -g @atproto/mcp-server
+```
+
+**Option 2: From Source (Recommended for development)**
+```bash
+git clone https://github.com/p3nGu1nZz/atproto.git
+cd atproto
+sudo ./install.sh --mcp
+```
+
+### Quick Start with Claude Desktop
+
+Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "atproto": {
+      "command": "atproto-mcp-server"
+    }
+  }
+}
+```
+
+Restart Claude Desktop and you'll have access to all atproto tools!
+
+**📖 Full Guide:** [docs/integrations/CLAUDE_DESKTOP.md](mcp-server/docs/integrations/CLAUDE_DESKTOP.md)
+
+### Quick Start with VS Code Copilot
+
+Add to your VS Code settings (`.vscode/settings.json` or user settings):
+
+```json
+{
+  "github.copilot.advanced": {
+    "mcp.servers": {
+      "atproto": {
+        "command": "atproto-mcp-server"
+      }
+    }
+  }
+}
+```
+
+Reload VS Code and ask Copilot to interact with Bluesky!
+
+**📖 Full Guide:** [docs/integrations/VSCODE_COPILOT.md](mcp-server/docs/integrations/VSCODE_COPILOT.md)
+
+### Available MCP Tools (34 total)
+
+The MCP server provides these categories of tools:
+
+- **Authentication (4):** login, logout, whoami, is_authenticated
+- **Content (5):** create post, reply, like, repost, delete
+- **Feed (4):** read feed, search, timeline, notifications
+- **Profile (4):** get profile, follow, unfollow, block
+- **Social (6):** follow/unfollow user, block/unblock, get followers/following
+- **Search (3):** search posts, users, timeline
+- **Batch (5):** batch post, follow, unfollow, like, from file
+- **Engagement (3):** like, repost, delete post
+
+**📖 Complete Tool Documentation:** [mcp-server/docs/MCP_TOOLS.md](mcp-server/docs/MCP_TOOLS.md)
+
+### Usage Examples
+
+**With Claude Desktop:**
+```
+Can you post "Hello from AI! 🤖 #atprotocol" to my Bluesky account?
+```
+
+**With VS Code Copilot:**
+```
+@workspace Search Bluesky for posts about "MCP" and summarize the top 5
+```
+
+**With GitHub Actions:**
+```yaml
+- name: Post Release
+  run: |
+    npm install -g @atproto/mcp-server
+    atproto login
+    atproto post "🚀 New release v${{ github.ref_name }} is live!"
+```
+
+### Quick Start with GitHub Copilot (Legacy)
 
 1. **Install with MCP support:**
    ```bash
