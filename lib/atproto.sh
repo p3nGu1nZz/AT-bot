@@ -153,17 +153,129 @@ api_request() {
     local auth_header="${4:-}"
     
     local url="${ATP_PDS}${endpoint}"
-    local curl_opts=(-s -X "$method")
     
-    if [ -n "$data" ]; then
-        curl_opts+=(-H "Content-Type: application/json" -d "$data")
-    fi
+    # Retry configuration
+    local max_retries=3
+    local retry_delay=1
+    local attempt=1
     
-    if [ -n "$auth_header" ]; then
-        curl_opts+=(-H "Authorization: Bearer $auth_header")
-    fi
+    # Timeout configuration (in seconds)
+    local timeout=30
     
-    curl "${curl_opts[@]}" "$url"
+    while [ $attempt -le $max_retries ]; do
+        debug "API request attempt $attempt/$max_retries: $method $endpoint"
+        
+        # Build curl options
+        local curl_opts=(-s -w '\n%{http_code}' --max-time "$timeout" -X "$method")
+        
+        if [ -n "$data" ]; then
+            curl_opts+=(-H "Content-Type: application/json" -d "$data")
+        fi
+        
+        if [ -n "$auth_header" ]; then
+            curl_opts+=(-H "Authorization: Bearer $auth_header")
+        fi
+        
+        # Make the request and capture both response body and HTTP code
+        local response
+        response=$(curl "${curl_opts[@]}" "$url" 2>&1)
+        local curl_exit_code=$?
+        
+        # Extract HTTP code from last line
+        local http_code
+        http_code=$(echo "$response" | tail -n1)
+        local response_body
+        response_body=$(echo "$response" | head -n-1)
+        
+        # Check curl exit code
+        if [ $curl_exit_code -ne 0 ]; then
+            warning "Network error (attempt $attempt/$max_retries): curl exit code $curl_exit_code"
+            
+            if [ $attempt -lt $max_retries ]; then
+                warning "Retrying in ${retry_delay}s..."
+                sleep "$retry_delay"
+                retry_delay=$((retry_delay * 2))  # Exponential backoff
+                attempt=$((attempt + 1))
+                continue
+            else
+                error "Network error: Failed after $max_retries attempts"
+                echo '{"error":"NetworkError","message":"Failed to connect to AT Protocol server"}'
+                return 1
+            fi
+        fi
+        
+        # Check HTTP status code
+        case "$http_code" in
+            200|201|202)
+                # Success
+                echo "$response_body"
+                return 0
+                ;;
+            400)
+                error "Bad Request (400): Invalid request parameters"
+                echo "$response_body"
+                return 1
+                ;;
+            401)
+                error "Unauthorized (401): Session expired or invalid credentials"
+                echo "$response_body"
+                return 1
+                ;;
+            403)
+                error "Forbidden (403): Access denied"
+                echo "$response_body"
+                return 1
+                ;;
+            404)
+                error "Not Found (404): Resource not found"
+                echo "$response_body"
+                return 1
+                ;;
+            429)
+                # Rate limited - retry with backoff
+                warning "Rate Limited (429): Too many requests (attempt $attempt/$max_retries)"
+                
+                if [ $attempt -lt $max_retries ]; then
+                    local wait_time=$((retry_delay * 2))
+                    warning "Waiting ${wait_time}s before retry..."
+                    sleep "$wait_time"
+                    retry_delay=$((retry_delay * 2))  # Exponential backoff
+                    attempt=$((attempt + 1))
+                    continue
+                else
+                    error "Rate limit exceeded: Failed after $max_retries attempts"
+                    echo '{"error":"RateLimitError","message":"Too many requests. Please try again later."}'
+                    return 1
+                fi
+                ;;
+            500|502|503|504)
+                # Server error - retry
+                warning "Server Error ($http_code): AT Protocol server error (attempt $attempt/$max_retries)"
+                
+                if [ $attempt -lt $max_retries ]; then
+                    warning "Retrying in ${retry_delay}s..."
+                    sleep "$retry_delay"
+                    retry_delay=$((retry_delay * 2))  # Exponential backoff
+                    attempt=$((attempt + 1))
+                    continue
+                else
+                    error "Server error: Failed after $max_retries attempts"
+                    echo "$response_body"
+                    return 1
+                fi
+                ;;
+            *)
+                # Unknown error
+                error "HTTP Error ($http_code): Unexpected response"
+                echo "$response_body"
+                return 1
+                ;;
+        esac
+    done
+    
+    # Should never reach here
+    error "API request failed unexpectedly"
+    return 1
 }
 
 # Extract JSON field value (simple implementation, works for flat JSON)

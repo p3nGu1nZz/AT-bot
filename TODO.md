@@ -101,11 +101,11 @@ This document tracks pending tasks, improvements, and features for the atproto p
 - [ ] Add repost functionality with custom text
 
 ### Error Handling & Resilience  
-- [ ] Improve network error handling and retry logic
+- [x] ✅ **COMPLETED** - Improve network error handling and retry logic (October 31, 2025)
+- [x] ✅ **COMPLETED** - Implement graceful handling of API rate limits (429 detection with exponential backoff) (October 31, 2025)
+- [x] ✅ **COMPLETED** - Add connection timeout configuration (30s default) (October 31, 2025)
+- [x] ✅ **COMPLETED** - Better error messages for common failure scenarios (HTTP status codes) (October 31, 2025)
 - [ ] Add better validation for user inputs
-- [ ] Implement graceful handling of API rate limits
-- [ ] Add connection timeout configuration
-- [ ] Better error messages for common failure scenarios
 - [ ] Add debug mode for troubleshooting (`--debug` flag)
 
 ## User Experience
