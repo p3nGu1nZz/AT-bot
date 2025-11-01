@@ -1024,7 +1024,24 @@ EOF
         return 1
     fi
     
-    success "Successfully followed: $target"
+    # Output in requested format
+    if is_json_output; then
+        # JSON output
+        local uri
+        uri=$(json_get_field "$response" "uri")
+        cat << EOF
+{
+  "success": true,
+  "action": "follow",
+  "target": "$target",
+  "uri": "$uri"
+}
+EOF
+    else
+        # Text output
+        success "Successfully followed: $target"
+    fi
+    
     return 0
 }
 
@@ -1243,7 +1260,24 @@ EOF
         return 1
     fi
     
-    success "Post liked successfully!"
+    # Output in requested format
+    if is_json_output; then
+        # JSON output
+        local uri
+        uri=$(json_get_field "$response" "uri")
+        cat << EOF
+{
+  "success": true,
+  "action": "like",
+  "post_uri": "$post_uri",
+  "like_uri": "$uri"
+}
+EOF
+    else
+        # Text output
+        success "Post liked successfully!"
+    fi
+    
     return 0
 }
 
@@ -1341,7 +1375,24 @@ EOF
         return 1
     fi
     
-    success "Post reposted successfully!"
+    # Output in requested format
+    if is_json_output; then
+        # JSON output
+        local uri
+        uri=$(json_get_field "$response" "uri")
+        cat << EOF
+{
+  "success": true,
+  "action": "repost",
+  "post_uri": "$post_uri",
+  "repost_uri": "$uri"
+}
+EOF
+    else
+        # Text output
+        success "Post reposted successfully!"
+    fi
+    
     return 0
 }
 
@@ -1798,6 +1849,14 @@ atproto_show_profile() {
         return 1
     fi
     
+    # Output in requested format
+    if is_json_output; then
+        # JSON output - return raw profile data
+        echo "$profile_json"
+        return 0
+    fi
+    
+    # Text output - human-readable format
     # Extract profile fields
     local handle display_name description followers following posts
     local created_at indexed_at lists feedgens starter_packs did
@@ -2056,6 +2115,14 @@ atproto_get_followers() {
         return 1
     fi
     
+    # Output in requested format
+    if is_json_output; then
+        # JSON output - return raw API response
+        echo "$response"
+        return 0
+    fi
+    
+    # Text output - human-readable format
     # Parse and display followers
     echo ""
     echo -e "${BLUE}Followers${NC}"
@@ -2146,6 +2213,14 @@ atproto_get_following() {
         return 1
     fi
     
+    # Output in requested format
+    if is_json_output; then
+        # JSON output - return raw API response
+        echo "$response"
+        return 0
+    fi
+    
+    # Text output - human-readable format
     # Parse and display following
     echo ""
     echo -e "${BLUE}Following${NC}"

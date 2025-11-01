@@ -42,7 +42,7 @@ This document tracks pending tasks, improvements, and features for the atproto p
 - [x] ✅ **COMPLETED** - Test MCP server integration with Claude Desktop/VS Code (October 31, 2025)
 - [x] ✅ **COMPLETED** - Verify post creation and other tools via MCP (October 31, 2025)
 - [x] ✅ **COMPLETED** - Add batch operation support (batch_post, batch_follow, batch_schedule) (October 31, 2025)
-- [ ] Add MCP server logging and debugging capabilities
+- [x] ✅ **COMPLETED** - Add MCP server logging and debugging capabilities (October 31, 2025)
 - [ ] Add error recovery and retry logic for shell commands
 - [ ] Implement MCP server health check endpoint
 
@@ -112,9 +112,9 @@ This document tracks pending tasks, improvements, and features for the atproto p
 
 ### CLI Interface
 - [x] ✅ **COMPLETED** - Add bash/zsh completion scripts
+- [x] ✅ **COMPLETED** - Support for output formatting options (JSON via --json flag) - October 31, 2025
 - [ ] Implement interactive mode for complex operations
 - [ ] Add configuration file support for user preferences
-- [ ] Support for output formatting options (JSON, table, etc.)
 - [ ] Add progress indicators for long-running operations
 - [ ] Implement `--quiet` and `--verbose` flags
 - [ ] Add color output configuration options

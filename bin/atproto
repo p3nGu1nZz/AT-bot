@@ -39,7 +39,11 @@ show_help() {
     cat << EOF
 atproto - A simple CLI tool for Bluesky AT Protocol automation
 
-Usage: atproto [COMMAND] [OPTIONS]
+Usage: atproto [OPTIONS] [COMMAND] [ARGS...]
+
+Global Options:
+    --json              Output in JSON format (machine-readable)
+    --text              Output in text format (human-readable, default)
 
 Commands:
     login               Login to your Bluesky account
@@ -85,6 +89,7 @@ Options:
 Examples:
     atproto login                    # Interactive login
     atproto whoami                   # Check current user
+    atproto --json whoami            # Check current user (JSON output)
     atproto post "Hello Bluesky!"    # Create a post
     atproto post --image photo.jpg "Check this out!"  # Post with image
     atproto reply at://... "Great!"  # Reply to a post
@@ -92,15 +97,19 @@ Examples:
     atproto repost at://...          # Repost a post
     atproto feed                     # Read timeline (10 posts)
     atproto feed 20                  # Read timeline (20 posts)
+    atproto --json feed 10           # Read timeline (JSON output)
     atproto follow user.bsky.social  # Follow a user
     atproto unfollow user.bsky.social # Unfollow a user
     atproto followers                # View your followers
     atproto followers user.bsky.social # View another user's followers
+    atproto --json followers 50      # View followers (JSON, limit 50)
     atproto following                # View who you follow
     atproto following user.bsky.social 100 # View who another user follows (limit 100)
     atproto search "bluesky" 20      # Search for posts
+    atproto --json search "bluesky"  # Search for posts (JSON output)
     atproto profile                  # View your profile
     atproto profile user.bsky.social # View another user's profile
+    atproto --json profile alice.bsky.social # View profile (JSON output)
     atproto profile-edit --name "My Name" --bio "My bio"  # Update profile
     atproto profile-edit --avatar avatar.png --banner banner.jpg  # Update images
     atproto refresh                  # Refresh session
@@ -231,6 +240,24 @@ show_version() {    # Set up environment for MCP server
 main() {
     # Ensure config directory exists
     mkdir -p "$CONFIG_DIR"
+    
+    # Parse global flags before command
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --json)
+                export ATP_OUTPUT_FORMAT="json"
+                shift
+                ;;
+            --text)
+                export ATP_OUTPUT_FORMAT="text"
+                shift
+                ;;
+            *)
+                # Not a global flag, break to process command
+                break
+                ;;
+        esac
+    done
     
     # Parse command
     case "${1:-help}" in

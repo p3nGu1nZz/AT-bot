@@ -23,6 +23,7 @@ import { searchTools } from './tools/search-tools.js';
 import { mediaTools } from './tools/media-tools.js';
 import { batchTools } from './tools/batch-tools.js';
 import { executeShellCommand } from './lib/shell-executor.js';
+import { logger } from './lib/logger.js';
 
 /**
  * atproto MCP Server
@@ -60,6 +61,11 @@ class ATBotMCPServer {
     
     this.tools = new Map(allTools.map(tool => [tool.name, tool]));
 
+    logger.info('MCP Server initialized', {
+      toolCount: this.tools.size,
+      tools: Array.from(this.tools.keys()),
+    });
+
     this.setupHandlers();
   }
 
@@ -74,15 +80,30 @@ class ATBotMCPServer {
 
     // Execute tool
     this.server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
-      const tool = this.tools.get(request.params.name);
+      const toolName = request.params.name;
+      const tool = this.tools.get(toolName);
+      
+      logger.debug('Tool execution requested', {
+        tool: toolName,
+        arguments: request.params.arguments,
+      });
       
       if (!tool) {
-        throw new Error(`Unknown tool: ${request.params.name}`);
+        logger.error('Unknown tool requested', { tool: toolName });
+        throw new Error(`Unknown tool: ${toolName}`);
       }
 
       try {
+        const startTime = Date.now();
+        
         // Execute the tool by calling the atproto CLI
         const result = await tool.handler(request.params.arguments);
+        
+        const duration = Date.now() - startTime;
+        logger.info('Tool executed successfully', {
+          tool: toolName,
+          duration: `${duration}ms`,
+        });
         
         return {
           content: [
@@ -93,6 +114,11 @@ class ATBotMCPServer {
           ],
         };
       } catch (error) {
+        logger.error('Tool execution failed', {
+          tool: toolName,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        
         return {
           content: [
             {
@@ -113,6 +139,11 @@ class ATBotMCPServer {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
     
+    logger.info('MCP Server started successfully', {
+      toolCount: this.tools.size,
+      logLevel: process.env.MCP_LOG_LEVEL || 'INFO',
+    });
+    
     // Log to stderr (stdout is reserved for MCP protocol)
     console.error('atproto MCP Server started successfully');
     console.error(`Registered ${this.tools.size} tools`);
@@ -122,6 +153,7 @@ class ATBotMCPServer {
 // Start server
 const server = new ATBotMCPServer();
 server.start().catch((error) => {
+  logger.error('Failed to start server', { error: error.message });
   console.error('Failed to start server:', error);
   process.exit(1);
 });
